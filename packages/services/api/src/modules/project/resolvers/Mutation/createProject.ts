@@ -8,6 +8,8 @@ import { TargetManager } from '../../../target/providers/target-manager';
 import { ProjectManager } from '../../providers/project-manager';
 import { ProjectSlugModel } from '../../validation';
 import type { MutationResolvers } from './../../../../__generated__/types.next';
+import { AuthManager } from '../../../auth/providers/auth-manager';
+import { AuditLogManager } from '../../../audit-logs/providers/audit-logs-manager';
 
 export const createProject: NonNullable<MutationResolvers['createProject']> = async (
   _,
@@ -85,6 +87,23 @@ export const createProject: NonNullable<MutationResolvers['createProject']> = as
       logger.error('Failed to create a target: ' + result.message);
     }
   }
+
+  const currentUser = await injector.get(AuthManager).getCurrentUser();
+  injector.get(AuditLogManager).createLogAuditEvent(
+    {
+      eventType: 'PROJECT_CREATED',
+      projectCreatedAuditLogSchema: {
+        projectId: result.project.id,
+        projectName: result.project.name,
+      },
+    },
+    {
+      organizationId: organization.id,
+      userEmail: currentUser.email,
+      userId: currentUser.id,
+      user: currentUser,
+    },
+  );
 
   return {
     ok: {
