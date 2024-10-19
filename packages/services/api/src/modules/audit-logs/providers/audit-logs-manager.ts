@@ -101,22 +101,21 @@ export class AuditLogManager {
       throw new Error('Organization ID is required');
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-    const sqlLimit = sql.raw(props.pagination?.limit?.toString()!);
+    const sqlLimit = sql.raw(props.pagination?.limit?.toString() ?? '25');
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-    const sqlOffset = sql.raw(props.pagination?.offset?.toString()!);
+    const sqlOffset = sql.raw(props.pagination?.offset?.toString() ?? '0');
 
     let where: SqlValue[] = [];
     where.push(sql`organization_id = ${props.selector.organization}`);
 
-    if (props.filter) {
-      if (props.filter?.userId) {
-        where.push(sql`user_id = ${props.filter.userId}`);
-      }
-      if (props.filter?.startDate && props.filter?.endDate) {
-        const from = formatToClickhouseDateTime(props.filter.startDate.toISOString());
-        const to = formatToClickhouseDateTime(props.filter.endDate.toISOString());
-        where.push(sql`event_time >= ${from} AND event_time <= ${to}`);
-      }
+    if (props.filter?.userId) {
+      where.push(sql`user_id = ${props.filter.userId}`);
+    }
+
+    if (props.filter?.startDate && props.filter?.endDate) {
+      const from = formatToClickhouseDateTime(props.filter.startDate.toISOString());
+      const to = formatToClickhouseDateTime(props.filter.endDate.toISOString());
+      where.push(sql`event_time >= ${from} AND event_time <= ${to}`);
     }
 
     const whereClause = where.length > 0 ? sql`WHERE ${sql.join(where, ' AND ')}` : sql``;

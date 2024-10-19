@@ -32,12 +32,12 @@ export const createOrganization: NonNullable<MutationResolvers['createOrganizati
       {
         eventType: 'ORGANIZATION_CREATED',
         organizationCreatedAuditLogSchema: {
-          organizationId: result.id,
-          organizationName: result.name,
+          organizationId: result.organization.id,
+          organizationName: result.organization.name,
         },
       },
       {
-        organizationId: result.id,
+        organizationId: result.organization.id,
         userEmail: user.email,
         userId: user.id,
         user: user,

@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { Target } from '../../../../shared/entities';
 import { assertOk } from '../../../../shared/helpers';
+import { AuditLogManager } from '../../../audit-logs/providers/audit-logs-manager';
+import { AuthManager } from '../../../auth/providers/auth-manager';
 import { OrganizationManager } from '../../../organization/providers/organization-manager';
 import { IdTranslator } from '../../../shared/providers/id-translator';
 import { Logger } from '../../../shared/providers/logger';
@@ -8,8 +10,6 @@ import { TargetManager } from '../../../target/providers/target-manager';
 import { ProjectManager } from '../../providers/project-manager';
 import { ProjectSlugModel } from '../../validation';
 import type { MutationResolvers } from './../../../../__generated__/types.next';
-import { AuthManager } from '../../../auth/providers/auth-manager';
-import { AuditLogManager } from '../../../audit-logs/providers/audit-logs-manager';
 
 export const createProject: NonNullable<MutationResolvers['createProject']> = async (
   _,
