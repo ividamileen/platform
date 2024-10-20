@@ -57,7 +57,7 @@ export const updateTargetSlug: NonNullable<MutationResolvers['updateTargetSlug']
           projectId: projectId,
           targetId: targetId,
           updatedFields: JSON.stringify({
-            newName: input.name,
+            newName: input.slug,
           }),
         },
       },
