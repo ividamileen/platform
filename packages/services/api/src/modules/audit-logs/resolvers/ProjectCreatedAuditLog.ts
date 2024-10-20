@@ -15,5 +15,6 @@ export const ProjectCreatedAuditLog: ProjectCreatedAuditLogResolvers = {
   eventTime: e => new Date(e.event_time).toISOString(),
   projectId: e => e.metadata.projectCreatedAuditLogSchema.projectId,
   projectName: e => e.metadata.projectCreatedAuditLogSchema.projectName,
+  projectType: e => e.metadata.projectCreatedAuditLogSchema.projectType,
   record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
 };

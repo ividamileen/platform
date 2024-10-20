@@ -78,22 +78,13 @@ export const createProject: NonNullable<MutationResolvers['createProject']> = as
     }),
   ]);
 
-  const logger = injector.get(Logger);
-  const targets: Target[] = [];
-  for (const result of targetResults) {
-    if (result.ok) {
-      targets.push(result.target);
-    } else {
-      logger.error('Failed to create a target: ' + result.message);
-    }
-  }
-
   const currentUser = await injector.get(AuthManager).getCurrentUser();
   injector.get(AuditLogManager).createLogAuditEvent(
     {
       eventType: 'PROJECT_CREATED',
       projectCreatedAuditLogSchema: {
         projectId: result.project.id,
+        projectType: result.project.type,
         projectName: result.project.name,
       },
     },
@@ -104,6 +95,16 @@ export const createProject: NonNullable<MutationResolvers['createProject']> = as
       user: currentUser,
     },
   );
+
+  const logger = injector.get(Logger);
+  const targets: Target[] = [];
+  for (const result of targetResults) {
+    if (result.ok) {
+      targets.push(result.target);
+    } else {
+      logger.error('Failed to create a target: ' + result.message);
+    }
+  }
 
   return {
     ok: {

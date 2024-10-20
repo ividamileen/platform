@@ -106,6 +106,7 @@ export const typeDefs = gql`
     eventTime: DateTime!
     record: AuditLogIdRecord!
     projectId: String!
+    projectType: String!
     projectName: String!
   }
 

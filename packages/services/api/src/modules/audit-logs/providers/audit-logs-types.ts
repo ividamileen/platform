@@ -190,6 +190,7 @@ const subscriptionCanceledAuditLogSchema = z.object({
 const projectCreatedAuditLogSchema = z.object({
   projectId: z.string(),
   projectName: z.string(),
+  projectType: z.string(),
 });
 
 const projectSettingsUpdatedAuditLogSchema = z.object({
