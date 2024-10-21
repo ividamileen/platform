@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { SubscriptionCanceledAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -15,5 +15,5 @@ export const SubscriptionCanceledAuditLog: SubscriptionCanceledAuditLogResolvers
   eventTime: e => new Date(e.event_time).toISOString(),
   newPlan: e => e.metadata.subscriptionCanceledAuditLogSchema.newPlan,
   previousPlan: e => e.metadata.subscriptionCanceledAuditLogSchema.previousPlan,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

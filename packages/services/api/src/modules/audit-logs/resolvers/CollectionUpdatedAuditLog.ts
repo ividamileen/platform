@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { CollectionUpdatedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -16,5 +16,5 @@ export const CollectionUpdatedAuditLog: CollectionUpdatedAuditLogResolvers = {
   collectionId: e => e.metadata.collectionUpdatedAuditLogSchema.collectionId,
   updatedFields: e => e.metadata.collectionUpdatedAuditLogSchema.updatedFields,
   collectionName: e => e.metadata.collectionUpdatedAuditLogSchema.collectionName,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

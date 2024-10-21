@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { SubscriptionCreatedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -17,5 +17,5 @@ export const SubscriptionCreatedAuditLog: SubscriptionCreatedAuditLogResolvers =
   operations: e => e.metadata.subscriptionCreatedAuditLogSchema.operations,
   paymentMethodId: e => e.metadata.subscriptionCreatedAuditLogSchema.paymentMethodId,
   previousPlan: e => e.metadata.subscriptionCreatedAuditLogSchema.previousPlan,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

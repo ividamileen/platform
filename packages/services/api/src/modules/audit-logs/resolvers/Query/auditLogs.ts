@@ -14,8 +14,11 @@ export const auditLogs: NonNullable<QueryResolvers['auditLogs']> = async (_paren
   const { selector, filter, pagination } = args;
   const auditLogs = await ctx.injector.get(AuditLogManager).getPaginatedAuditLogs({
     selector: selector,
-    filter: filter,
-    pagination: pagination,
+    filter: filter as any,
+    pagination: {
+      limit: pagination?.limit ? pagination.limit : 25,
+      offset: pagination?.offset ? pagination.offset : 0,
+    },
   });
 
   return {

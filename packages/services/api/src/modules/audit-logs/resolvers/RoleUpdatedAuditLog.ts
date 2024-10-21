@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { RoleUpdatedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -16,5 +16,5 @@ export const RoleUpdatedAuditLog: RoleUpdatedAuditLogResolvers = {
   roleId: e => e.metadata.roleUpdatedAuditLogSchema.roleId,
   updatedFields: e => e.metadata.roleUpdatedAuditLogSchema.updatedFields,
   roleName: e => e.metadata.roleUpdatedAuditLogSchema.roleName,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

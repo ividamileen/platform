@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { OperationInDocumentCollectionDeletedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -18,5 +18,6 @@ export const OperationInDocumentCollectionDeletedAuditLog: OperationInDocumentCo
     collectionName: e =>
       e.metadata.operationInDocumentCollectionDeletedAuditLogSchema.collectionName,
     operationId: e => e.metadata.operationInDocumentCollectionDeletedAuditLogSchema.operationId,
-    record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+    record: (e, _, { injector }) =>
+      injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
   };

@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { UserRemovedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -15,5 +15,5 @@ export const UserRemovedAuditLog: UserRemovedAuditLogResolvers = {
   eventTime: e => new Date(e.event_time).toISOString(),
   removedUserEmail: e => e.metadata.userRemovedAuditLogSchema.removedUserEmail,
   removedUserId: e => e.metadata.userRemovedAuditLogSchema.removedUserId,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

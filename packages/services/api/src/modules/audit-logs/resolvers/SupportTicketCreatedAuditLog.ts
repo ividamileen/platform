@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { SupportTicketCreatedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -17,5 +17,5 @@ export const SupportTicketCreatedAuditLog: SupportTicketCreatedAuditLogResolvers
   ticketId: e => e.metadata.supportTicketCreatedAuditLogSchema.ticketId,
   ticketPriority: e => e.metadata.supportTicketCreatedAuditLogSchema.ticketPriority,
   ticketSubject: e => e.metadata.supportTicketCreatedAuditLogSchema.ticketSubject,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

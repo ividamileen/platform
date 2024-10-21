@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { OrganizationUpdatedIntegrationAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -16,5 +16,6 @@ export const OrganizationUpdatedIntegrationAuditLog: OrganizationUpdatedIntegrat
     eventTime: e => new Date(e.event_time).toISOString(),
     updatedFields: e => e.metadata.organizationUpdatedIntegrationAuditLogSchema.updatedFields,
     integrationId: e => e.metadata.organizationUpdatedIntegrationAuditLogSchema.integrationId,
-    record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+    record: (e, _, { injector }) =>
+      injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
   };

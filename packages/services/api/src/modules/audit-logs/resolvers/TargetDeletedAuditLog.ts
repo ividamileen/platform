@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { TargetDeletedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -16,5 +16,5 @@ export const TargetDeletedAuditLog: TargetDeletedAuditLogResolvers = {
   projectId: e => e.metadata.targetCreatedAuditLogSchema.projectId,
   targetId: e => e.metadata.targetCreatedAuditLogSchema.targetId,
   targetName: e => e.metadata.targetCreatedAuditLogSchema.targetName,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

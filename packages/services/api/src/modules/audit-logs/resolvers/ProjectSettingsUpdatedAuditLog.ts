@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { ProjectSettingsUpdatedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -15,5 +15,5 @@ export const ProjectSettingsUpdatedAuditLog: ProjectSettingsUpdatedAuditLogResol
   eventTime: e => new Date(e.event_time).toISOString(),
   projectId: e => e.metadata.projectSettingsUpdatedAuditLogSchema.projectId,
   updatedFields: e => e.metadata.projectSettingsUpdatedAuditLogSchema.updatedFields,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

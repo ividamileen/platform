@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { SchemaPublishAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -19,5 +19,5 @@ export const SchemaPublishAuditLog: SchemaPublishAuditLogResolvers = {
   schemaVersionId: e => e.metadata.schemaPublishAuditLogSchema.schemaVersionId,
   serviceName: e => e.metadata.schemaPublishAuditLogSchema.serviceName,
   targetId: e => e.metadata.schemaPublishAuditLogSchema.targetId,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

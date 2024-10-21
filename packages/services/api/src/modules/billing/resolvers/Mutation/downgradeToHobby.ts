@@ -45,23 +45,6 @@ export const downgradeToHobby: NonNullable<MutationResolvers['downgradeToHobby']
       },
     });
 
-    const currentUser = await injector.get(AuthManager).getCurrentUser();
-    injector.get(AuditLogManager).createLogAuditEvent(
-      {
-        eventType: 'SUBSCRIPTION_CANCELED',
-        subscriptionCanceledAuditLogSchema: {
-          newPlan: 'HOBBY',
-          previousPlan: 'PRO',
-        },
-      },
-      {
-        organizationId: organizationId,
-        userEmail: currentUser.email,
-        userId: currentUser.id,
-        user: currentUser,
-      },
-    );
-
     return {
       previousPlan: 'PRO',
       newPlan: 'HOBBY',

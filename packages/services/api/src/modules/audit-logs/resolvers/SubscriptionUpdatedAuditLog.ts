@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { SubscriptionUpdatedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -14,5 +14,5 @@ export const SubscriptionUpdatedAuditLog: SubscriptionUpdatedAuditLogResolvers =
   __isTypeOf: e => e.event_action === 'SUBSCRIPTION_UPDATED',
   eventTime: e => new Date(e.event_time).toISOString(),
   updatedFields: e => e.metadata.subscriptionUpdatedAuditLogSchema.updatedFields,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

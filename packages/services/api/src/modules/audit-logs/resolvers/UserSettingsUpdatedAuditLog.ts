@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { UserSettingsUpdatedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -14,5 +14,5 @@ export const UserSettingsUpdatedAuditLog: UserSettingsUpdatedAuditLogResolvers =
   __isTypeOf: e => e.event_action === 'USER_SETTINGS_UPDATED',
   eventTime: e => new Date(e.event_time).toISOString(),
   updatedFields: e => e.metadata.userSettingsUpdatedAuditLogSchema.updatedFields,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

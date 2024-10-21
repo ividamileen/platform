@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { RoleCreatedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -15,5 +15,5 @@ export const RoleCreatedAuditLog: RoleCreatedAuditLogResolvers = {
   eventTime: e => new Date(e.event_time).toISOString(),
   roleId: e => e.metadata.roleCreatedAuditLogSchema.roleId,
   roleName: e => e.metadata.roleCreatedAuditLogSchema.roleName,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

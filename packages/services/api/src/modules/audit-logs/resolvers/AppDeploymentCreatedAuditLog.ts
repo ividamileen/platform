@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { AppDeploymentCreatedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -16,5 +16,5 @@ export const AppDeploymentCreatedAuditLog: AppDeploymentCreatedAuditLogResolvers
   deploymentId: e => e.metadata.appDeploymentCreatedAuditLogSchema.deploymentId,
   deploymentName: e => e.metadata.appDeploymentCreatedAuditLogSchema.deploymentName,
   deploymentVersion: e => e.metadata.appDeploymentCreatedAuditLogSchema.deploymentVersion,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };

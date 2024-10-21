@@ -1,4 +1,4 @@
-import { resolveRecordAuditLog } from '../helpers';
+import { AuditLogManager } from '../providers/audit-logs-manager';
 import type { OrganizationDeletedAuditLogResolvers } from './../../../__generated__/types.next';
 
 /*
@@ -14,5 +14,5 @@ export const OrganizationDeletedAuditLog: OrganizationDeletedAuditLogResolvers =
   __isTypeOf: e => e.event_action === 'ORGANIZATION_DELETED',
   eventTime: e => new Date(e.event_time).toISOString(),
   organizationId: e => e.metadata.organizationDeletedAuditLogSchema.organizationId,
-  record: (e, _, { injector }) => resolveRecordAuditLog(e, injector),
+  record: (e, _, { injector }) => injector.get(AuditLogManager).resolveRecordAuditLog(e, injector),
 };
