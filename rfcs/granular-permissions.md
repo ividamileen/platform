@@ -101,6 +101,590 @@ organization member role or organization access token.
 When updating a policy, the changes will be reflected for all organization members and organization
 access tokens that reference such policies.
 
+### Permission overview
+
+The following permissions are planned to be assignable to organization member roles and access
+tokens.
+
+#### `organization:describe`
+
+View and retrieve information about a Hive organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "organization:describe",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `organization:updateSlug`
+
+Update the organization slug that uniquely identifies a organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "organization:updateSlug",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `organization:delete`
+
+Delete an organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "organization:delete",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `organization:modifyGitHubIntegration`
+
+View and modify the GitHub integration and grant access to different GitHub repositories.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "organization:modifyGitHubIntegration",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `organization:modifySlackIntegration`
+
+View and modify the Slack integration.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "organization:modifySlackIntegration",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `organization:modifyOIDC`
+
+View and modify the OIDC integration.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "organization:modifyOIDC",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `support:manageTickets`
+
+Create, view and answer support tickets.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "support:manageTickets",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `billing:describe`
+
+View billing information.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "billing:describe",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `billing:update`
+
+Modify billing information.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "billing:update",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `policy:describe`
+
+View the policy statement definitions within an organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "policy:describe",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `policy:modify`
+
+Modify the policy statement definitions.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "policy:modify",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `accessToken:describe`
+
+View the access tokens within an organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "accessToken:describe",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `accessToken:create`
+
+Create a access token within an organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "accessToken:create",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `accessToken:delete`
+
+Delete a access token within an organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "accessToken:delete",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `member:describe`
+
+View and retrieve information about the members within an organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "member:describe",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `member:assignRole`
+
+Assign roles to members within a organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "member:assignRule",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `member:modifyRole`
+
+Modify existing member roles and add new permissions.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "member:modifyRole",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `member:removeMember`
+
+Remove a user from a organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "member:removeMember",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `member:manageInvites`
+
+Allow inviting an user to an organization; allow deleting invites; set role for invited user.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "member:manageInvites",
+    "resource": ["hrn:<organizationId>:organization/933007e7-b3f6-4182-8dd5-8d3ce1857b1a"]
+  }
+]
+```
+
+#### `project:create`
+
+Create a new project within an organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "project:describe",
+    "resource": ["hrn:<organizationId>:organization/<organizationId>"]
+  }
+]
+```
+
+#### `project:describe`
+
+View and retrieve information about a project within an organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "project:describe",
+    "resource": ["hrn:<organizationId>:project/<projectId>"]
+  }
+]
+```
+
+#### `project:delete`
+
+Delete a project within an organization.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "project:delete",
+    "resource": ["hrn:<organizationId>:project/<projectId>"]
+  }
+]
+```
+
+#### `alert:modify`
+
+Modify alerts for a project.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "alert:modify",
+    "resource": ["hrn:<organizationId>:project/<projectId>"]
+  }
+]
+```
+
+#### `project:updateSlug`
+
+Update the organization slug that uniquely identifies a project.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "project:updateSlug",
+    "resource": ["hrn:<organizationId>:project/<projectId>"]
+  }
+]
+```
+
+#### `schemaLinting:manage`
+
+Configure schema policy and linting within a project.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "schemaLinting:manage",
+    "resource": ["hrn:<organizationId>:project/<projectId>"]
+  }
+]
+```
+
+#### `target:create`
+
+Create a new target within a project.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "target:create",
+    "resource": ["hrn:<organizationId>:project/<projectId>"]
+  }
+]
+```
+
+**Example: Allow creating target in any project**
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "target:create",
+    "resource": ["hrn:<organizationId>:project/*"]
+  }
+]
+```
+
+**Example: Prevent creating target in single project**
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "target:create",
+    "resource": ["hrn:<organizationId>:project/*"]
+  },
+  {
+    "effect": "deny",
+    "action": "target:create",
+    "resource": ["hrn:<organizationId>:project/<projectId>"]
+  }
+]
+```
+
+#### `target:delete`
+
+Delete a target within a project.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "target:delete",
+    "resource": ["hrn:<organizationId>:target/<targetId>"]
+  }
+]
+```
+
+#### `schemaCheck:create`
+
+Create a schema check within a target.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "schemaCheck:create",
+    "resource": ["hrn:<organizationId>:target/<targetId>"]
+  }
+]
+```
+
+#### `schemaCheck:approve`
+
+Approve a failed schema check within a project.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "schemaCheck:approve",
+    "resource": ["hrn:<organizationId>:target/<targetId>"]
+  }
+]
+```
+
+#### `schemaVersion:publish`
+
+Publish a new schema version within a target.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "schemaVersion:publish",
+    "resource": ["hrn:<organizationId>:target/<targetId>"]
+  }
+]
+```
+
+**Example: Publish only to specific federation service**
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "schemaVersion:publish",
+    "resource": ["hrn:<organizationId>:target/<targetId>/service/<serviceName>"]
+  }
+]
+```
+
+#### `appDeployment:create`
+
+Create a app deployment version within a target.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "appDeployment:create",
+    "resource": ["hrn:<organizationId>:target/<targetId>"]
+  }
+]
+```
+
+**Example: Only allow creating an app deployment with a specific app name**
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "appDeployment:create",
+    "resource": ["hrn:<organizationId>:target/appDeployment/<appDeploymentName>"]
+  }
+]
+```
+
+#### `appDeployment:publish`
+
+Publish an app deployment version within in a target.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "appDeployment:publish",
+    "resource": ["hrn:<organizationId>:target/<targetId>"]
+  }
+]
+```
+
+**Example: Only allow publishing an app deployment with a specific app name**
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "appDeployment:publish",
+    "resource": ["hrn:<organizationId>:target/appDeployment/<appDeploymentName>"]
+  }
+]
+```
+
+#### `laboratory:describe`
+
+View operations in the laboratory.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "laboratory:describe",
+    "resource": ["hrn:<organizationId>:target/<targetId>"]
+  }
+]
+```
+
+#### `laboratory:modify`
+
+Create, update and delete operations
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "laboratory:modifyOperations",
+    "resource": ["hrn:<organizationId>:target/<targetId>"]
+  }
+]
+```
+
+#### `cdn:read`
+
+Read artifacts from the Hive CDN.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "cdn:read",
+    "resource": ["hrn:<organizationId>:target/<targetId>"]
+  }
+]
+```
+
+#### `usage:report`
+
+Report schema usage data to the Hive registry.
+
+```json
+[
+  {
+    "effect": "allow",
+    "action": "usage:report",
+    "resource": ["hrn:<organizationId>:target/<targetId>"]
+  }
+]
+```
+
+### Permission Questions
+
+> Why is there no `target:describe` permissions?
+
+Target data is shared between targets, e.g. usage data for conditional breaking changes, schema
+checks and schema publishes. Having granular access to targets would make the whole layer more
+complicated than it needs to be. In general, we got the feedback that people want to only limit
+access to who can see projects and who can publish a specific service schema/do a specific schema
+check for a service. If required, we can later on introduce them.
+
 ### Merging CDN access tokens and registry access tokens
 
 In the new permission system, there will no longer be access tokens that belong to one target.
