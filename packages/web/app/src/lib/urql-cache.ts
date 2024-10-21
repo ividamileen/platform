@@ -12,10 +12,10 @@ import type { DeleteCollectionMutationType } from '@/components/target/laborator
 import type { DeleteOperationMutationType } from '@/components/target/laboratory/delete-operation-modal';
 import type { CreateAccessToken_CreateTokenMutation } from '@/components/target/settings/registry-access-token';
 import { graphql } from '@/gql';
+import { CollectionsQuery } from '@/lib/hooks/laboratory/use-collections';
 import type { CreateOrganizationMutation } from '@/pages/organization-new';
 import type { DeleteOrganizationDocument } from '@/pages/organization-settings';
 import type { DeleteProjectMutation } from '@/pages/project-settings';
-import { CollectionsQuery } from '@/pages/target-laboratory';
 import {
   TokensDocument,
   type DeleteTargetMutation,
@@ -139,8 +139,8 @@ const createTarget: TypedDocumentNodeUpdateResolver<typeof CreateTarget_CreateTa
       query: TargetsDocument,
       variables: {
         selector: {
-          organization: selector.organization,
-          project: selector.project,
+          organizationSlug: selector.organizationSlug,
+          projectSlug: selector.projectSlug,
         },
       },
     },
@@ -181,9 +181,9 @@ const createToken: TypedDocumentNodeUpdateResolver<typeof CreateAccessToken_Crea
       query: TokensDocument,
       variables: {
         selector: {
-          organization: selector.organization,
-          project: selector.project,
-          target: selector.target,
+          organizationSlug: selector.organizationSlug,
+          projectSlug: selector.projectSlug,
+          targetSlug: selector.targetSlug,
         },
       },
     },
@@ -207,9 +207,9 @@ const deleteTokens: TypedDocumentNodeUpdateResolver<typeof DeleteTokensDocument>
       query: TokensDocument,
       variables: {
         selector: {
-          organization: selector.organization,
-          project: selector.project,
-          target: selector.target,
+          organizationSlug: selector.organizationSlug,
+          projectSlug: selector.projectSlug,
+          targetSlug: selector.targetSlug,
         },
       },
     },

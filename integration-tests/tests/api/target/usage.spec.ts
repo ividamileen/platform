@@ -334,9 +334,9 @@ test.concurrent('check usage from two selected targets', async ({ expect }) => {
 
   const productionTargetResult = await createTarget(
     {
-      name: 'target2',
-      organization: organization.cleanId,
-      project: project.cleanId,
+      slug: 'target2',
+      organizationSlug: organization.slug,
+      projectSlug: project.slug,
     },
     ownerToken,
   ).then(r => r.expectNoGraphQLErrors());
@@ -431,12 +431,12 @@ test.concurrent('check usage from two selected targets', async ({ expect }) => {
   // Now switch to using checking both staging and production
   const updateValidationResult = await updateTargetValidationSettings(
     {
-      organization: organization.cleanId,
-      project: project.cleanId,
-      target: staging.cleanId,
+      organizationSlug: organization.slug,
+      projectSlug: project.slug,
+      targetSlug: staging.slug,
       percentage: 50, // Out of 3 requests, 1 is for Query.me, 2 are done for Query.me so it's 1/3 = 33.3%
       period: 2,
-      targets: [productionTarget.id, staging.id],
+      targetIds: [productionTarget.id, staging.id],
     },
     {
       authToken: ownerToken,
@@ -581,12 +581,12 @@ test.concurrent('check usage not from excluded client names', async ({ expect })
   // Exclude app from the check (tests partial, incomplete exclusion)
   let updateValidationResult = await updateTargetValidationSettings(
     {
-      organization: organization.cleanId,
-      project: project.cleanId,
-      target: target.cleanId,
+      organizationSlug: organization.slug,
+      projectSlug: project.slug,
+      targetSlug: target.slug,
       percentage: 0,
       period: 2,
-      targets: [target.id],
+      targetIds: [target.id],
       excludedClients: ['app'],
     },
     {
@@ -617,12 +617,12 @@ test.concurrent('check usage not from excluded client names', async ({ expect })
   // Exclude BOTH 'app' and 'cli' (tests multi client covering exclusion)
   updateValidationResult = await updateTargetValidationSettings(
     {
-      organization: organization.cleanId,
-      project: project.cleanId,
-      target: target.cleanId,
+      organizationSlug: organization.slug,
+      projectSlug: project.slug,
+      targetSlug: target.slug,
       percentage: 0,
       period: 2,
-      targets: [target.id],
+      targetIds: [target.id],
       excludedClients: ['app', 'cli'],
     },
     {
@@ -1114,6 +1114,99 @@ describe('changes with usage data', () => {
     reportOperation: {
       operation: 'query videoOnly { media { __typename ... on Video { url } } }',
       operationName: 'videoOnly',
+      fields: 'auto-collect',
+    },
+  });
+
+  testChangesWithUsageData({
+    title: 'removing a used enum value is a breaking change',
+    publishSdl: /* GraphQL */ `
+      type Query {
+        feed: Post
+      }
+
+      enum Media {
+        Image
+        Video
+      }
+
+      type Post {
+        id: ID!
+        title: String!
+        type: Media
+      }
+    `,
+    checkSdl: /* GraphQL */ `
+      type Query {
+        feed: Post
+      }
+
+      enum Media {
+        Image
+      }
+
+      type Post {
+        id: ID!
+        title: String!
+        type: Media
+      }
+    `,
+    expectedSchemaCheckTypename: {
+      // Should be breaking,
+      // because it will cause existing queries
+      // that use this enum value to error
+      beforeReportedOperation: 'SchemaCheckError',
+      afterReportedOperation: 'SchemaCheckError',
+    },
+    reportOperation: {
+      operation: 'query feed { feed { id type } }',
+      operationName: 'feed',
+      fields: 'auto-collect',
+    },
+  });
+
+  testChangesWithUsageData({
+    title: 'adding a new value to a used enum value is NOT a breaking change',
+    publishSdl: /* GraphQL */ `
+      type Query {
+        feed: Post
+      }
+
+      enum Media {
+        Image
+        Video
+      }
+
+      type Post {
+        id: ID!
+        title: String!
+        type: Media
+      }
+    `,
+    checkSdl: /* GraphQL */ `
+      type Query {
+        feed: Post
+      }
+
+      enum Media {
+        Image
+        Video
+        Audio
+      }
+
+      type Post {
+        id: ID!
+        title: String!
+        type: Media
+      }
+    `,
+    expectedSchemaCheckTypename: {
+      beforeReportedOperation: 'SchemaCheckSuccess',
+      afterReportedOperation: 'SchemaCheckSuccess',
+    },
+    reportOperation: {
+      operation: 'query feed { feed { id type } }',
+      operationName: 'feed',
       fields: 'auto-collect',
     },
   });
@@ -2525,9 +2618,9 @@ test.concurrent(
       variables: {
         id: firstSchemaCheckId,
         selector: {
-          organization: organization.cleanId,
-          project: project.cleanId,
-          target: target.cleanId,
+          organizationSlug: organization.slug,
+          projectSlug: project.slug,
+          targetSlug: target.slug,
         },
       },
       authToken: token.secret,
@@ -2791,12 +2884,12 @@ test.concurrent('ensure percentage precision up to 2 decimal places', async ({ e
   // should accept a breaking change when percentage is 2%
   let updateValidationResult = await updateTargetValidationSettings(
     {
-      organization: organization.cleanId,
-      project: project.cleanId,
-      target: target.cleanId,
+      organizationSlug: organization.slug,
+      projectSlug: project.slug,
+      targetSlug: target.slug,
       percentage: 2,
       period: 2,
-      targets: [target.id],
+      targetIds: [target.id],
       excludedClients: [],
     },
     {
@@ -2819,12 +2912,12 @@ test.concurrent('ensure percentage precision up to 2 decimal places', async ({ e
   // should reject a breaking change when percentage is 1.99%
   updateValidationResult = await updateTargetValidationSettings(
     {
-      organization: organization.cleanId,
-      project: project.cleanId,
-      target: target.cleanId,
+      organizationSlug: organization.slug,
+      projectSlug: project.slug,
+      targetSlug: target.slug,
       percentage: 1.99,
       period: 2,
-      targets: [target.id],
+      targetIds: [target.id],
       excludedClients: [],
     },
     {

@@ -6,7 +6,6 @@ import type {
   SchemaVersion,
 } from '@hive/storage';
 import type { SchemaError } from '../../__generated__/types';
-import type { PaginatedSchemaVersionConnection } from '../../modules/shared/providers/storage';
 import type { DateRange, PushedCompositeSchema, SingleSchema } from '../../shared/entities';
 import type { PromiseOrValue } from '../../shared/helpers';
 import type { SuperGraphInformation } from './lib/federation-super-graph';
@@ -24,11 +23,26 @@ export type SchemaChangeApprovalMapper = SchemaCheckApprovalMetadata;
 export type SchemaErrorConnectionMapper = readonly SchemaError[];
 export type SchemaWarningConnectionMapper = readonly SchemaCheckWarning[];
 export type SchemaConnectionMapper = readonly SchemaMapper[];
-export type SchemaVersionConnectionMapper = PaginatedSchemaVersionConnection;
+export type SchemaVersionConnectionMapper = Readonly<{
+  edges: ReadonlyArray<{
+    cursor: string;
+    node: SchemaVersion & {
+      organizationId: string;
+      projectId: string;
+      targetId: string;
+    };
+  }>;
+  pageInfo: Readonly<{
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    startCursor: string;
+    endCursor: string;
+  }>;
+}>;
 export interface SchemaVersionMapper extends SchemaVersion {
-  project: string;
-  target: string;
-  organization: string;
+  projectId: string;
+  targetId: string;
+  organizationId: string;
 }
 export type SingleSchemaMapper = SingleSchema;
 export type CompositeSchemaMapper = PushedCompositeSchema;
@@ -37,9 +51,9 @@ export type SchemaExplorerMapper = {
   schema: GraphQLSchema;
   usage: {
     period: DateRange;
-    organization: string;
-    project: string;
-    target: string;
+    organizationId: string;
+    projectId: string;
+    targetId: string;
   };
   supergraph: null | SuperGraphInformation;
 };
@@ -47,9 +61,9 @@ export type UnusedSchemaExplorerMapper = {
   sdl: DocumentNode;
   usage: {
     period: DateRange;
-    organization: string;
-    project: string;
-    target: string;
+    organizationId: string;
+    projectId: string;
+    targetId: string;
     usedCoordinates: Set<string>;
   };
   supergraph: null | SuperGraphInformation;
@@ -58,9 +72,9 @@ export type DeprecatedSchemaExplorerMapper = {
   sdl: DocumentNode;
   usage: {
     period: DateRange;
-    organization: string;
-    project: string;
-    target: string;
+    organizationId: string;
+    projectId: string;
+    targetId: string;
   };
   supergraph: null | SuperGraphInformation;
 };
@@ -85,9 +99,9 @@ export type SchemaCoordinateUsageForUnusedExplorer = {
   isUsed: false;
   usedCoordinates: Set<string>;
   period: DateRange;
-  organization: string;
-  project: string;
-  target: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 };
 export type WithSchemaCoordinatesUsage<T> = T & {
   usage: // explorer
@@ -97,9 +111,9 @@ export type WithSchemaCoordinatesUsage<T> = T & {
           total: number;
           usedByClients: () => PromiseOrValue<Array<string>>;
           period: DateRange;
-          organization: string;
-          project: string;
-          target: string;
+          organizationId: string;
+          projectId: string;
+          targetId: string;
           typename: string;
         };
       }>
@@ -241,9 +255,9 @@ export type SchemaCoordinateUsageMapper =
       total: number;
       usedByClients: () => PromiseOrValue<Array<string>>;
       period: DateRange;
-      organization: string;
-      project: string;
-      target: string;
+      organizationId: string;
+      projectId: string;
+      targetId: string;
       coordinate: string;
     }
   | {

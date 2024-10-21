@@ -869,7 +869,7 @@ test('add documents to app deployment fails if document does not pass validation
         index: 0,
         message: 'Cannot query field "hi" on type "Query".',
       },
-      message: 'Failed to validate GraphQL operation against schema.',
+      message: 'The GraphQL operation is not valid against the latest schema version.',
     },
     ok: null,
   });
@@ -1524,9 +1524,9 @@ test('get app deployment documents via GraphQL API', async () => {
     document: GetPaginatedPersistedDocuments,
     variables: {
       targetSelector: {
-        organization: organization.cleanId,
-        project: project.cleanId,
-        target: target.cleanId,
+        organizationSlug: organization.slug,
+        projectSlug: project.slug,
+        targetSlug: target.slug,
       },
       appDeploymentName: 'app-name',
       appDeploymentVersion: 'app-version',
@@ -1641,9 +1641,9 @@ test('paginate app deployment documents via GraphQL API', async () => {
     document: GetPaginatedPersistedDocuments,
     variables: {
       targetSelector: {
-        organization: organization.cleanId,
-        project: project.cleanId,
-        target: target.cleanId,
+        organizationSlug: organization.slug,
+        projectSlug: project.slug,
+        targetSlug: target.slug,
       },
       appDeploymentName: 'app-name',
       appDeploymentVersion: 'app-version',
@@ -1674,9 +1674,9 @@ test('paginate app deployment documents via GraphQL API', async () => {
     document: GetPaginatedPersistedDocuments,
     variables: {
       targetSelector: {
-        organization: organization.cleanId,
-        project: project.cleanId,
-        target: target.cleanId,
+        organizationSlug: organization.slug,
+        projectSlug: project.slug,
+        targetSlug: target.slug,
       },
       appDeploymentName: 'app-name',
       appDeploymentVersion: 'app-version',
@@ -1708,9 +1708,9 @@ test('paginate app deployment documents via GraphQL API', async () => {
     document: GetPaginatedPersistedDocuments,
     variables: {
       targetSelector: {
-        organization: organization.cleanId,
-        project: project.cleanId,
-        target: target.cleanId,
+        organizationSlug: organization.slug,
+        projectSlug: project.slug,
+        targetSlug: target.slug,
       },
       appDeploymentName: 'app-name',
       appDeploymentVersion: 'app-version',
@@ -1814,9 +1814,9 @@ test('app deployment usage reporting', async () => {
     document: GetAppDeployment,
     variables: {
       targetSelector: {
-        organization: organization.cleanId,
-        project: project.cleanId,
-        target: target.cleanId,
+        organizationSlug: organization.slug,
+        projectSlug: project.slug,
+        targetSlug: target.slug,
       },
       appDeploymentName: 'app-name',
       appDeploymentVersion: 'app-version',
@@ -1867,9 +1867,9 @@ test('app deployment usage reporting', async () => {
     document: GetAppDeployment,
     variables: {
       targetSelector: {
-        organization: organization.cleanId,
-        project: project.cleanId,
-        target: target.cleanId,
+        organizationSlug: organization.slug,
+        projectSlug: project.slug,
+        targetSlug: target.slug,
       },
       appDeploymentName: 'app-name',
       appDeploymentVersion: 'app-version',

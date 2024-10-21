@@ -5,7 +5,7 @@
   "description": "Compose schemas outside GraphQL Hive",
   "repository": {
     "type": "git",
-    "url": "kamilkisiela/graphql-hive",
+    "url": "graphql-hive/platform",
     "directory": "packages/libraries/external-composition"
   },
   "homepage": "https://the-guild.dev/graphql/hive",
@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@apollo/composition": "2.8.4",
-    "esbuild": "0.23.0",
+    "esbuild": "0.23.1",
     "fastify": "4.28.1",
     "graphql": "16.9.0"
   },

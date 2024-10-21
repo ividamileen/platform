@@ -1,6 +1,5 @@
 {
   "name": "@hive/tokens",
-  "version": "0.0.0",
   "type": "module",
   "license": "MIT",
   "private": true,
@@ -12,7 +11,7 @@
   "devDependencies": {
     "@hive/service-common": "workspace:*",
     "@hive/storage": "workspace:*",
-    "@sentry/node": "7.118.0",
+    "@sentry/node": "7.119.0",
     "@trpc/server": "10.45.2",
     "@types/ms": "0.7.34",
     "dotenv": "16.4.5",
@@ -23,7 +22,7 @@
     "pino-pretty": "11.2.2",
     "reflect-metadata": "0.2.2",
     "tiny-lru": "8.0.2",
-    "tslib": "2.6.3",
+    "tslib": "2.7.0",
     "zod": "3.23.8"
   },
   "buildOptions": {

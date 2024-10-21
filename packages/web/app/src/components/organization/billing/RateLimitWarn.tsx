@@ -1,13 +1,12 @@
 import { ReactElement } from 'react';
-import { Callout } from '@/components/v2';
+import { Callout } from '@/components/ui/callout';
 import { FragmentType, graphql, useFragment } from '@/gql';
 import { BillingPlanType } from '@/gql/graphql';
 
 const RateLimitWarn_OrganizationFragment = graphql(`
   fragment RateLimitWarn_OrganizationFragment on Organization {
     id
-    cleanId
-    name
+    slug
     plan
     rateLimit {
       limitedForOperations

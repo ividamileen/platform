@@ -1,5 +1,32 @@
 # @graphql-hive/core
 
+## 0.8.2
+
+### Patch Changes
+
+- [#5676](https://github.com/graphql-hive/platform/pull/5676)
+  [`c728803`](https://github.com/graphql-hive/platform/commit/c7288038f24c0214b4023994f306c6229c1ce72c)
+  Thanks [@kamilkisiela](https://github.com/kamilkisiela)! - Correct collection of enum values when
+  used in a list
+
+## 0.8.1
+
+### Patch Changes
+
+- [#5667](https://github.com/kamilkisiela/graphql-hive/pull/5667)
+  [`be5d39c`](https://github.com/kamilkisiela/graphql-hive/commit/be5d39cbf08d0681d142e83a708d300abc504c44)
+  Thanks [@kamilkisiela](https://github.com/kamilkisiela)! - Report enum values when an enum is used
+  as an output type
+
+## 0.8.0
+
+### Minor Changes
+
+- [#5401](https://github.com/kamilkisiela/graphql-hive/pull/5401)
+  [`3ffdb6e`](https://github.com/kamilkisiela/graphql-hive/commit/3ffdb6e9466deb3c3aa09eea1445fc4caf698fd5)
+  Thanks [@n1ru4l](https://github.com/n1ru4l)! - Deduplicate persisted document lookups from the
+  registry for reducing the amount of concurrent HTTP requests.
+
 ## 0.7.1
 
 ### Patch Changes

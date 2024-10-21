@@ -1,4 +1,4 @@
-import { ReactElement, useMemo, useState } from 'react';
+import { ReactElement, useMemo } from 'react';
 import { AlertCircleIcon, RefreshCw } from 'lucide-react';
 import { useQuery } from 'urql';
 import { Section } from '@/components/common';
@@ -16,6 +16,7 @@ import { Subtitle, Title } from '@/components/ui/page';
 import { QueryError } from '@/components/ui/query-error';
 import { FragmentType, graphql, useFragment } from '@/gql';
 import { useDateRangeController } from '@/lib/hooks/use-date-range-controller';
+import { useSearchParamsFilter } from '@/lib/hooks/use-search-params-filters';
 
 const GraphQLOperationBody_OperationFragment = graphql(`
   fragment GraphQLOperationBody_OperationFragment on Operation {
@@ -51,16 +52,16 @@ const Operation_View_OperationBodyQuery = graphql(`
 `);
 
 function OperationView({
-  organizationCleanId,
-  projectCleanId,
-  targetCleanId,
+  organizationSlug,
+  projectSlug,
+  targetSlug,
   dataRetentionInDays,
   operationHash,
   operationName,
 }: {
-  organizationCleanId: string;
-  projectCleanId: string;
-  targetCleanId: string;
+  organizationSlug: string;
+  projectSlug: string;
+  targetSlug: string;
   dataRetentionInDays: number;
   operationHash: string;
   operationName: string;
@@ -69,16 +70,16 @@ function OperationView({
     dataRetentionInDays,
     defaultPreset: presetLast1Day,
   });
-  const [selectedClients, setSelectedClients] = useState<string[]>([]);
+  const [selectedClients, setSelectedClients] = useSearchParamsFilter<string[]>('clients', []);
   const operationsList = useMemo(() => [operationHash], [operationHash]);
 
   const [result] = useQuery({
     query: Operation_View_OperationBodyQuery,
     variables: {
       selector: {
-        organization: organizationCleanId,
-        project: projectCleanId,
-        target: targetCleanId,
+        organizationSlug,
+        projectSlug,
+        targetSlug,
       },
       hash: operationHash,
     },
@@ -101,9 +102,9 @@ function OperationView({
               period={dateRangeController.resolvedRange}
               selected={selectedClients}
               onFilter={setSelectedClients}
-              organizationId={organizationCleanId}
-              projectId={projectCleanId}
-              targetId={targetCleanId}
+              organizationSlug={organizationSlug}
+              projectSlug={projectSlug}
+              targetSlug={targetSlug}
             />
             <DateRangePicker
               validUnits={['y', 'M', 'w', 'd', 'h']}
@@ -120,9 +121,9 @@ function OperationView({
       </div>
       {!result.fetching && isNotNoQueryOrMutation === false ? (
         <OperationsStats
-          organization={organizationCleanId}
-          project={projectCleanId}
-          target={targetCleanId}
+          organizationSlug={organizationSlug}
+          projectSlug={projectSlug}
+          targetSlug={targetSlug}
           period={dateRangeController.resolvedRange}
           dateRangeText={dateRangeController.selectedPreset.label}
           operationsFilter={operationsList}
@@ -137,7 +138,7 @@ function OperationView({
           <AlertDescription>
             Hive is currently only collecting usage data for this operation. We are currently
             evaluating what kind of insights are useful for subscriptions.{' '}
-            <Link variant="primary" href="https://github.com/kamilkisiela/graphql-hive/issues/3290">
+            <Link variant="primary" href="https://github.com/graphql-hive/platform/issues/3290">
               Please reach out to us directly or via the GitHub issue
             </Link>
             .
@@ -153,40 +154,48 @@ function OperationView({
 }
 
 const OperationInsightsPageQuery = graphql(`
-  query OperationInsightsPageQuery($organizationId: ID!, $projectId: ID!, $targetId: ID!) {
-    organization(selector: { organization: $organizationId }) {
+  query OperationInsightsPageQuery(
+    $organizationSlug: String!
+    $projectSlug: String!
+    $targetSlug: String!
+  ) {
+    organization(selector: { organizationSlug: $organizationSlug }) {
       organization {
         id
-        cleanId
+        slug
         rateLimit {
           retentionInDays
         }
       }
     }
     hasCollectedOperations(
-      selector: { organization: $organizationId, project: $projectId, target: $targetId }
+      selector: {
+        organizationSlug: $organizationSlug
+        projectSlug: $projectSlug
+        targetSlug: $targetSlug
+      }
     )
   }
 `);
 
 function OperationInsightsContent(props: {
-  organizationId: string;
-  projectId: string;
-  targetId: string;
+  organizationSlug: string;
+  projectSlug: string;
+  targetSlug: string;
   operationHash: string;
   operationName: string;
 }) {
   const [query] = useQuery({
     query: OperationInsightsPageQuery,
     variables: {
-      organizationId: props.organizationId,
-      projectId: props.projectId,
-      targetId: props.targetId,
+      organizationSlug: props.organizationSlug,
+      projectSlug: props.projectSlug,
+      targetSlug: props.targetSlug,
     },
   });
 
   if (query.error) {
-    return <QueryError organizationId={props.organizationId} error={query.error} />;
+    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
   }
 
   const currentOrganization = query.data?.organization?.organization;
@@ -194,17 +203,17 @@ function OperationInsightsContent(props: {
 
   return (
     <TargetLayout
-      organizationId={props.organizationId}
-      projectId={props.projectId}
-      targetId={props.targetId}
+      organizationSlug={props.organizationSlug}
+      projectSlug={props.projectSlug}
+      targetSlug={props.targetSlug}
       page={Page.Insights}
     >
       {currentOrganization ? (
         hasCollectedOperations ? (
           <OperationView
-            organizationCleanId={props.organizationId}
-            projectCleanId={props.projectId}
-            targetCleanId={props.targetId}
+            organizationSlug={props.organizationSlug}
+            projectSlug={props.projectSlug}
+            targetSlug={props.targetSlug}
             dataRetentionInDays={currentOrganization.rateLimit.retentionInDays}
             operationHash={props.operationHash}
             operationName={props.operationName}
@@ -224,9 +233,9 @@ function OperationInsightsContent(props: {
 }
 
 export function TargetInsightsOperationPage(props: {
-  organizationId: string;
-  projectId: string;
-  targetId: string;
+  organizationSlug: string;
+  projectSlug: string;
+  targetSlug: string;
   operationHash: string;
   operationName: string;
 }) {

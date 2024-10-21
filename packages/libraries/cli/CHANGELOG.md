@@ -1,5 +1,47 @@
 # @graphql-hive/cli
 
+## 0.44.2
+
+### Patch Changes
+
+- Updated dependencies
+  [[`c728803`](https://github.com/graphql-hive/platform/commit/c7288038f24c0214b4023994f306c6229c1ce72c)]:
+  - @graphql-hive/core@0.8.2
+
+## 0.44.1
+
+### Patch Changes
+
+- Updated dependencies
+  [[`be5d39c`](https://github.com/kamilkisiela/graphql-hive/commit/be5d39cbf08d0681d142e83a708d300abc504c44)]:
+  - @graphql-hive/core@0.8.1
+
+## 0.44.0
+
+### Minor Changes
+
+- [#5661](https://github.com/kamilkisiela/graphql-hive/pull/5661)
+  [`ed25aca`](https://github.com/kamilkisiela/graphql-hive/commit/ed25aca53a0c064adf50d13b0aa3407028d72049)
+  Thanks [@n1ru4l](https://github.com/n1ru4l)! - Improve error output for rejected app deployment
+  creation. The CLI now shows which operation is affected and the reason for the failed upload.
+
+## 0.43.0
+
+### Minor Changes
+
+- [#5474](https://github.com/kamilkisiela/graphql-hive/pull/5474)
+  [`3850ad2`](https://github.com/kamilkisiela/graphql-hive/commit/3850ad24d421631a56676cc1bff5d0c4a3d28a49)
+  Thanks [@n1ru4l](https://github.com/n1ru4l)! - Introduce schema publish retries, when being
+  blocked by other concurrent schema publishes.
+
+## 0.42.1
+
+### Patch Changes
+
+- Updated dependencies
+  [[`3ffdb6e`](https://github.com/kamilkisiela/graphql-hive/commit/3ffdb6e9466deb3c3aa09eea1445fc4caf698fd5)]:
+  - @graphql-hive/core@0.8.0
+
 ## 0.42.0
 
 ### Minor Changes

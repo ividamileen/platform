@@ -67,8 +67,8 @@ export default gql`
   }
 
   input UpdateNativeFederationInput {
-    organization: ID!
-    project: ID!
+    organizationSlug: String!
+    projectSlug: String!
     enabled: Boolean!
   }
 
@@ -85,8 +85,8 @@ export default gql`
   }
 
   input DisableExternalSchemaCompositionInput {
-    organization: ID!
-    project: ID!
+    organizationSlug: String!
+    projectSlug: String!
   }
 
   """
@@ -98,8 +98,8 @@ export default gql`
   }
 
   input EnableExternalSchemaCompositionInput {
-    organization: ID!
-    project: ID!
+    organizationSlug: String!
+    projectSlug: String!
     endpoint: String!
     secret: String!
   }
@@ -117,8 +117,8 @@ export default gql`
   }
 
   input TestExternalSchemaCompositionInput {
-    organization: ID!
-    project: ID!
+    organizationSlug: String!
+    projectSlug: String!
   }
 
   """
@@ -134,8 +134,8 @@ export default gql`
   }
 
   input UpdateProjectRegistryModelInput {
-    organization: ID!
-    project: ID!
+    organizationSlug: String!
+    projectSlug: String!
     model: RegistryModel!
   }
 
@@ -296,6 +296,7 @@ export default gql`
 
   union SchemaPublishPayload =
     | SchemaPublishSuccess
+    | SchemaPublishRetry
     | SchemaPublishError
     | SchemaPublishMissingServiceError
     | SchemaPublishMissingUrlError
@@ -334,6 +335,10 @@ export default gql`
     Link GitHub version to a GitHub commit on a repository.
     """
     gitHub: SchemaPublishGitHubInput
+    """
+    Whether the CLI supports retrying the schema publish, in case acquiring the schema publish lock fails due to a busy queue.
+    """
+    supportsRetry: Boolean = False
   }
 
   input SchemaComposeInput {
@@ -595,6 +600,10 @@ export default gql`
     changes: SchemaChangeConnection
   }
 
+  type SchemaPublishRetry {
+    reason: String!
+  }
+
   type SchemaPublishError {
     valid: Boolean!
     linkToWebsite: String
@@ -645,25 +654,25 @@ export default gql`
   }
 
   input SchemaCompareInput {
-    organization: ID!
-    project: ID!
-    target: ID!
+    organizationSlug: String!
+    projectSlug: String!
+    targetSlug: String!
     after: ID!
     before: ID!
   }
 
   input SchemaVersionUpdateInput {
-    organization: ID!
-    project: ID!
-    target: ID!
-    version: ID!
+    organizationSlug: String!
+    projectSlug: String!
+    targetSlug: String!
+    versionId: ID!
     valid: Boolean!
   }
 
   input UpdateBaseSchemaInput {
-    organization: ID!
-    project: ID!
-    target: ID!
+    organizationSlug: String!
+    projectSlug: String!
+    targetSlug: String!
     newBase: String
   }
 
@@ -1308,9 +1317,9 @@ export default gql`
   }
 
   input ApproveFailedSchemaCheckInput {
-    organization: ID!
-    project: ID!
-    target: ID!
+    organizationSlug: String!
+    projectSlug: String!
+    targetSlug: String!
     schemaCheckId: ID!
     """
     Optional comment visible in the schema check.

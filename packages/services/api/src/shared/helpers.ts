@@ -2,12 +2,7 @@ import { createHash } from 'node:crypto';
 import type { InjectionToken } from 'graphql-modules';
 import ms from 'ms';
 import { UTCDate } from '@date-fns/utc';
-import type {
-  DateRangeInput,
-  OrganizationSelector,
-  ProjectSelector,
-  TargetSelector,
-} from '../__generated__/types.next';
+import type { DateRangeInput } from '../__generated__/types.next';
 import { DateRange } from './entities';
 
 export {
@@ -33,32 +28,6 @@ export type MapToArray<T, K extends keyof T> = Omit<T, K> & {
 
 export function uuid(len = 13) {
   return Math.random().toString(16).substr(2, len);
-}
-
-export function filterSelector(
-  kind: 'organization',
-  selector: OrganizationSelector,
-): OrganizationSelector;
-export function filterSelector(kind: 'project', selector: ProjectSelector): ProjectSelector;
-export function filterSelector(kind: 'target', selector: TargetSelector): TargetSelector;
-export function filterSelector(kind: 'organization' | 'project' | 'target', selector: any): any {
-  switch (kind) {
-    case 'organization':
-      return {
-        organization: selector.organization,
-      };
-    case 'project':
-      return {
-        organization: selector.organization,
-        project: selector.project,
-      };
-    case 'target':
-      return {
-        organization: selector.organization,
-        project: selector.project,
-        target: selector.target,
-      };
-  }
 }
 
 export function stringifySelector<
@@ -237,6 +206,13 @@ export function batchBy<TItem, TResult>(
     const tickArgs = [...currentBatch.args];
     const tickCallbacks = [...currentBatch.callbacks];
 
+    if (tickArgs.length !== tickCallbacks.length) {
+      for (const cb of tickCallbacks) {
+        cb.reject(new Error('Batch args and callbacks should have the same length.'));
+      }
+      throw new Error('Batch args and callbacks should have the same length.');
+    }
+
     loader(tickArgs).then(
       promises => {
         for (let i = 0; i < tickCallbacks.length; i++) {
@@ -293,6 +269,8 @@ export function batchBy<TItem, TResult>(
     const currentBatch = getBatchGroup(batchKey);
     scheduleExecutionOnNextTick();
     currentBatch.args.push(arg);
+    const d = Promise.withResolvers<TResult>();
+    currentBatch.callbacks.push({ resolve: d.resolve, reject: d.reject });
 
     // if the current batch is full, we already start loading it.
     if (currentBatch.callbacks.length >= maxBatchSize) {
@@ -300,8 +278,15 @@ export function batchBy<TItem, TResult>(
       startLoadingBatch(currentBatch);
     }
 
-    const d = Promise.withResolvers<TResult>();
-    currentBatch.callbacks.push({ resolve: d.resolve, reject: d.reject });
     return d.promise;
   };
+}
+
+export function assertOk<TOk extends { ok: true }, TNot extends { ok: false; message: string }>(
+  result: TOk | TNot,
+  message: string,
+): asserts result is TOk {
+  if (!result.ok) {
+    throw new Error(`${message}: ${result.message}`);
+  }
 }

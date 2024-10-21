@@ -9,7 +9,7 @@ import { Storage } from '../shared/providers/storage';
 import { CollectionModule } from './__generated__/types';
 import { CollectionProvider } from './providers/collection.provider';
 
-const MAX_INPUT_LENGTH = 5000;
+const MAX_INPUT_LENGTH = 10_000;
 
 // The following validates the length and the validity of the JSON object incoming as string.
 const inputObjectSchema = zod
@@ -54,13 +54,15 @@ async function validateTargetAccess(
   ]);
 
   await injector.get(AuthManager).ensureTargetAccess({
-    organization,
-    project,
-    target,
+    organizationId: organization,
+    projectId: project,
+    targetId: target,
     scope,
   });
 
-  return await injector.get(Storage).getTarget({ target, organization, project });
+  return await injector
+    .get(Storage)
+    .getTarget({ targetId: target, organizationId: organization, projectId: project });
 }
 
 export const resolvers: CollectionModule.Resolvers = {

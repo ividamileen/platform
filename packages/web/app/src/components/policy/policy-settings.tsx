@@ -9,7 +9,8 @@ import {
   SchemaPolicyInput,
 } from '@/gql/graphql';
 import type { ResultOf } from '@graphql-typed-document-node/core';
-import { Callout, DataWrapper } from '../v2';
+import { Callout } from '../ui/callout';
+import { DataWrapper } from '../v2';
 import { PolicyListItem } from './policy-list-item';
 import { buildValidationSchema, PolicyFormValues } from './rules-configuration';
 
@@ -163,7 +164,7 @@ export function PolicySettings({
   const activePolicy = useFragment(PolicySettings_SchemaPolicyFragment, currentState);
 
   return (
-    <DataWrapper query={availableRules} organizationId={null}>
+    <DataWrapper query={availableRules} organizationSlug={null}>
       {query => (
         <PolicySettingsListForm
           saving={saving}

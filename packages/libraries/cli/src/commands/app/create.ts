@@ -59,15 +59,15 @@ export default class AppCreate extends Command<typeof AppCreate> {
       throw new Error('Invalid manifest');
     }
 
-    const result = await this.registryApi(endpoint, accessToken).request(
-      CreateAppDeploymentMutation,
-      {
+    const result = await this.registryApi(endpoint, accessToken).request({
+      operation: CreateAppDeploymentMutation,
+      variables: {
         input: {
           appName: flags['name'],
           appVersion: flags['version'],
         },
       },
-    );
+    });
 
     if (result.createAppDeployment.error) {
       // TODO: better error message formatting :)
@@ -89,20 +89,39 @@ export default class AppCreate extends Command<typeof AppCreate> {
 
     const flush = async (force = false) => {
       if (buffer.length >= 100 || force) {
-        const result = await this.registryApi(endpoint, accessToken).request(
-          AddDocumentsToAppDeploymentMutation,
-          {
+        const result = await this.registryApi(endpoint, accessToken).request({
+          operation: AddDocumentsToAppDeploymentMutation,
+          variables: {
             input: {
               appName: flags['name'],
               appVersion: flags['version'],
               documents: buffer,
             },
           },
-        );
+        });
 
         if (result.addDocumentsToAppDeployment.error) {
-          // TODO: better error message formatting :)
-          throw new Error(result.addDocumentsToAppDeployment.error.message);
+          if (result.addDocumentsToAppDeployment.error.details) {
+            const affectedOperation = buffer.at(
+              result.addDocumentsToAppDeployment.error.details.index,
+            );
+
+            const maxCharacters = 40;
+
+            if (affectedOperation) {
+              const truncatedBody = (
+                affectedOperation.body.length > maxCharacters - 3
+                  ? affectedOperation.body.substring(0, maxCharacters) + '...'
+                  : affectedOperation.body
+              ).replace(/\n/g, '\\n');
+              this.infoWarning(
+                `Failed uploading document: ${result.addDocumentsToAppDeployment.error.details.message}` +
+                  `\nOperation hash: ${affectedOperation?.hash}` +
+                  `\nOperation body: ${truncatedBody}`,
+              );
+            }
+          }
+          this.error(result.addDocumentsToAppDeployment.error.message);
         }
         buffer = [];
       }
@@ -157,6 +176,11 @@ const AddDocumentsToAppDeploymentMutation = graphql(/* GraphQL */ `
       }
       error {
         message
+        details {
+          index
+          message
+          __typename
+        }
       }
     }
   }

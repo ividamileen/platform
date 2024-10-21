@@ -43,7 +43,10 @@ export const SchemaCheckConclusion = {
    */
   Failure: 'FAILURE',
   /**
-   * Skipped as the schemas have not changed from the compared schema version
+   * Skipped as the schemas have not changed from the latest schema version
+   *
+   * At this point, the schema is not checked for breaking changes or composition errors,
+   * these are passed from the latest schema version (not necessarily the latest composable version).
    */
   Skip: 'SKIP',
 } as const;
@@ -81,12 +84,12 @@ export type CheckFailureReasonCode =
 export type CheckPolicyResultRecord = CheckPolicyResponse[number] | { message: string };
 export type SchemaCheckWarning = {
   message: string;
-  source: string;
-  line: number;
-  column: number;
-  ruleId: string;
-  endLine: number | null;
-  endColumn: number | null;
+  source?: string;
+  line?: number | null;
+  column?: number | null;
+  ruleId: string | null;
+  endLine?: number | null;
+  endColumn?: number | null;
 };
 
 export type SchemaCheckSuccess = {

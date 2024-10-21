@@ -24,7 +24,6 @@ import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/components/ui/use-toast';
 import { UserMenu } from '@/components/ui/user-menu';
-import { Tabs } from '@/components/v2/tabs';
 import { env } from '@/env/frontend';
 import { graphql, useFragment } from '@/gql';
 import { ProjectType } from '@/gql/graphql';
@@ -36,6 +35,7 @@ import {
 import { getIsStripeEnabled } from '@/lib/billing/stripe-public-key';
 import { useToggle } from '@/lib/hooks';
 import { useLastVisitedOrganizationWriter } from '@/lib/last-visited-org';
+import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Slot } from '@radix-ui/react-slot';
 import { Link, useRouter } from '@tanstack/react-router';
@@ -44,6 +44,7 @@ import { RateLimitWarn } from '../organization/billing/RateLimitWarn';
 import { HiveLink } from '../ui/hive-link';
 import { PlusIcon } from '../ui/icon';
 import { QueryError } from '../ui/query-error';
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 import { OrganizationSelector } from './organization-selectors';
 
 export enum Page {
@@ -58,7 +59,7 @@ export enum Page {
 const OrganizationLayout_OrganizationFragment = graphql(`
   fragment OrganizationLayout_OrganizationFragment on Organization {
     id
-    cleanId
+    slug
     me {
       ...CanAccessOrganization_MemberFragment
     }
@@ -91,7 +92,7 @@ export function OrganizationLayout({
 }: {
   page?: Page;
   className?: string;
-  organizationId: string;
+  organizationSlug: string;
   children: ReactNode;
 }): ReactElement | null {
   const [isModalOpen, toggleModalOpen] = useToggle();
@@ -104,21 +105,21 @@ export function OrganizationLayout({
     OrganizationLayout_OrganizationFragment,
     query.data?.organizations.nodes,
   );
-  const currentOrganization = organizations?.find(org => org.cleanId === props.organizationId);
+  const currentOrganization = organizations?.find(org => org.slug === props.organizationSlug);
 
   useOrganizationAccess({
     member: currentOrganization?.me ?? null,
     scope: OrganizationAccessScope.Read,
     redirect: true,
-    organizationId: props.organizationId,
+    organizationSlug: props.organizationSlug,
   });
 
-  useLastVisitedOrganizationWriter(currentOrganization?.cleanId);
+  useLastVisitedOrganizationWriter(currentOrganization?.slug);
 
   const meInCurrentOrg = currentOrganization?.me;
 
   if (query.error) {
-    return <QueryError error={query.error} organizationId={props.organizationId} />;
+    return <QueryError error={query.error} organizationSlug={props.organizationSlug} />;
   }
 
   return (
@@ -128,14 +129,14 @@ export function OrganizationLayout({
           <div className="flex flex-row items-center gap-4">
             <HiveLink className="size-8" />
             <OrganizationSelector
-              currentOrganizationCleanId={props.organizationId}
+              currentOrganizationSlug={props.organizationSlug}
               organizations={query.data?.organizations ?? null}
             />
           </div>
           <div>
             <UserMenu
               me={query.data?.me ?? null}
-              currentOrganizationCleanId={props.organizationId}
+              currentOrganizationSlug={props.organizationSlug}
               organizations={query.data?.organizations ?? null}
             />
           </div>
@@ -144,70 +145,70 @@ export function OrganizationLayout({
       <div className="relative h-[--tabs-navbar-height] border-b border-gray-800">
         <div className="container flex items-center justify-between">
           {currentOrganization && meInCurrentOrg ? (
-            <Tabs value={page}>
-              <Tabs.List>
-                <Tabs.Trigger value={Page.Overview} asChild>
+            <Tabs value={page} className="min-w-[600px]">
+              <TabsList variant="menu">
+                <TabsTrigger variant="menu" value={Page.Overview} asChild>
                   <Link
-                    to="/$organizationId"
-                    params={{ organizationId: currentOrganization.cleanId }}
+                    to="/$organizationSlug"
+                    params={{ organizationSlug: currentOrganization.slug }}
                   >
                     Overview
                   </Link>
-                </Tabs.Trigger>
+                </TabsTrigger>
                 {canAccessOrganization(OrganizationAccessScope.Members, meInCurrentOrg) && (
-                  <Tabs.Trigger value={Page.Members} asChild>
+                  <TabsTrigger variant="menu" value={Page.Members} asChild>
                     <Link
-                      to="/$organizationId/view/members"
-                      params={{ organizationId: currentOrganization.cleanId }}
+                      to="/$organizationSlug/view/members"
+                      params={{ organizationSlug: currentOrganization.slug }}
                       search={{ page: 'list' }}
                     >
                       Members
                     </Link>
-                  </Tabs.Trigger>
+                  </TabsTrigger>
                 )}
                 {canAccessOrganization(OrganizationAccessScope.Settings, meInCurrentOrg) && (
                   <>
-                    <Tabs.Trigger value={Page.Policy} asChild>
+                    <TabsTrigger variant="menu" value={Page.Policy} asChild>
                       <Link
-                        to="/$organizationId/view/policy"
-                        params={{ organizationId: currentOrganization.cleanId }}
+                        to="/$organizationSlug/view/policy"
+                        params={{ organizationSlug: currentOrganization.slug }}
                       >
                         Policy
                       </Link>
-                    </Tabs.Trigger>
-                    <Tabs.Trigger value={Page.Settings} asChild>
+                    </TabsTrigger>
+                    <TabsTrigger variant="menu" value={Page.Settings} asChild>
                       <Link
-                        to="/$organizationId/view/settings"
-                        params={{ organizationId: currentOrganization.cleanId }}
+                        to="/$organizationSlug/view/settings"
+                        params={{ organizationSlug: currentOrganization.slug }}
                       >
                         Settings
                       </Link>
-                    </Tabs.Trigger>
+                    </TabsTrigger>
                   </>
                 )}
                 {canAccessOrganization(OrganizationAccessScope.Read, meInCurrentOrg) &&
                   env.zendeskSupport && (
-                    <Tabs.Trigger value={Page.Support} asChild>
+                    <TabsTrigger variant="menu" value={Page.Support} asChild>
                       <Link
-                        to="/$organizationId/view/support"
-                        params={{ organizationId: currentOrganization.cleanId }}
+                        to="/$organizationSlug/view/support"
+                        params={{ organizationSlug: currentOrganization.slug }}
                       >
                         Support
                       </Link>
-                    </Tabs.Trigger>
+                    </TabsTrigger>
                   )}
                 {getIsStripeEnabled() &&
                   canAccessOrganization(OrganizationAccessScope.Settings, meInCurrentOrg) && (
-                    <Tabs.Trigger value={Page.Subscription} asChild>
+                    <TabsTrigger variant="menu" value={Page.Subscription} asChild>
                       <Link
-                        to="/$organizationId/view/subscription"
-                        params={{ organizationId: currentOrganization.cleanId }}
+                        to="/$organizationSlug/view/subscription"
+                        params={{ organizationSlug: currentOrganization.slug }}
                       >
                         Subscription
                       </Link>
-                    </Tabs.Trigger>
+                    </TabsTrigger>
                   )}
-              </Tabs.List>
+              </TabsList>
             </Tabs>
           ) : (
             <div className="flex flex-row gap-x-8 border-b-2 border-b-transparent px-4 py-3">
@@ -223,9 +224,11 @@ export function OrganizationLayout({
                 New project
               </Button>
               <CreateProjectModal
-                organizationId={props.organizationId}
+                organizationSlug={props.organizationSlug}
                 isOpen={isModalOpen}
                 toggleModalOpen={toggleModalOpen}
+                // reset the form every time it is closed
+                key={String(isModalOpen)}
               />
             </>
           ) : null}
@@ -250,13 +253,11 @@ export const CreateProjectMutation = graphql(`
       ok {
         createdProject {
           id
-          name
-          cleanId
+          slug
         }
         createdTargets {
           id
-          name
-          cleanId
+          slug
         }
         updatedOrganization {
           id
@@ -265,9 +266,7 @@ export const CreateProjectMutation = graphql(`
       error {
         message
         inputErrors {
-          name
-          buildUrl
-          validationUrl
+          slug
         }
       }
     }
@@ -275,15 +274,15 @@ export const CreateProjectMutation = graphql(`
 `);
 
 const createProjectFormSchema = z.object({
-  projectName: z
+  projectSlug: z
     .string({
-      required_error: 'Project name is required',
+      required_error: 'Project slug is required',
     })
     .min(2, {
-      message: 'Project name must be at least 2 characters long',
+      message: 'Project slug must be at least 2 characters long',
     })
-    .max(40, {
-      message: 'Project name must be at most 40 characters long',
+    .max(50, {
+      message: 'Project slug must be at most 50 characters long',
     }),
   projectType: z.nativeEnum(ProjectType, {
     required_error: 'Project type is required',
@@ -317,7 +316,7 @@ function ProjectTypeCard(props: {
 function CreateProjectModal(props: {
   isOpen: boolean;
   toggleModalOpen: () => void;
-  organizationId: string;
+  organizationSlug: string;
 }) {
   const [_, mutate] = useMutation(CreateProjectMutation);
   const router = useRouter();
@@ -327,7 +326,7 @@ function CreateProjectModal(props: {
     mode: 'onChange',
     resolver: zodResolver(createProjectFormSchema),
     defaultValues: {
-      projectName: '',
+      projectSlug: '',
       projectType: ProjectType.Single,
     },
   });
@@ -335,23 +334,23 @@ function CreateProjectModal(props: {
   async function onSubmit(values: z.infer<typeof createProjectFormSchema>) {
     const { data, error } = await mutate({
       input: {
-        organization: props.organizationId,
-        name: values.projectName,
+        organizationSlug: props.organizationSlug,
+        slug: values.projectSlug,
         type: values.projectType,
       },
     });
     if (data?.createProject.ok) {
       props.toggleModalOpen();
       void router.navigate({
-        to: '/$organizationId/$projectId',
+        to: '/$organizationSlug/$projectSlug',
         params: {
-          organizationId: props.organizationId,
-          projectId: data.createProject.ok.createdProject.cleanId,
+          organizationSlug: props.organizationSlug,
+          projectSlug: data.createProject.ok.createdProject.slug,
         },
       });
-    } else if (data?.createProject.error?.inputErrors.name) {
-      form.setError('projectName', {
-        message: data?.createProject.error?.inputErrors.name,
+    } else if (data?.createProject.error?.inputErrors.slug) {
+      form.setError('projectSlug', {
+        message: data?.createProject.error?.inputErrors.slug,
       });
     } else {
       toast({
@@ -382,23 +381,23 @@ export function CreateProjectModalContent(props: {
     <Dialog open={props.isOpen} onOpenChange={props.toggleModalOpen}>
       <DialogContent className="container w-4/5 max-w-[600px] md:w-3/5">
         <Form {...props.form}>
-          <form className="space-y-8" onSubmit={props.form.handleSubmit(props.onSubmit)}>
-            <DialogHeader>
+          <form onSubmit={props.form.handleSubmit(props.onSubmit)}>
+            <DialogHeader className="mb-8">
               <DialogTitle>Create a project</DialogTitle>
               <DialogDescription>
                 A Hive <b>project</b> represents a <b>GraphQL API</b> running a GraphQL schema.
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-8">
+            <div>
               <FormField
                 control={props.form.control}
-                name="projectName"
+                name="projectSlug"
                 render={({ field }) => {
                   return (
-                    <FormItem>
-                      <FormLabel>Name of your project</FormLabel>
+                    <FormItem className="mt-0">
+                      <FormLabel>Slug of your project</FormLabel>
                       <FormControl>
-                        <Input placeholder="My GraphQL API" autoComplete="off" {...field} />
+                        <Input placeholder="my-project" autoComplete="off" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -410,29 +409,38 @@ export function CreateProjectModalContent(props: {
                 name="projectType"
                 render={({ field }) => {
                   return (
-                    <FormItem>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="pt-2"
-                      >
+                    <FormItem className="mt-2">
+                      <FormLabel>Project Type</FormLabel>
+                      <RadioGroup onValueChange={field.onChange} defaultValue={field.value}>
                         <ProjectTypeCard
                           type={ProjectType.Single}
-                          title="Single"
-                          description="Monolithic GraphQL schema developed as a standalone"
-                          icon={<BoxIcon />}
+                          title="Monolith"
+                          description="Single GraphQL schema developed as a monolith"
+                          icon={
+                            <BoxIcon
+                              className={cn(field.value === ProjectType.Single && 'text-white')}
+                            />
+                          }
                         />
                         <ProjectTypeCard
                           type={ProjectType.Federation}
                           title="Federation"
                           description="Project developed according to Apollo Federation specification"
-                          icon={<BlocksIcon />}
+                          icon={
+                            <BlocksIcon
+                              className={cn(field.value === ProjectType.Federation && 'text-white')}
+                            />
+                          }
                         />
                         <ProjectTypeCard
                           type={ProjectType.Stitching}
                           title="Stitching"
                           description="Project that stitches together multiple GraphQL APIs"
-                          icon={<FoldVerticalIcon />}
+                          icon={
+                            <FoldVerticalIcon
+                              className={cn(field.value === ProjectType.Stitching && 'text-white')}
+                            />
+                          }
                         />
                       </RadioGroup>
                     </FormItem>
@@ -440,7 +448,7 @@ export function CreateProjectModalContent(props: {
                 }}
               />
             </div>
-            <DialogFooter>
+            <DialogFooter className="mt-8">
               <Button
                 className="w-full"
                 type="submit"
