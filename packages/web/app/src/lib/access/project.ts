@@ -27,14 +27,14 @@ export function useProjectAccess({
   scope,
   member: mmember,
   redirect = false,
-  organizationSlug,
-  projectSlug,
+  organizationId,
+  projectId,
 }: {
   scope: ProjectAccessScope;
   member: null | FragmentType<typeof CanAccessProject_MemberFragment>;
   redirect?: boolean;
-  organizationSlug: string;
-  projectSlug: string;
+  organizationId: string;
+  projectId: string;
 }) {
   const member = useFragment(CanAccessProject_MemberFragment, mmember);
 
@@ -44,10 +44,10 @@ export function useProjectAccess({
     redirectTo: redirect
       ? router => {
           void router.navigate({
-            to: '/$organizationSlug/$projectSlug',
+            to: '/$organizationId/$projectId',
             params: {
-              organizationSlug,
-              projectSlug,
+              organizationId,
+              projectId,
             },
           });
         }

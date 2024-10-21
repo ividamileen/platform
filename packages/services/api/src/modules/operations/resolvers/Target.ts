@@ -8,16 +8,16 @@ export const Target: Pick<
 > = {
   totalRequests: (target, { period }, { injector }) => {
     return injector.get(OperationsManager).countRequests({
-      targetId: target.id,
-      projectId: target.projectId,
-      organizationId: target.orgId,
+      target: target.id,
+      project: target.projectId,
+      organization: target.orgId,
       period: parseDateRangeInput(period),
     });
   },
   requestsOverTime: async (target, { resolution, period }, { injector }) => {
     const result = await injector.get(OperationsManager).readRequestsOverTimeOfTargets({
-      projectId: target.projectId,
-      organizationId: target.orgId,
+      project: target.projectId,
+      organization: target.orgId,
       targets: [target.id],
       period: parseDateRangeInput(period),
       resolution,
@@ -28,9 +28,9 @@ export const Target: Pick<
   operation: (target, args, { injector }) => {
     return injector.get(OperationsManager).getOperation({
       hash: args.hash,
-      organizationId: target.orgId,
-      projectId: target.projectId,
-      targetId: target.id,
+      organization: target.orgId,
+      project: target.projectId,
+      target: target.id,
     });
   },
 };

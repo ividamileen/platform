@@ -12,7 +12,7 @@ export const schemaDelete: NonNullable<MutationResolvers['schemaDelete']> = asyn
   { input },
   { injector, request },
 ) => {
-  const [organizationId, projectId, target] = await Promise.all([
+  const [organization, project, target] = await Promise.all([
     injector.get(OrganizationManager).getOrganizationIdByToken(),
     injector.get(ProjectManager).getProjectIdByToken(),
     injector.get(TargetManager).getTargetFromToken(),
@@ -34,8 +34,8 @@ export const schemaDelete: NonNullable<MutationResolvers['schemaDelete']> = asyn
     {
       dryRun: input.dryRun,
       serviceName: input.serviceName.toLowerCase(),
-      organizationId,
-      projectId,
+      organization,
+      project,
       target,
       checksum,
     },

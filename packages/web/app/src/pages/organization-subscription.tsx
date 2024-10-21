@@ -78,12 +78,12 @@ const SubscriptionPageQuery = graphql(`
   }
 `);
 
-function SubscriptionPageContent(props: { organizationSlug: string }) {
+function SubscriptionPageContent(props: { organizationId: string }) {
   const [query] = useQuery({
     query: SubscriptionPageQuery,
     variables: {
       selector: {
-        organizationSlug: props.organizationSlug,
+        organization: props.organizationId,
       },
     },
   });
@@ -97,7 +97,7 @@ function SubscriptionPageContent(props: { organizationSlug: string }) {
     scope: OrganizationAccessScope.Settings,
     member: organization?.me ?? null,
     redirect: true,
-    organizationSlug: props.organizationSlug,
+    organizationId: props.organizationId,
   });
 
   const monthlyUsage = query.data?.monthlyUsage ?? [];
@@ -107,7 +107,7 @@ function SubscriptionPageContent(props: { organizationSlug: string }) {
   );
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationId} error={query.error} />;
   }
 
   if (query.fetching) {
@@ -129,7 +129,7 @@ function SubscriptionPageContent(props: { organizationSlug: string }) {
   return (
     <OrganizationLayout
       page={Page.Subscription}
-      organizationSlug={props.organizationSlug}
+      organizationId={props.organizationId}
       className="flex flex-col gap-y-10"
     >
       <div className="grow">
@@ -141,8 +141,8 @@ function SubscriptionPageContent(props: { organizationSlug: string }) {
           <div>
             <Button asChild>
               <Link
-                to="/$organizationSlug/view/manage-subscription"
-                params={{ organizationSlug: currentOrganization.slug }}
+                to="/$organizationId/view/manage-subscription"
+                params={{ organizationId: currentOrganization.slug }}
               >
                 Manage subscription
               </Link>
@@ -268,12 +268,12 @@ function SubscriptionPageContent(props: { organizationSlug: string }) {
   );
 }
 
-export function OrganizationSubscriptionPage(props: { organizationSlug: string }): ReactElement {
+export function OrganizationSubscriptionPage(props: { organizationId: string }): ReactElement {
   return (
     <>
       <Meta title="Subscription & Usage" />
-      <RenderIfStripeAvailable organizationSlug={props.organizationSlug}>
-        <SubscriptionPageContent organizationSlug={props.organizationSlug} />
+      <RenderIfStripeAvailable organizationId={props.organizationId}>
+        <SubscriptionPageContent organizationId={props.organizationId} />
       </RenderIfStripeAvailable>
     </>
   );

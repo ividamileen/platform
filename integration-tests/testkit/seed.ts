@@ -129,7 +129,7 @@ export function initSeed() {
                 variables: {
                   allowOverrides,
                   selector: {
-                    organizationSlug: organization.slug,
+                    organization: organization.slug,
                   },
                   policy,
                 },
@@ -153,8 +153,8 @@ export function initSeed() {
               const inviteResult = await inviteToOrganization(
                 {
                   email,
-                  organizationSlug: organization.slug,
-                  roleId,
+                  organization: organization.slug,
+                  role: roleId,
                 },
                 inviteToken,
               ).then(r => r.expectNoGraphQLErrors());
@@ -166,7 +166,7 @@ export function initSeed() {
             },
             async members() {
               const membersResult = await getOrganizationMembers(
-                { organizationSlug: organization.slug },
+                { organization: organization.slug },
                 ownerToken,
               ).then(r => r.expectNoGraphQLErrors());
 
@@ -180,7 +180,7 @@ export function initSeed() {
             },
             async projects() {
               const projectsResult = await getOrganizationProjects(
-                { organizationSlug: organization.slug },
+                { organization: organization.slug },
                 ownerToken,
               ).then(r => r.expectNoGraphQLErrors());
 
@@ -201,7 +201,7 @@ export function initSeed() {
               const useLegacyRegistryModels = options?.useLegacyRegistryModels === true;
               const projectResult = await createProject(
                 {
-                  organizationSlug: organization.slug,
+                  organization: organization.slug,
                   type: projectType,
                   slug: generateUnique(),
                 },
@@ -215,8 +215,8 @@ export function initSeed() {
               if (useLegacyRegistryModels) {
                 await updateRegistryModel(
                   {
-                    organizationSlug: organization.slug,
-                    projectSlug: projectResult.createProject.ok!.createdProject.slug,
+                    organization: organization.slug,
+                    project: projectResult.createProject.ok!.createdProject.slug,
                     model: RegistryModel.Legacy,
                   },
                   ownerToken,
@@ -241,8 +241,8 @@ export function initSeed() {
                     document: UpdateSchemaPolicyForProject,
                     variables: {
                       selector: {
-                        organizationSlug: organization.slug,
-                        projectSlug: project.slug,
+                        organization: organization.slug,
+                        project: project.slug,
                       },
                       policy,
                     },
@@ -254,10 +254,10 @@ export function initSeed() {
                 async removeTokens(tokenIds: string[]) {
                   return await deleteTokens(
                     {
-                      organizationSlug: organization.slug,
-                      projectSlug: project.slug,
-                      targetSlug: target.slug,
-                      tokenIds,
+                      organization: organization.slug,
+                      project: project.slug,
+                      target: target.slug,
+                      tokens: tokenIds,
                     },
                     ownerToken,
                   )
@@ -281,9 +281,9 @@ export function initSeed() {
                         description,
                       },
                       selector: {
-                        organizationSlug: organization.slug,
-                        projectSlug: project.slug,
-                        targetSlug: target.slug,
+                        organization: organization.slug,
+                        project: project.slug,
+                        target: target.slug,
                       },
                     },
                     authToken: token,
@@ -311,9 +311,9 @@ export function initSeed() {
                         description,
                       },
                       selector: {
-                        organizationSlug: organization.slug,
-                        projectSlug: project.slug,
-                        targetSlug: target.slug,
+                        organization: organization.slug,
+                        project: project.slug,
+                        target: target.slug,
                       },
                     },
                     authToken: token,
@@ -333,9 +333,9 @@ export function initSeed() {
                     variables: {
                       id: collectionId,
                       selector: {
-                        organizationSlug: organization.slug,
-                        projectSlug: project.slug,
-                        targetSlug: target.slug,
+                        organization: organization.slug,
+                        project: project.slug,
+                        target: target.slug,
                       },
                     },
                     authToken: token,
@@ -362,9 +362,9 @@ export function initSeed() {
                         variables: input.variables,
                       },
                       selector: {
-                        organizationSlug: organization.slug,
-                        projectSlug: project.slug,
-                        targetSlug: target.slug,
+                        organization: organization.slug,
+                        project: project.slug,
+                        target: target.slug,
                       },
                     },
                     authToken: input.token || ownerToken,
@@ -378,9 +378,9 @@ export function initSeed() {
                     variables: {
                       id: input.operationId,
                       selector: {
-                        organizationSlug: organization.slug,
-                        projectSlug: project.slug,
-                        targetSlug: target.slug,
+                        organization: organization.slug,
+                        project: project.slug,
+                        target: target.slug,
                       },
                     },
                     authToken: input.token || ownerToken,
@@ -409,9 +409,9 @@ export function initSeed() {
                         variables: input.variables,
                       },
                       selector: {
-                        organizationSlug: organization.slug,
-                        projectSlug: project.slug,
-                        targetSlug: target.slug,
+                        organization: organization.slug,
+                        project: project.slug,
+                        target: target.slug,
                       },
                     },
                     authToken: input.token || ownerToken,
@@ -443,9 +443,9 @@ export function initSeed() {
                   const tokenResult = await createToken(
                     {
                       name: generateUnique(),
-                      organizationSlug: organization.slug,
-                      projectSlug: project.slug,
-                      targetSlug: target.slug,
+                      organization: organization.slug,
+                      project: project.slug,
+                      target: target.slug,
                       organizationScopes: organizationScopes,
                       projectScopes: projectScopes,
                       targetScopes: targetScopes,
@@ -462,9 +462,9 @@ export function initSeed() {
                     async readOperationBody(hash: string) {
                       const operationBodyResult = await readOperationBody(
                         {
-                          organizationSlug: organization.slug,
-                          projectSlug: project.slug,
-                          targetSlug: target.slug,
+                          organization: organization.slug,
+                          project: project.slug,
+                          target: target.slug,
                           hash,
                         },
                         secret,
@@ -475,9 +475,9 @@ export function initSeed() {
                     async readOperationsStats(from: string, to: string) {
                       const statsResult = await readOperationsStats(
                         {
-                          organizationSlug: organization.slug,
-                          projectSlug: project.slug,
-                          targetSlug: target.slug,
+                          organization: organization.slug,
+                          project: project.slug,
+                          target: target.slug,
                           period: {
                             from,
                             to,
@@ -522,9 +522,9 @@ export function initSeed() {
                       const result = await setTargetValidation(
                         {
                           enabled,
-                          targetSlug: target.slug,
-                          projectSlug: project.slug,
-                          organizationSlug: organization.slug,
+                          target: target.slug,
+                          project: project.slug,
+                          organization: organization.slug,
                         },
                         {
                           token: secret,
@@ -542,13 +542,13 @@ export function initSeed() {
                     }) {
                       const result = await updateTargetValidationSettings(
                         {
-                          organizationSlug: organization.slug,
-                          projectSlug: project.slug,
-                          targetSlug: target.slug,
+                          organization: organization.slug,
+                          project: project.slug,
+                          target: target.slug,
                           excludedClients,
                           percentage,
                           period: 2,
-                          targetIds: [target.id],
+                          targets: [target.id],
                         },
                         {
                           token: secret,
@@ -560,21 +560,21 @@ export function initSeed() {
                     async fetchMetadataFromCDN() {
                       return fetchMetadataFromCDN(
                         {
-                          organizationSlug: organization.slug,
-                          projectSlug: project.slug,
-                          targetSlug: target.slug,
+                          organization: organization.slug,
+                          project: project.slug,
+                          target: target.slug,
                         },
                         secret,
                       );
                     },
-                    async updateSchemaVersionStatus(versionId: string, valid: boolean) {
+                    async updateSchemaVersionStatus(version: string, valid: boolean) {
                       return await updateSchemaVersionStatus(
                         {
-                          organizationSlug: organization.slug,
-                          projectSlug: project.slug,
-                          targetSlug: target.slug,
+                          organization: organization.slug,
+                          project: project.slug,
+                          target: target.slug,
                           valid,
-                          versionId,
+                          version,
                         },
                         secret,
                       ).then(r => r.expectNoGraphQLErrors());
@@ -582,9 +582,9 @@ export function initSeed() {
                     async fetchSchemaFromCDN() {
                       return fetchSchemaFromCDN(
                         {
-                          organizationSlug: organization.slug,
-                          projectSlug: project.slug,
-                          targetSlug: target.slug,
+                          organization: organization.slug,
+                          project: project.slug,
+                          target: target.slug,
                         },
                         secret,
                       );
@@ -592,9 +592,9 @@ export function initSeed() {
                     async createCdnAccess() {
                       const result = await createCdnAccess(
                         {
-                          organizationSlug: organization.slug,
-                          projectSlug: project.slug,
-                          targetSlug: target.slug,
+                          organization: organization.slug,
+                          project: project.slug,
+                          target: target.slug,
                         },
                         secret,
                       ).then(r => r.expectNoGraphQLErrors());
@@ -654,9 +654,9 @@ export function initSeed() {
                       return (
                         await compareToPreviousVersion(
                           {
-                            organizationSlug: organization.slug,
-                            projectSlug: project.slug,
-                            targetSlug: target.slug,
+                            organization: organization.slug,
+                            project: project.slug,
+                            target: target.slug,
                             version,
                           },
                           secret,
@@ -667,9 +667,9 @@ export function initSeed() {
                       const result = await updateBaseSchema(
                         {
                           newBase,
-                          organizationSlug: organization.slug,
-                          projectSlug: project.slug,
-                          targetSlug: target.slug,
+                          organization: organization.slug,
+                          project: project.slug,
+                          target: target.slug,
                         },
                         secret,
                       ).then(r => r.expectNoGraphQLErrors());
@@ -679,9 +679,9 @@ export function initSeed() {
                     async fetchVersions(count: number) {
                       const result = await fetchVersions(
                         {
-                          organizationSlug: organization.slug,
-                          projectSlug: project.slug,
-                          targetSlug: target.slug,
+                          organization: organization.slug,
+                          project: project.slug,
+                          target: target.slug,
                         },
                         count,
                         secret,
@@ -703,9 +703,9 @@ export function initSeed() {
                     async fetchSupergraph() {
                       const supergraphResponse = await fetchSupergraphFromCDN(
                         {
-                          organizationSlug: organization.slug,
-                          projectSlug: project.slug,
-                          targetSlug: target.slug,
+                          organization: organization.slug,
+                          project: project.slug,
+                          target: target.slug,
                         },
                         secret,
                       );
@@ -728,7 +728,7 @@ export function initSeed() {
 
               const invitationResult = await inviteToOrganization(
                 {
-                  organizationSlug: organization.slug,
+                  organization: organization.slug,
                   email: memberEmail,
                 },
                 inviteToken,
@@ -769,9 +769,9 @@ export function initSeed() {
                 ) {
                   const memberRoleAssignmentResult = await assignMemberRole(
                     {
-                      organizationSlug: organization.slug,
-                      userId: input.userId,
-                      roleId: input.roleId,
+                      organization: organization.slug,
+                      user: input.userId,
+                      role: input.roleId,
                     },
                     options.useMemberToken ? memberToken : ownerToken,
                   ).then(r => r.expectNoGraphQLErrors());
@@ -790,8 +790,8 @@ export function initSeed() {
                 ) {
                   const memberRoleDeletionResult = await deleteMemberRole(
                     {
-                      organizationSlug: organization.slug,
-                      roleId,
+                      organization: organization.slug,
+                      role: roleId,
                     },
                     options.useMemberToken ? memberToken : ownerToken,
                   ).then(r => r.expectNoGraphQLErrors());
@@ -820,7 +820,7 @@ export function initSeed() {
                   });
                   const memberRoleCreationResult = await createMemberRole(
                     {
-                      organizationSlug: organization.slug,
+                      organization: organization.slug,
                       name,
                       description: 'some description',
                       organizationAccessScopes: scopes.organization,
@@ -875,8 +875,8 @@ export function initSeed() {
                 ) {
                   const memberRoleUpdateResult = await updateMemberRole(
                     {
-                      organizationSlug: organization.slug,
-                      roleId: role.id,
+                      organization: organization.slug,
+                      role: role.id,
                       name: role.name,
                       description: role.description,
                       organizationAccessScopes: scopes.organization,

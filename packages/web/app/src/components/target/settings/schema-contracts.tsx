@@ -140,9 +140,9 @@ function DisableContractDialog(props: { contractId: string; onClose: () => void 
 }
 
 export function SchemaContracts(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   const [disabledContractId, setDisabledContractId] = useState<string | null>(null);
 
@@ -150,9 +150,9 @@ export function SchemaContracts(props: {
     query: SchemaContractsQuery,
     variables: {
       selector: {
-        organizationSlug: props.organizationSlug,
-        projectSlug: props.projectSlug,
-        targetSlug: props.targetSlug,
+        organization: props.organizationId,
+        project: props.projectId,
+        target: props.targetId,
       },
     },
   });

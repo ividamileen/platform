@@ -60,9 +60,9 @@ const SchemaVersionView_SchemaVersionFragment = graphql(`
 function SchemaVersionView(props: {
   schemaVersion: FragmentType<typeof SchemaVersionView_SchemaVersionFragment>;
   projectType: ProjectType;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   const schemaVersion = useFragment(SchemaVersionView_SchemaVersionFragment, props.schemaVersion);
 
@@ -159,15 +159,15 @@ function SchemaVersionView(props: {
         <ContractVersionView
           contractVersion={contractVersionNode}
           projectType={props.projectType}
-          organizationSlug={props.organizationSlug}
-          projectSlug={props.projectSlug}
-          targetSlug={props.targetSlug}
+          organizationId={props.organizationId}
+          projectId={props.projectId}
+          targetId={props.targetId}
         />
       ) : (
         <DefaultSchemaVersionView
-          organizationSlug={props.organizationSlug}
-          projectSlug={props.projectSlug}
-          targetSlug={props.targetSlug}
+          organizationId={props.organizationId}
+          projectId={props.projectId}
+          targetId={props.targetId}
           schemaVersion={schemaVersion}
           projectType={props.projectType}
           hasContracts={!!schemaVersion.contractVersions?.edges}
@@ -222,9 +222,9 @@ const DefaultSchemaVersionView_SchemaVersionFragment = graphql(`
 function DefaultSchemaVersionView(props: {
   schemaVersion: FragmentType<typeof DefaultSchemaVersionView_SchemaVersionFragment>;
   projectType: ProjectType;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
   hasContracts: boolean;
 }) {
   const schemaVersion = useFragment(
@@ -326,9 +326,9 @@ function DefaultSchemaVersionView(props: {
             {schemaVersion.breakingSchemaChanges?.nodes.length && (
               <div className="mb-2">
                 <ChangesBlock
-                  organizationSlug={props.organizationSlug}
-                  projectSlug={props.projectSlug}
-                  targetSlug={props.targetSlug}
+                  organizationId={props.organizationId}
+                  projectId={props.projectId}
+                  targetId={props.targetId}
                   schemaCheckId=""
                   title="Breaking Changes"
                   criticality={CriticalityLevel.Breaking}
@@ -339,9 +339,9 @@ function DefaultSchemaVersionView(props: {
             {schemaVersion.safeSchemaChanges?.nodes?.length && (
               <div className="mb-2">
                 <ChangesBlock
-                  organizationSlug={props.organizationSlug}
-                  projectSlug={props.projectSlug}
-                  targetSlug={props.targetSlug}
+                  organizationId={props.organizationId}
+                  projectId={props.projectId}
+                  targetId={props.targetId}
                   schemaCheckId=""
                   title="Safe Changes"
                   criticality={CriticalityLevel.Safe}
@@ -410,9 +410,9 @@ const ContractVersionView_ContractVersionFragment = graphql(`
 function ContractVersionView(props: {
   contractVersion: FragmentType<typeof ContractVersionView_ContractVersionFragment>;
   projectType: ProjectType;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   const contractVersion = useFragment(
     ContractVersionView_ContractVersionFragment,
@@ -500,9 +500,9 @@ function ContractVersionView(props: {
             {contractVersion.breakingSchemaChanges?.nodes.length && (
               <div className="mb-2">
                 <ChangesBlock
-                  organizationSlug={props.organizationSlug}
-                  projectSlug={props.projectSlug}
-                  targetSlug={props.targetSlug}
+                  organizationId={props.organizationId}
+                  projectId={props.projectId}
+                  targetId={props.targetId}
                   schemaCheckId=""
                   title="Breaking Changes"
                   criticality={CriticalityLevel.Breaking}
@@ -513,9 +513,9 @@ function ContractVersionView(props: {
             {contractVersion.safeSchemaChanges?.nodes?.length && (
               <div className="mb-2">
                 <ChangesBlock
-                  organizationSlug={props.organizationSlug}
-                  projectSlug={props.projectSlug}
-                  targetSlug={props.targetSlug}
+                  organizationId={props.organizationId}
+                  projectId={props.projectId}
+                  targetId={props.targetId}
                   schemaCheckId=""
                   title="Safe Changes"
                   criticality={CriticalityLevel.Safe}
@@ -546,25 +546,19 @@ function ContractVersionView(props: {
 
 const ActiveSchemaVersion_SchemaVersionQuery = graphql(`
   query ActiveSchemaVersion_SchemaVersionQuery(
-    $organizationSlug: String!
-    $projectSlug: String!
-    $targetSlug: String!
+    $organization: ID!
+    $project: ID!
+    $target: ID!
     $versionId: ID!
   ) {
-    target(
-      selector: {
-        organizationSlug: $organizationSlug
-        projectSlug: $projectSlug
-        targetSlug: $targetSlug
-      }
-    ) {
+    target(selector: { organization: $organization, project: $project, target: $target }) {
       id
       schemaVersion(id: $versionId) {
         id
         ...SchemaVersionView_SchemaVersionFragment
       }
     }
-    project(selector: { organizationSlug: $organizationSlug, projectSlug: $projectSlug }) {
+    project(selector: { organization: $organization, project: $project }) {
       id
       type
     }
@@ -573,16 +567,16 @@ const ActiveSchemaVersion_SchemaVersionQuery = graphql(`
 
 function ActiveSchemaVersion(props: {
   versionId: string;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   const [query] = useQuery({
     query: ActiveSchemaVersion_SchemaVersionQuery,
     variables: {
-      organizationSlug: props.organizationSlug,
-      projectSlug: props.projectSlug,
-      targetSlug: props.targetSlug,
+      organization: props.organizationId,
+      project: props.projectId,
+      target: props.targetId,
       versionId: props.versionId,
     },
   });
@@ -621,9 +615,9 @@ function ActiveSchemaVersion(props: {
 
   return schemaVersion ? (
     <SchemaVersionView
-      organizationSlug={props.organizationSlug}
-      projectSlug={props.projectSlug}
-      targetSlug={props.targetSlug}
+      organizationId={props.organizationId}
+      projectId={props.projectId}
+      targetId={props.targetId}
       schemaVersion={schemaVersion}
       projectType={projectType}
     />
@@ -631,9 +625,9 @@ function ActiveSchemaVersion(props: {
 }
 
 export function TargetHistoryVersionPage(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
   versionId: string;
 }) {
   return <ActiveSchemaVersion {...props} />;

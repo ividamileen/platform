@@ -11,7 +11,12 @@ import type {
   SchemaVersion,
   TargetBreadcrumb,
 } from '@hive/storage';
-import type { RegistryModel, SchemaChecksFilter } from '../../../__generated__/types';
+import type {
+  AddAlertChannelInput,
+  AddAlertInput,
+  RegistryModel,
+  SchemaChecksFilter,
+} from '../../../__generated__/types';
 import type {
   Alert,
   AlertChannel,
@@ -42,15 +47,15 @@ import type { Contracts } from '../../schema/providers/contracts';
 import type { SchemaCoordinatesDiffResult } from '../../schema/providers/inspector';
 
 export interface OrganizationSelector {
-  organizationId: string;
+  organization: string;
 }
 
 export interface ProjectSelector extends OrganizationSelector {
-  projectId: string;
+  project: string;
 }
 
 export interface TargetSelector extends ProjectSelector {
-  targetId: string;
+  target: string;
 }
 
 type CreateContractVersionInput = {
@@ -84,18 +89,18 @@ export interface Storage {
 
   updateUser(_: { id: string; fullName: string; displayName: string }): Promise<User | never>;
 
-  getOrganizationId(_: { organizationSlug: string }): Promise<string | null>;
+  getOrganizationId(_: OrganizationSelector): Promise<string | null>;
   getOrganizationByInviteCode(_: { inviteCode: string }): Promise<Organization | null>;
   getOrganizationBySlug(_: { slug: string }): Promise<Organization | null>;
   getOrganizationByGitHubInstallationId(_: {
     installationId: string;
   }): Promise<Organization | null>;
-  getOrganization(_: { organizationId: string }): Promise<Organization | never>;
-  getMyOrganization(_: { userId: string }): Promise<Organization | null>;
-  getOrganizations(_: { userId: string }): Promise<readonly Organization[] | never>;
+  getOrganization(_: { organization: string }): Promise<Organization | never>;
+  getMyOrganization(_: { user: string }): Promise<Organization | null>;
+  getOrganizations(_: { user: string }): Promise<readonly Organization[] | never>;
   createOrganization(
     _: Pick<Organization, 'slug'> & {
-      userId: string;
+      user: string;
       adminScopes: ReadonlyArray<OrganizationAccessScope | ProjectAccessScope | TargetAccessScope>;
       viewerScopes: ReadonlyArray<OrganizationAccessScope | ProjectAccessScope | TargetAccessScope>;
       reservedSlugs: string[];
@@ -120,7 +125,7 @@ export interface Storage {
 
   updateOrganizationSlug(
     _: OrganizationSelector &
-      Pick<Organization, 'slug'> & { userId: string; reservedSlugs: string[] },
+      Pick<Organization, 'slug'> & { user: string; reservedSlugs: string[] },
   ): Promise<
     | {
         ok: true;
@@ -150,7 +155,7 @@ export interface Storage {
 
   createOrganizationTransferRequest(
     _: OrganizationSelector & {
-      userId: string;
+      user: string;
     },
   ): Promise<{
     code: string;
@@ -159,7 +164,7 @@ export interface Storage {
   getOrganizationTransferRequest(
     _: OrganizationSelector & {
       code: string;
-      userId: string;
+      user: string;
     },
   ): Promise<{
     code: string;
@@ -168,7 +173,7 @@ export interface Storage {
   answerOrganizationTransferRequest(
     _: OrganizationSelector & {
       code: string;
-      userId: string;
+      user: string;
       accept: boolean;
     },
   ): Promise<void>;
@@ -182,34 +187,34 @@ export interface Storage {
 
   getOrganizationOwner(_: OrganizationSelector): Promise<Member | never>;
 
-  getOrganizationMember(_: OrganizationSelector & { userId: string }): Promise<Member | null>;
+  getOrganizationMember(_: OrganizationSelector & { user: string }): Promise<Member | null>;
 
   getOrganizationMemberAccessPairs(
-    _: readonly (OrganizationSelector & { userId: string })[],
+    _: readonly (OrganizationSelector & { user: string })[],
   ): Promise<
     ReadonlyArray<ReadonlyArray<OrganizationAccessScope | ProjectAccessScope | TargetAccessScope>>
   >;
 
   hasOrganizationMemberPairs(
-    _: readonly (OrganizationSelector & { userId: string })[],
+    _: readonly (OrganizationSelector & { user: string })[],
   ): Promise<readonly boolean[]>;
 
   hasOrganizationProjectMemberPairs(
-    _: readonly (ProjectSelector & { userId: string })[],
+    _: readonly (ProjectSelector & { user: string })[],
   ): Promise<readonly boolean[]>;
 
   addOrganizationMemberViaInvitationCode(
     _: OrganizationSelector & {
       code: string;
-      userId: string;
+      user: string;
     },
   ): Promise<void>;
 
-  deleteOrganizationMember(_: OrganizationSelector & { userId: string }): Promise<void>;
+  deleteOrganizationMember(_: OrganizationSelector & { user: string }): Promise<void>;
 
   updateOrganizationMemberAccess(
     _: OrganizationSelector & {
-      userId: string;
+      user: string;
       scopes: ReadonlyArray<OrganizationAccessScope | ProjectAccessScope | TargetAccessScope>;
     },
   ): Promise<void>;
@@ -261,7 +266,7 @@ export interface Storage {
 
   getProject(_: ProjectSelector): Promise<Project | never>;
 
-  getProjectId(_: { organizationSlug: string; projectSlug: string }): Promise<string | never>;
+  getProjectId(_: ProjectSelector): Promise<string | never>;
 
   getProjectBySlug(_: { slug: string } & OrganizationSelector): Promise<Project | null>;
 
@@ -285,7 +290,7 @@ export interface Storage {
     | never
   >;
 
-  updateProjectSlug(_: ProjectSelector & { slug: string; userId: string }): Promise<
+  updateProjectSlug(_: ProjectSelector & { slug: string; user: string }): Promise<
     | {
         ok: true;
         project: Project;
@@ -319,11 +324,7 @@ export interface Storage {
     },
   ): Promise<Project>;
 
-  getTargetId(_: {
-    organizationSlug: string;
-    projectSlug: string;
-    targetSlug: string;
-  }): Promise<string | never>;
+  getTargetId(_: TargetSelector & { useIds?: boolean }): Promise<string | never>;
 
   getTargetBySlug(
     _: {
@@ -342,7 +343,7 @@ export interface Storage {
       }
   >;
 
-  updateTargetSlug(_: TargetSelector & { slug: string; userId: string }): Promise<
+  updateTargetSlug(_: TargetSelector & { slug: string; user: string }): Promise<
     | {
         ok: true;
         target: Target;
@@ -407,13 +408,13 @@ export interface Storage {
     } & TargetSelector,
   ): Promise<{
     schemas: Schema[];
-    versionId: string;
+    version: string;
     valid: boolean;
   } | null>;
 
-  getLatestValidVersion(_: { targetId: string }): Promise<SchemaVersion | never>;
+  getLatestValidVersion(_: { target: string }): Promise<SchemaVersion | never>;
 
-  getMaybeLatestValidVersion(_: { targetId: string }): Promise<SchemaVersion | null | never>;
+  getMaybeLatestValidVersion(_: { target: string }): Promise<SchemaVersion | null | never>;
 
   getLatestVersion(_: TargetSelector): Promise<SchemaVersion | never>;
 
@@ -421,7 +422,7 @@ export interface Storage {
 
   /** Find the version before a schema version */
   getVersionBeforeVersionId(_: {
-    targetId: string;
+    target: string;
     beforeVersionId: string;
     beforeVersionCreatedAt: string;
     onlyComposable: boolean;
@@ -445,11 +446,11 @@ export interface Storage {
     before: string | null;
     after: string | null;
   }>;
-  getSchemasOfVersion(_: { versionId: string; includeMetadata?: boolean }): Promise<Schema[]>;
+  getSchemasOfVersion(_: { version: string; includeMetadata?: boolean }): Promise<Schema[]>;
   getSchemaByNameOfVersion(_: { versionId: string; serviceName: string }): Promise<Schema | null>;
   getSchemasOfPreviousVersion(
     _: {
-      versionId: string;
+      version: string;
       onlyComposable: boolean;
     } & TargetSelector,
   ): Promise<
@@ -468,7 +469,7 @@ export interface Storage {
     first: number | null;
     cursor: null | string;
   }): Promise<PaginatedSchemaVersionConnection>;
-  getVersion(_: TargetSelector & { versionId: string }): Promise<SchemaVersion | never>;
+  getVersion(_: TargetSelector & { version: string }): Promise<SchemaVersion | never>;
   deleteSchema(
     _: {
       serviceName: string;
@@ -545,19 +546,19 @@ export interface Storage {
   updateVersionStatus(
     _: {
       valid: boolean;
-      versionId: string;
+      version: string;
     } & TargetSelector,
   ): Promise<SchemaVersion | never>;
 
-  getSchemaLog(_: { commit: string; targetId: string }): Promise<SchemaLog>;
+  getSchemaLog(_: { commit: string; target: string }): Promise<SchemaLog>;
 
   createActivity(
     _: {
-      userId: string;
+      user: string;
       type: string;
       meta: object;
     } & OrganizationSelector &
-      Partial<Pick<TargetSelector, 'projectId' | 'targetId'>>,
+      Partial<Pick<TargetSelector, 'project' | 'target'>>,
   ): Promise<void>;
 
   addSlackIntegration(_: OrganizationSelector & { token: string }): Promise<void>;
@@ -572,34 +573,21 @@ export interface Storage {
 
   getGitHubIntegrationInstallationId(_: OrganizationSelector): Promise<string | null | undefined>;
 
-  addAlertChannel(_: {
-    name: string;
-    organizationId: string;
-    projectId: string;
-    type: AlertChannel['type'];
-    slackChannel?: string | null;
-    webhookEndpoint?: string | null;
-  }): Promise<AlertChannel>;
+  addAlertChannel(_: AddAlertChannelInput): Promise<AlertChannel>;
 
-  deleteAlertChannels(_: {
-    channelIds: readonly string[];
-    projectId: string;
-    organizationId: string;
-  }): Promise<readonly AlertChannel[]>;
+  deleteAlertChannels(
+    _: ProjectSelector & {
+      channels: readonly string[];
+    },
+  ): Promise<readonly AlertChannel[]>;
 
   getAlertChannels(_: ProjectSelector): Promise<readonly AlertChannel[]>;
 
-  addAlert(_: {
-    channelId: string;
-    organizationId: string;
-    projectId: string;
-    targetId: string;
-    type: Alert['type'];
-  }): Promise<Alert>;
+  addAlert(_: AddAlertInput): Promise<Alert>;
 
   deleteAlerts(
     _: ProjectSelector & {
-      alertIds: readonly string[];
+      alerts: readonly string[];
     },
   ): Promise<readonly Alert[]>;
 

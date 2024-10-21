@@ -328,16 +328,16 @@ const joinOrganizationRoute = createRoute({
 
 const transferOrganizationRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: 'action/transfer/$organizationSlug/$code',
+  path: 'action/transfer/$organizationId/$code',
   component: function TransferOrganizationRoute() {
-    const { organizationSlug, code } = transferOrganizationRoute.useParams();
-    return <OrganizationTransferPage organizationSlug={organizationSlug} code={code} />;
+    const { organizationId, code } = transferOrganizationRoute.useParams();
+    return <OrganizationTransferPage organizationId={organizationId} code={code} />;
   },
 });
 
 const organizationRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: '$organizationSlug',
+  path: '$organizationId',
   notFoundComponent: NotFound,
   errorComponent: ErrorComponent,
 });
@@ -347,11 +347,11 @@ const organizationIndexRoute = createRoute({
   path: '/',
   validateSearch: OrganizationIndexRouteSearch.parse,
   component: function OrganizationRoute() {
-    const { organizationSlug } = organizationRoute.useParams();
+    const { organizationId } = organizationRoute.useParams();
     const { search, sortBy, sortOrder } = organizationIndexRoute.useSearch();
     return (
       <OrganizationPage
-        organizationSlug={organizationSlug}
+        organizationId={organizationId}
         search={search}
         sortBy={sortBy}
         sortOrder={sortOrder}
@@ -366,8 +366,8 @@ const organizationSupportRoute = createRoute({
   getParentRoute: () => organizationRoute,
   path: 'view/support',
   component: function OrganizationSupportRoute() {
-    const { organizationSlug } = organizationSupportRoute.useParams();
-    return <OrganizationSupportPage organizationSlug={organizationSlug} />;
+    const { organizationId } = organizationSupportRoute.useParams();
+    return <OrganizationSupportPage organizationId={organizationId} />;
   },
 });
 
@@ -375,10 +375,8 @@ const organizationSupportTicketRoute = createRoute({
   getParentRoute: () => organizationRoute,
   path: 'view/support/ticket/$ticketId',
   component: function OrganizationSupportTicketRoute() {
-    const { organizationSlug, ticketId } = organizationSupportTicketRoute.useParams();
-    return (
-      <OrganizationSupportTicketPage organizationSlug={organizationSlug} ticketId={ticketId} />
-    );
+    const { organizationId, ticketId } = organizationSupportTicketRoute.useParams();
+    return <OrganizationSupportTicketPage organizationId={organizationId} ticketId={ticketId} />;
   },
 });
 
@@ -386,8 +384,8 @@ const organizationSubscriptionRoute = createRoute({
   getParentRoute: () => organizationRoute,
   path: 'view/subscription',
   component: function OrganizationSubscriptionRoute() {
-    const { organizationSlug } = organizationSubscriptionRoute.useParams();
-    return <OrganizationSubscriptionPage organizationSlug={organizationSlug} />;
+    const { organizationId } = organizationSubscriptionRoute.useParams();
+    return <OrganizationSubscriptionPage organizationId={organizationId} />;
   },
 });
 
@@ -395,10 +393,8 @@ const organizationSubscriptionManageLegacyRoute = createRoute({
   getParentRoute: () => organizationRoute,
   path: 'view/subscription/manage',
   component: function OrganizationSubscriptionManageLegacyRoute() {
-    const { organizationSlug } = organizationSubscriptionManageLegacyRoute.useParams();
-    return (
-      <Navigate to="/$organizationSlug/view/manage-subscription" params={{ organizationSlug }} />
-    );
+    const { organizationId } = organizationSubscriptionManageLegacyRoute.useParams();
+    return <Navigate to="/$organizationId/view/manage-subscription" params={{ organizationId }} />;
   },
 });
 
@@ -406,8 +402,8 @@ const organizationSubscriptionManageRoute = createRoute({
   getParentRoute: () => organizationRoute,
   path: 'view/manage-subscription',
   component: function OrganizationSubscriptionManageRoute() {
-    const { organizationSlug } = organizationSubscriptionManageRoute.useParams();
-    return <OrganizationSubscriptionManagePage organizationSlug={organizationSlug} />;
+    const { organizationId } = organizationSubscriptionManageRoute.useParams();
+    return <OrganizationSubscriptionManagePage organizationId={organizationId} />;
   },
 });
 
@@ -415,8 +411,8 @@ const organizationPolicyRoute = createRoute({
   getParentRoute: () => organizationRoute,
   path: 'view/policy',
   component: function OrganizationPolicyRoute() {
-    const { organizationSlug } = organizationPolicyRoute.useParams();
-    return <OrganizationPolicyPage organizationSlug={organizationSlug} />;
+    const { organizationId } = organizationPolicyRoute.useParams();
+    return <OrganizationPolicyPage organizationId={organizationId} />;
   },
 });
 
@@ -424,8 +420,8 @@ const organizationSettingsRoute = createRoute({
   getParentRoute: () => organizationRoute,
   path: 'view/settings',
   component: function OrganizationSettingsRoute() {
-    const { organizationSlug } = organizationSettingsRoute.useParams();
-    return <OrganizationSettingsPage organizationSlug={organizationSlug} />;
+    const { organizationId } = organizationSettingsRoute.useParams();
+    return <OrganizationSettingsPage organizationId={organizationId} />;
   },
 });
 
@@ -440,7 +436,7 @@ const organizationMembersRoute = createRoute({
     return OrganizationMembersRouteSearch.parse(search);
   },
   component: function OrganizationMembersRoute() {
-    const { organizationSlug } = organizationMembersRoute.useParams();
+    const { organizationId } = organizationMembersRoute.useParams();
     const { page } = organizationMembersRoute.useSearch();
     const navigate = useNavigate({ from: organizationMembersRoute.fullPath });
     const onPageChange = useCallback(
@@ -452,7 +448,7 @@ const organizationMembersRoute = createRoute({
 
     return (
       <OrganizationMembersPage
-        organizationSlug={organizationSlug}
+        organizationId={organizationId}
         page={page}
         onPageChange={onPageChange}
       />
@@ -462,7 +458,7 @@ const organizationMembersRoute = createRoute({
 
 const projectRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: '$organizationSlug/$projectSlug',
+  path: '$organizationId/$projectId',
   notFoundComponent: NotFound,
   errorComponent: ErrorComponent,
 });
@@ -472,12 +468,12 @@ const projectIndexRoute = createRoute({
   path: '/',
   validateSearch: ProjectIndexRouteSearch.parse,
   component: function ProjectRoute() {
-    const { organizationSlug, projectSlug } = projectIndexRoute.useParams();
+    const { organizationId, projectId } = projectIndexRoute.useParams();
     const { search, sortBy, sortOrder } = projectIndexRoute.useSearch();
     return (
       <ProjectPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
+        organizationId={organizationId}
+        projectId={projectId}
         search={search}
         sortBy={sortBy}
         sortOrder={sortOrder}
@@ -490,8 +486,8 @@ const projectSettingsRoute = createRoute({
   getParentRoute: () => projectRoute,
   path: 'view/settings',
   component: function ProjectSettingsRoute() {
-    const { organizationSlug, projectSlug } = projectSettingsRoute.useParams();
-    return <ProjectSettingsPage organizationSlug={organizationSlug} projectSlug={projectSlug} />;
+    const { organizationId, projectId } = projectSettingsRoute.useParams();
+    return <ProjectSettingsPage organizationId={organizationId} projectId={projectId} />;
   },
 });
 
@@ -499,8 +495,8 @@ const projectPolicyRoute = createRoute({
   getParentRoute: () => projectRoute,
   path: 'view/policy',
   component: function ProjectPolicyRoute() {
-    const { organizationSlug, projectSlug } = projectPolicyRoute.useParams();
-    return <ProjectPolicyPage organizationSlug={organizationSlug} projectSlug={projectSlug} />;
+    const { organizationId, projectId } = projectPolicyRoute.useParams();
+    return <ProjectPolicyPage organizationId={organizationId} projectId={projectId} />;
   },
 });
 
@@ -508,14 +504,14 @@ const projectAlertsRoute = createRoute({
   getParentRoute: () => projectRoute,
   path: 'view/alerts',
   component: function ProjectAlertsRoute() {
-    const { organizationSlug, projectSlug } = projectAlertsRoute.useParams();
-    return <ProjectAlertsPage organizationSlug={organizationSlug} projectSlug={projectSlug} />;
+    const { organizationId, projectId } = projectAlertsRoute.useParams();
+    return <ProjectAlertsPage organizationId={organizationId} projectId={projectId} />;
   },
 });
 
 const targetRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: '$organizationSlug/$projectSlug/$targetSlug',
+  path: '$organizationId/$projectId/$targetId',
   notFoundComponent: NotFound,
   errorComponent: ErrorComponent,
 });
@@ -524,14 +520,8 @@ const targetIndexRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: '/',
   component: function TargetRoute() {
-    const { organizationSlug, projectSlug, targetSlug } = targetIndexRoute.useParams();
-    return (
-      <TargetPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
-      />
-    );
+    const { organizationId, projectId, targetId } = targetIndexRoute.useParams();
+    return <TargetPage organizationId={organizationId} projectId={projectId} targetId={targetId} />;
   },
 });
 
@@ -556,14 +546,14 @@ const targetSettingsRoute = createRoute({
     return TargetSettingRouteSearch.parse(search);
   },
   component: function TargetSettingsRoute() {
-    const { organizationSlug, projectSlug, targetSlug } = targetSettingsRoute.useParams();
+    const { organizationId, projectId, targetId } = targetSettingsRoute.useParams();
     const { page } = targetSettingsRoute.useSearch();
 
     return (
       <TargetSettingsPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         page={page}
       />
     );
@@ -574,12 +564,12 @@ const targetLaboratoryRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'laboratory',
   component: function TargetLaboratoryRoute() {
-    const { organizationSlug, projectSlug, targetSlug } = targetLaboratoryRoute.useParams();
+    const { organizationId, projectId, targetId } = targetLaboratoryRoute.useParams();
     return (
       <TargetLaboratoryPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
       />
     );
   },
@@ -589,13 +579,9 @@ const targetAppsRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'apps',
   component: function TargetAppsRoute() {
-    const { organizationSlug, projectSlug, targetSlug } = targetAppsRoute.useParams();
+    const { organizationId, projectId, targetId } = targetAppsRoute.useParams();
     return (
-      <TargetAppsPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
-      />
+      <TargetAppsPage organizationId={organizationId} projectId={projectId} targetId={targetId} />
     );
   },
 });
@@ -604,13 +590,13 @@ const targetAppVersionRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'apps/$appName/$appVersion',
   component: function TargetAppVersionRoute() {
-    const { organizationSlug, projectSlug, targetSlug, appName, appVersion } =
+    const { organizationId, projectId, targetId, appName, appVersion } =
       targetAppVersionRoute.useParams();
     return (
       <TargetAppVersionPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         appName={appName}
         appVersion={appVersion}
       />
@@ -622,12 +608,12 @@ const targetInsightsRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'insights',
   component: function TargetInsightsRoute() {
-    const { organizationSlug, projectSlug, targetSlug } = targetInsightsRoute.useParams();
+    const { organizationId, projectId, targetId } = targetInsightsRoute.useParams();
     return (
       <TargetInsightsPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
       />
     );
   },
@@ -637,13 +623,13 @@ const targetInsightsCoordinateRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'insights/schema-coordinate/$coordinate',
   component: function TargetInsightsRoute() {
-    const { organizationSlug, projectSlug, targetSlug, coordinate } =
+    const { organizationId, projectId, targetId, coordinate } =
       targetInsightsCoordinateRoute.useParams();
     return (
       <TargetInsightsCoordinatePage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         coordinate={coordinate}
       />
     );
@@ -654,13 +640,12 @@ const targetInsightsClientRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'insights/client/$name',
   component: function TargetInsightsRoute() {
-    const { organizationSlug, projectSlug, targetSlug, name } =
-      targetInsightsClientRoute.useParams();
+    const { organizationId, projectId, targetId, name } = targetInsightsClientRoute.useParams();
     return (
       <TargetInsightsClientPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         name={name}
       />
     );
@@ -671,13 +656,13 @@ const targetInsightsOperationsRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'insights/$operationName/$operationHash',
   component: function TargetInsightsRoute() {
-    const { organizationSlug, projectSlug, targetSlug, operationName, operationHash } =
+    const { organizationId, projectId, targetId, operationName, operationHash } =
       targetInsightsOperationsRoute.useParams();
     return (
       <TargetInsightsOperationPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         operationName={operationName}
         operationHash={operationHash}
       />
@@ -689,12 +674,12 @@ const targetHistoryRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'history',
   component: function TargetHistoryRoute() {
-    const { organizationSlug, projectSlug, targetSlug } = targetHistoryRoute.useParams();
+    const { organizationId, projectId, targetId } = targetHistoryRoute.useParams();
     return (
       <TargetHistoryPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
       />
     );
   },
@@ -704,13 +689,13 @@ const targetHistoryVersionRoute = createRoute({
   getParentRoute: () => targetHistoryRoute,
   path: '$versionId',
   component: function TargetHistoryVersionRoute() {
-    const { organizationSlug, projectSlug, targetSlug, versionId } =
+    const { organizationId, projectId, targetId, versionId } =
       targetHistoryVersionRoute.useParams();
     return (
       <TargetHistoryVersionPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         versionId={versionId}
       />
     );
@@ -721,12 +706,12 @@ const targetExplorerRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'explorer',
   component: function TargetExplorerRoute() {
-    const { organizationSlug, projectSlug, targetSlug } = targetExplorerRoute.useParams();
+    const { organizationId, projectId, targetId } = targetExplorerRoute.useParams();
     return (
       <TargetExplorerPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
       />
     );
   },
@@ -736,13 +721,12 @@ const targetExplorerTypeRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'explorer/$typename',
   component: function TargetExplorerTypeRoute() {
-    const { organizationSlug, projectSlug, targetSlug, typename } =
-      targetExplorerTypeRoute.useParams();
+    const { organizationId, projectId, targetId, typename } = targetExplorerTypeRoute.useParams();
     return (
       <TargetExplorerTypePage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         typename={typename}
       />
     );
@@ -753,12 +737,12 @@ const targetExplorerDeprecatedRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'explorer/deprecated',
   component: function TargetExplorerDeprecatedRoute() {
-    const { organizationSlug, projectSlug, targetSlug } = targetExplorerDeprecatedRoute.useParams();
+    const { organizationId, projectId, targetId } = targetExplorerDeprecatedRoute.useParams();
     return (
       <TargetExplorerDeprecatedPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
       />
     );
   },
@@ -768,12 +752,12 @@ const targetExplorerUnusedRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'explorer/unused',
   component: function TargetExplorerUnusedRoute() {
-    const { organizationSlug, projectSlug, targetSlug } = targetExplorerUnusedRoute.useParams();
+    const { organizationId, projectId, targetId } = targetExplorerUnusedRoute.useParams();
     return (
       <TargetExplorerUnusedPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
       />
     );
   },
@@ -783,13 +767,9 @@ const targetChecksRoute = createRoute({
   getParentRoute: () => targetRoute,
   path: 'checks',
   component: function TargetChecksRoute() {
-    const { organizationSlug, projectSlug, targetSlug } = targetChecksRoute.useParams();
+    const { organizationId, projectId, targetId } = targetChecksRoute.useParams();
     return (
-      <TargetChecksPage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
-      />
+      <TargetChecksPage organizationId={organizationId} projectId={projectId} targetId={targetId} />
     );
   },
 });
@@ -798,13 +778,13 @@ const targetChecksSingleRoute = createRoute({
   getParentRoute: () => targetChecksRoute,
   path: '$schemaCheckId',
   component: function TargetChecksSingleRoute() {
-    const { organizationSlug, projectSlug, targetSlug, schemaCheckId } =
+    const { organizationId, projectId, targetId, schemaCheckId } =
       targetChecksSingleRoute.useParams();
     return (
       <TargetChecksSinglePage
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         schemaCheckId={schemaCheckId}
       />
     );

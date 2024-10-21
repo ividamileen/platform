@@ -11,6 +11,6 @@ export const monthlyUsage: NonNullable<QueryResolvers['monthlyUsage']> = async (
   const organization = await translator.translateOrganizationId(selector);
 
   return injector.get(OperationsManager).readMonthlyUsage({
-    organizationId: organization,
+    organization,
   });
 };

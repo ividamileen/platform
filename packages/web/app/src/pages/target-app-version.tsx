@@ -31,27 +31,21 @@ import { Link, useRouter } from '@tanstack/react-router';
 
 const TargetAppsVersionQuery = graphql(`
   query TargetAppsVersionQuery(
-    $organizationSlug: String!
-    $projectSlug: String!
-    $targetSlug: String!
+    $organizationId: ID!
+    $projectId: ID!
+    $targetId: ID!
     $appName: String!
     $appVersion: String!
     $first: Int
     $after: String
   ) {
-    organization(selector: { organizationSlug: $organizationSlug }) {
+    organization(selector: { organization: $organizationId }) {
       organization {
         id
         isAppDeploymentsEnabled
       }
     }
-    target(
-      selector: {
-        organizationSlug: $organizationSlug
-        projectSlug: $projectSlug
-        targetSlug: $targetSlug
-      }
-    ) {
+    target(selector: { organization: $organizationId, project: $projectId, target: $targetId }) {
       id
       appDeployment(appName: $appName, appVersion: $appVersion) {
         id
@@ -77,18 +71,18 @@ const TargetAppsVersionQuery = graphql(`
 `);
 
 export function TargetAppVersionPage(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
   appName: string;
   appVersion: string;
 }) {
   const [data] = useQuery({
     query: TargetAppsVersionQuery,
     variables: {
-      organizationSlug: props.organizationSlug,
-      projectSlug: props.projectSlug,
-      targetSlug: props.targetSlug,
+      organizationId: props.organizationId,
+      projectId: props.projectId,
+      targetId: props.targetId,
       appName: props.appName,
       appVersion: props.appVersion,
       first: 20,
@@ -105,11 +99,11 @@ export function TargetAppVersionPage(props: {
   useEffect(() => {
     if (isAppDeploymentsEnabled) {
       void router.navigate({
-        to: '/$organizationSlug/$projectSlug/$targetSlug',
+        to: '/$organizationId/$projectId/$targetId',
         params: {
-          organizationSlug: props.organizationSlug,
-          projectSlug: props.projectSlug,
-          targetSlug: props.targetSlug,
+          organizationId: props.organizationId,
+          projectId: props.projectId,
+          targetId: props.targetId,
         },
         replace: true,
       });
@@ -125,9 +119,9 @@ export function TargetAppVersionPage(props: {
       <>
         <Meta title="App Version Not found" />
         <TargetLayout
-          targetSlug={props.targetSlug}
-          projectSlug={props.projectSlug}
-          organizationSlug={props.organizationSlug}
+          targetId={props.targetId}
+          projectId={props.projectId}
+          organizationId={props.organizationId}
           page={Page.Apps}
           className="min-h-content"
         >
@@ -154,9 +148,9 @@ export function TargetAppVersionPage(props: {
     <>
       <Meta title={title} />
       <TargetLayout
-        targetSlug={props.targetSlug}
-        projectSlug={props.projectSlug}
-        organizationSlug={props.organizationSlug}
+        targetId={props.targetId}
+        projectId={props.projectId}
+        organizationId={props.organizationId}
         page={Page.Apps}
         className="min-h-content"
       >
@@ -165,11 +159,11 @@ export function TargetAppVersionPage(props: {
             subPageTitle={
               <span className="flex items-center">
                 <Link
-                  to="/$organizationSlug/$projectSlug/$targetSlug/apps"
+                  to="/$organizationId/$projectId/$targetId/apps"
                   params={{
-                    organizationSlug: props.organizationSlug,
-                    projectSlug: props.projectSlug,
-                    targetSlug: props.targetSlug,
+                    organizationId: props.organizationId,
+                    projectId: props.projectId,
+                    targetId: props.targetId,
                   }}
                 >
                   App Deployments
@@ -270,11 +264,11 @@ export function TargetAppVersionPage(props: {
                             <DropdownMenuContent>
                               <DropdownMenuItem asChild className="cursor-pointer">
                                 <Link
-                                  to="/$organizationSlug/$projectSlug/$targetSlug/laboratory"
+                                  to="/$organizationId/$projectId/$targetId/laboratory"
                                   params={{
-                                    organizationSlug: props.organizationSlug,
-                                    projectSlug: props.projectSlug,
-                                    targetSlug: props.targetSlug,
+                                    organizationId: props.organizationId,
+                                    projectId: props.projectId,
+                                    targetId: props.targetId,
                                   }}
                                   search={{
                                     operationString: edge.node.body,
@@ -285,11 +279,11 @@ export function TargetAppVersionPage(props: {
                               </DropdownMenuItem>
                               <DropdownMenuItem asChild className="cursor-pointer">
                                 <Link
-                                  to="/$organizationSlug/$projectSlug/$targetSlug/insights/$operationName/$operationHash"
+                                  to="/$organizationId/$projectId/$targetId/insights/$operationName/$operationHash"
                                   params={{
-                                    organizationSlug: props.organizationSlug,
-                                    projectSlug: props.projectSlug,
-                                    targetSlug: props.targetSlug,
+                                    organizationId: props.organizationId,
+                                    projectId: props.projectId,
+                                    targetId: props.targetId,
                                     operationName: edge.node.operationName ?? edge.node.hash,
                                     operationHash: edge.node.insightsHash,
                                   }}
@@ -322,9 +316,9 @@ export function TargetAppVersionPage(props: {
                       setIsLoadingMore(true);
                       void client
                         .query(TargetAppsVersionQuery, {
-                          organizationSlug: props.organizationSlug,
-                          projectSlug: props.projectSlug,
-                          targetSlug: props.targetSlug,
+                          organizationId: props.organizationId,
+                          projectId: props.projectId,
+                          targetId: props.targetId,
                           appName: props.appName,
                           appVersion: props.appVersion,
                           first: 20,

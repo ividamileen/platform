@@ -28,16 +28,16 @@ export function useTargetAccess({
   scope,
   member: mmember,
   redirect = false,
-  organizationSlug,
-  projectSlug,
-  targetSlug,
+  organizationId,
+  projectId,
+  targetId,
 }: {
   scope: TargetAccessScope;
   member: null | FragmentType<typeof CanAccessTarget_MemberFragment>;
   redirect?: boolean;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   const member = useFragment(CanAccessTarget_MemberFragment, mmember);
   const canAccess = canAccessTarget(scope, mmember);
@@ -46,11 +46,11 @@ export function useTargetAccess({
     redirectTo: redirect
       ? router => {
           void router.navigate({
-            to: '/$organizationSlug/$projectSlug/$targetSlug',
+            to: '/$organizationId/$projectId/$targetId',
             params: {
-              organizationSlug,
-              projectSlug,
-              targetSlug,
+              organizationId,
+              projectId,
+              targetId,
             },
           });
         }

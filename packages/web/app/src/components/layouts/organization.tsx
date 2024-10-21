@@ -92,7 +92,7 @@ export function OrganizationLayout({
 }: {
   page?: Page;
   className?: string;
-  organizationSlug: string;
+  organizationId: string;
   children: ReactNode;
 }): ReactElement | null {
   const [isModalOpen, toggleModalOpen] = useToggle();
@@ -105,13 +105,13 @@ export function OrganizationLayout({
     OrganizationLayout_OrganizationFragment,
     query.data?.organizations.nodes,
   );
-  const currentOrganization = organizations?.find(org => org.slug === props.organizationSlug);
+  const currentOrganization = organizations?.find(org => org.slug === props.organizationId);
 
   useOrganizationAccess({
     member: currentOrganization?.me ?? null,
     scope: OrganizationAccessScope.Read,
     redirect: true,
-    organizationSlug: props.organizationSlug,
+    organizationId: props.organizationId,
   });
 
   useLastVisitedOrganizationWriter(currentOrganization?.slug);
@@ -119,7 +119,7 @@ export function OrganizationLayout({
   const meInCurrentOrg = currentOrganization?.me;
 
   if (query.error) {
-    return <QueryError error={query.error} organizationSlug={props.organizationSlug} />;
+    return <QueryError error={query.error} organizationId={props.organizationId} />;
   }
 
   return (
@@ -129,14 +129,14 @@ export function OrganizationLayout({
           <div className="flex flex-row items-center gap-4">
             <HiveLink className="size-8" />
             <OrganizationSelector
-              currentOrganizationSlug={props.organizationSlug}
+              currentOrganizationCleanId={props.organizationId}
               organizations={query.data?.organizations ?? null}
             />
           </div>
           <div>
             <UserMenu
               me={query.data?.me ?? null}
-              currentOrganizationSlug={props.organizationSlug}
+              currentOrganizationCleanId={props.organizationId}
               organizations={query.data?.organizations ?? null}
             />
           </div>
@@ -148,18 +148,15 @@ export function OrganizationLayout({
             <Tabs value={page} className="min-w-[600px]">
               <TabsList variant="menu">
                 <TabsTrigger variant="menu" value={Page.Overview} asChild>
-                  <Link
-                    to="/$organizationSlug"
-                    params={{ organizationSlug: currentOrganization.slug }}
-                  >
+                  <Link to="/$organizationId" params={{ organizationId: currentOrganization.slug }}>
                     Overview
                   </Link>
                 </TabsTrigger>
                 {canAccessOrganization(OrganizationAccessScope.Members, meInCurrentOrg) && (
                   <TabsTrigger variant="menu" value={Page.Members} asChild>
                     <Link
-                      to="/$organizationSlug/view/members"
-                      params={{ organizationSlug: currentOrganization.slug }}
+                      to="/$organizationId/view/members"
+                      params={{ organizationId: currentOrganization.slug }}
                       search={{ page: 'list' }}
                     >
                       Members
@@ -170,16 +167,16 @@ export function OrganizationLayout({
                   <>
                     <TabsTrigger variant="menu" value={Page.Policy} asChild>
                       <Link
-                        to="/$organizationSlug/view/policy"
-                        params={{ organizationSlug: currentOrganization.slug }}
+                        to="/$organizationId/view/policy"
+                        params={{ organizationId: currentOrganization.slug }}
                       >
                         Policy
                       </Link>
                     </TabsTrigger>
                     <TabsTrigger variant="menu" value={Page.Settings} asChild>
                       <Link
-                        to="/$organizationSlug/view/settings"
-                        params={{ organizationSlug: currentOrganization.slug }}
+                        to="/$organizationId/view/settings"
+                        params={{ organizationId: currentOrganization.slug }}
                       >
                         Settings
                       </Link>
@@ -190,8 +187,8 @@ export function OrganizationLayout({
                   env.zendeskSupport && (
                     <TabsTrigger variant="menu" value={Page.Support} asChild>
                       <Link
-                        to="/$organizationSlug/view/support"
-                        params={{ organizationSlug: currentOrganization.slug }}
+                        to="/$organizationId/view/support"
+                        params={{ organizationId: currentOrganization.slug }}
                       >
                         Support
                       </Link>
@@ -201,8 +198,8 @@ export function OrganizationLayout({
                   canAccessOrganization(OrganizationAccessScope.Settings, meInCurrentOrg) && (
                     <TabsTrigger variant="menu" value={Page.Subscription} asChild>
                       <Link
-                        to="/$organizationSlug/view/subscription"
-                        params={{ organizationSlug: currentOrganization.slug }}
+                        to="/$organizationId/view/subscription"
+                        params={{ organizationId: currentOrganization.slug }}
                       >
                         Subscription
                       </Link>
@@ -224,7 +221,7 @@ export function OrganizationLayout({
                 New project
               </Button>
               <CreateProjectModal
-                organizationSlug={props.organizationSlug}
+                organizationId={props.organizationId}
                 isOpen={isModalOpen}
                 toggleModalOpen={toggleModalOpen}
                 // reset the form every time it is closed
@@ -316,7 +313,7 @@ function ProjectTypeCard(props: {
 function CreateProjectModal(props: {
   isOpen: boolean;
   toggleModalOpen: () => void;
-  organizationSlug: string;
+  organizationId: string;
 }) {
   const [_, mutate] = useMutation(CreateProjectMutation);
   const router = useRouter();
@@ -334,7 +331,7 @@ function CreateProjectModal(props: {
   async function onSubmit(values: z.infer<typeof createProjectFormSchema>) {
     const { data, error } = await mutate({
       input: {
-        organizationSlug: props.organizationSlug,
+        organization: props.organizationId,
         slug: values.projectSlug,
         type: values.projectType,
       },
@@ -342,10 +339,10 @@ function CreateProjectModal(props: {
     if (data?.createProject.ok) {
       props.toggleModalOpen();
       void router.navigate({
-        to: '/$organizationSlug/$projectSlug',
+        to: '/$organizationId/$projectId',
         params: {
-          organizationSlug: props.organizationSlug,
-          projectSlug: data.createProject.ok.createdProject.slug,
+          organizationId: props.organizationId,
+          projectId: data.createProject.ok.createdProject.slug,
         },
       });
     } else if (data?.createProject.error?.inputErrors.slug) {

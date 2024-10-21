@@ -85,7 +85,7 @@ const UserMenu_MemberFragment = graphql(`
 export function UserMenu(props: {
   me: FragmentType<typeof UserMenu_MeFragment> | null;
   organizations: FragmentType<typeof UserMenu_OrganizationConnectionFragment> | null;
-  currentOrganizationSlug: string;
+  currentOrganizationCleanId: string;
 }) {
   const docsUrl = getDocsUrl();
   const me = useFragment(UserMenu_MeFragment, props.me);
@@ -96,7 +96,7 @@ export function UserMenu(props: {
   const [isUserSettingsModalOpen, toggleUserSettingsModalOpen] = useToggle();
   const [isLeaveOrganizationModalOpen, toggleLeaveOrganizationModalOpen] = useToggle();
   const currentOrganization = organizations?.find(
-    org => org.slug === props.currentOrganizationSlug,
+    org => org.slug === props.currentOrganizationCleanId,
   );
   const meInOrg = useFragment(UserMenu_MemberFragment, currentOrganization?.me);
 
@@ -112,7 +112,7 @@ export function UserMenu(props: {
         <LeaveOrganizationModal
           toggleModalOpen={toggleLeaveOrganizationModalOpen}
           isOpen={isLeaveOrganizationModalOpen}
-          organizationSlug={currentOrganization.slug}
+          organizationId={currentOrganization.slug}
         />
       ) : null}
       <div className="flex flex-row items-center gap-8">
@@ -168,9 +168,9 @@ export function UserMenu(props: {
                       active={currentOrganization?.slug === org.slug}
                     >
                       <Link
-                        to="/$organizationSlug"
+                        to="/$organizationId"
                         params={{
-                          organizationSlug: org.slug,
+                          organizationId: org.slug,
                         }}
                       >
                         {org.slug}
@@ -215,9 +215,9 @@ export function UserMenu(props: {
               {currentOrganization && env.zendeskSupport ? (
                 <DropdownMenuItem asChild>
                   <Link
-                    to="/$organizationSlug/view/support"
+                    to="/$organizationId/view/support"
                     params={{
-                      organizationSlug: currentOrganization.slug,
+                      organizationId: currentOrganization.slug,
                     }}
                   >
                     <LifeBuoyIcon className="mr-2 size-4" />
@@ -288,16 +288,16 @@ const LeaveOrganizationModal_LeaveOrganizationMutation = graphql(`
 export function LeaveOrganizationModal(props: {
   isOpen: boolean;
   toggleModalOpen: () => void;
-  organizationSlug: string;
+  organizationId: string;
 }) {
-  const { organizationSlug } = props;
+  const { organizationId } = props;
   const [, mutate] = useMutation(LeaveOrganizationModal_LeaveOrganizationMutation);
   const notify = useNotifications();
 
   async function onSubmit() {
     const result = await mutate({
       input: {
-        organizationSlug,
+        organization: organizationId,
       },
     });
 
@@ -320,7 +320,7 @@ export function LeaveOrganizationModal(props: {
     <LeaveOrganizationModalContent
       isOpen={props.isOpen}
       toggleModalOpen={props.toggleModalOpen}
-      organizationSlug={organizationSlug}
+      organizationCleanId={organizationId}
       onSubmit={onSubmit}
     />
   );
@@ -329,19 +329,19 @@ export function LeaveOrganizationModal(props: {
 export function LeaveOrganizationModalContent(props: {
   isOpen: boolean;
   toggleModalOpen: () => void;
-  organizationSlug: string;
+  organizationCleanId: string;
   onSubmit: () => void;
 }) {
   return (
     <Dialog open={props.isOpen} onOpenChange={props.toggleModalOpen}>
       <DialogContent className="w-4/5 max-w-[520px] md:w-3/5">
         <DialogHeader>
-          <DialogTitle>Leave {props.organizationSlug}?</DialogTitle>
+          <DialogTitle>Leave {props.organizationCleanId}?</DialogTitle>
           <DialogDescription>
             Are you sure you want to leave this organization?
             <br />
             You will lose access to{' '}
-            <span className="font-semibold text-white">{props.organizationSlug}</span>.
+            <span className="font-semibold text-white">{props.organizationCleanId}</span>.
           </DialogDescription>
           <DialogDescription className="font-bold">This action is irreversible!</DialogDescription>
         </DialogHeader>

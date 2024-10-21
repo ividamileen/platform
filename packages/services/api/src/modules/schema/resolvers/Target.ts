@@ -32,10 +32,10 @@ export const Target: Pick<
   },
   schemaVersion: async (target, args, { injector }) => {
     const schemaVersion = await injector.get(SchemaManager).getSchemaVersion({
-      organizationId: target.orgId,
-      projectId: target.projectId,
-      targetId: target.id,
-      versionId: args.id,
+      organization: target.orgId,
+      project: target.projectId,
+      target: target.id,
+      version: args.id,
     });
 
     if (schemaVersion === null) {
@@ -44,37 +44,37 @@ export const Target: Pick<
 
     return {
       ...schemaVersion,
-      organizationId: target.orgId,
-      projectId: target.projectId,
-      targetId: target.id,
+      organization: target.orgId,
+      project: target.projectId,
+      target: target.id,
     };
   },
   latestSchemaVersion: (target, _, { injector }) => {
     return injector.get(SchemaManager).getMaybeLatestVersion({
-      targetId: target.id,
-      projectId: target.projectId,
-      organizationId: target.orgId,
+      target: target.id,
+      project: target.projectId,
+      organization: target.orgId,
     });
   },
   latestValidSchemaVersion: async (target, __, { injector }) => {
     return injector.get(SchemaManager).getMaybeLatestValidVersion({
-      organizationId: target.orgId,
-      projectId: target.projectId,
-      targetId: target.id,
+      organization: target.orgId,
+      project: target.projectId,
+      target: target.id,
     });
   },
   baseSchema: (target, _, { injector }) => {
     return injector.get(SchemaManager).getBaseSchema({
-      targetId: target.id,
-      projectId: target.projectId,
-      organizationId: target.orgId,
+      target: target.id,
+      project: target.projectId,
+      organization: target.orgId,
     });
   },
   hasSchema: (target, _, { injector }) => {
     return injector.get(SchemaManager).hasSchema({
-      targetId: target.id,
-      projectId: target.projectId,
-      organizationId: target.orgId,
+      target: target.id,
+      project: target.projectId,
+      organization: target.orgId,
     });
   },
   schemaCheck: async (target, args, { injector }) => {
@@ -118,9 +118,9 @@ export const Target: Pick<
   },
   schemaVersionsCount: (target, { period }, { injector }) => {
     return injector.get(SchemaManager).countSchemaVersionsOfTarget({
-      organizationId: target.orgId,
-      projectId: target.projectId,
-      targetId: target.id,
+      organization: target.orgId,
+      project: target.projectId,
+      target: target.id,
       period: period ? parseDateRangeInput(period) : null,
     });
   },
@@ -140,9 +140,9 @@ export const Target: Pick<
   },
   hasCollectedSubscriptionOperations: async (target, _, { injector }) => {
     return await injector.get(OperationsManager).hasCollectedSubscriptionOperations({
-      targetId: target.id,
-      projectId: target.projectId,
-      organizationId: target.orgId,
+      target: target.id,
+      project: target.projectId,
+      organization: target.orgId,
     });
   },
 };

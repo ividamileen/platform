@@ -80,11 +80,11 @@ export function createOrganization(input: CreateOrganizationInput, authToken: st
   });
 }
 
-export function getOrganization(organizationSlug: string, authToken: string) {
+export function getOrganization(organizationId: string, authToken: string) {
   return execute({
     document: graphql(`
-      query getOrganization($organizationSlug: String!) {
-        organization(selector: { organizationSlug: $organizationSlug }) {
+      query getOrganization($organizationId: ID!) {
+        organization(selector: { organization: $organizationId }) {
           organization {
             id
             slug
@@ -102,7 +102,7 @@ export function getOrganization(organizationSlug: string, authToken: string) {
     `),
     authToken,
     variables: {
-      organizationSlug,
+      organizationId,
     },
   });
 }
@@ -140,7 +140,7 @@ export function updateOrganizationSlug(input: UpdateOrganizationSlugInput, authT
           ok {
             updatedOrganizationPayload {
               selector {
-                organizationSlug
+                organization
               }
               organization {
                 id
@@ -357,8 +357,8 @@ export function updateProjectSlug(input: UpdateProjectSlugInput, authToken: stri
         updateProjectSlug(input: $input) {
           ok {
             selector {
-              organizationSlug
-              projectSlug
+              organization
+              project
             }
             project {
               id
@@ -432,9 +432,9 @@ export function updateTargetSlug(input: UpdateTargetSlugInput, authToken: string
         updateTargetSlug(input: $input) {
           ok {
             selector {
-              organizationSlug
-              projectSlug
-              targetSlug
+              organization
+              project
+              target
             }
             target {
               id
@@ -926,9 +926,9 @@ export function readOperationsStats(input: OperationsStatsSelectorInput, token: 
 
 export function readOperationBody(
   selector: {
-    organizationSlug: string;
-    projectSlug: string;
-    targetSlug: string;
+    organization: string;
+    project: string;
+    target: string;
     hash: string;
   },
   token: string,
@@ -947,9 +947,9 @@ export function readOperationBody(
     token,
     variables: {
       selector: {
-        organizationSlug: selector.organizationSlug,
-        projectSlug: selector.projectSlug,
-        targetSlug: selector.targetSlug,
+        organization: selector.organization,
+        project: selector.project,
+        target: selector.target,
       },
       hash: selector.hash,
     },
@@ -1096,28 +1096,22 @@ export function fetchVersions(selector: TargetSelectorInput, first: number, toke
 
 export function compareToPreviousVersion(
   selector: {
-    organizationSlug: string;
-    projectSlug: string;
-    targetSlug: string;
+    organization: string;
+    project: string;
+    target: string;
     version: string;
   },
   token: string,
 ) {
   return execute({
     document: graphql(`
-      query compareToPreviousVersion(
-        $organizationSlug: String!
-        $projectSlug: String!
-        $targetSlug: String!
+      query SchemaCompareToPreviousVersionQuery(
+        $organization: ID!
+        $project: ID!
+        $target: ID!
         $version: ID!
       ) {
-        target(
-          selector: {
-            organizationSlug: $organizationSlug
-            projectSlug: $projectSlug
-            targetSlug: $targetSlug
-          }
-        ) {
+        target(selector: { organization: $organization, project: $project, target: $target }) {
           id
           schemaVersion(id: $version) {
             id

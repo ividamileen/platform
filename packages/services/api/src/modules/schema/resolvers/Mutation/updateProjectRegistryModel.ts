@@ -13,8 +13,8 @@ export const updateProjectRegistryModel: NonNullable<
 
   return {
     ok: await injector.get(SchemaManager).updateRegistryModel({
-      projectId: project,
-      organizationId: organization,
+      project,
+      organization,
       model: input.model,
     }),
   };

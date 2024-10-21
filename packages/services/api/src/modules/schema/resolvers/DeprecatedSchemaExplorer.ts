@@ -8,9 +8,9 @@ export const DeprecatedSchemaExplorer: DeprecatedSchemaExplorerResolvers = {
 
     async function getStats(typename: string) {
       const stats = await operationsManager.countCoordinatesOfTarget({
-        targetId: usage.targetId,
-        organizationId: usage.organizationId,
-        projectId: usage.projectId,
+        target: usage.target,
+        organization: usage.organization,
+        project: usage.project,
         period: usage.period,
       });
 

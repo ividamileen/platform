@@ -1,4 +1,5 @@
 import { Injectable, Scope } from 'graphql-modules';
+import type { AlertsModule } from '../__generated__/types';
 import type { Alert, AlertChannel } from '../../../shared/entities';
 import { cache } from '../../../shared/helpers';
 import { AuthManager } from '../../auth/providers/auth-manager';
@@ -37,74 +38,54 @@ export class AlertsManager {
     this.logger = logger.child({ source: 'AlertsManager' });
   }
 
-  async addChannel(input: {
-    name: string;
-    organizationId: string;
-    projectId: string;
-    type: AlertChannel['type'];
-    slackChannel?: string | null;
-    webhookEndpoint?: string | null;
-  }): Promise<AlertChannel> {
+  async addChannel(input: AlertsModule.AddAlertChannelInput): Promise<AlertChannel> {
     this.logger.debug(
       'Adding Alert Channel (organization=%s, project=%s, type=%s)',
-      input.organizationId,
-      input.projectId,
+      input.organization,
+      input.project,
       input.type,
     );
     await this.authManager.ensureProjectAccess({
+      ...input,
       scope: ProjectAccessScope.ALERTS,
-      organizationId: input.organizationId,
-      projectId: input.projectId,
     });
 
-    const channel = await this.storage.addAlertChannel({
-      slackChannel: input.slackChannel,
-      webhookEndpoint: input.webhookEndpoint,
-      name: input.name,
-      type: input.type,
-      organizationId: input.organizationId,
-      projectId: input.projectId,
-    });
+    const channel = await this.storage.addAlertChannel(input);
 
     await this.triggerChannelConfirmation({
       kind: 'created',
       channel,
-      organization: input.organizationId,
-      project: input.projectId,
+      organization: input.organization,
+      project: input.project,
     });
 
     return channel;
   }
 
-  async deleteChannels(input: {
-    channelIds: readonly string[];
-    organizationId: string;
-    projectId: string;
-  }): Promise<readonly AlertChannel[]> {
+  async deleteChannels(
+    input: ProjectSelector & {
+      channels: readonly string[];
+    },
+  ): Promise<readonly AlertChannel[]> {
     this.logger.debug(
       'Deleting Alert Channels (organization=%s, project=%s, size=%s)',
-      input.organizationId,
-      input.projectId,
-      input.channelIds.length,
+      input.organization,
+      input.project,
+      input.channels.length,
     );
     await this.authManager.ensureProjectAccess({
+      ...input,
       scope: ProjectAccessScope.ALERTS,
-      organizationId: input.organizationId,
-      projectId: input.projectId,
     });
-    const channels = await this.storage.deleteAlertChannels({
-      organizationId: input.organizationId,
-      projectId: input.projectId,
-      channelIds: input.channelIds,
-    });
+    const channels = await this.storage.deleteAlertChannels(input);
 
     await Promise.all(
       channels.map(channel =>
         this.triggerChannelConfirmation({
           kind: 'deleted',
           channel,
-          organization: input.organizationId,
-          project: input.projectId,
+          organization: input.organization,
+          project: input.project,
         }),
       ),
     );
@@ -112,12 +93,12 @@ export class AlertsManager {
     return channels;
   }
 
-  @cache<ProjectSelector>(selector => selector.projectId + selector.organizationId)
+  @cache<ProjectSelector>(selector => selector.project + selector.organization)
   async getChannels(selector: ProjectSelector): Promise<readonly AlertChannel[]> {
     this.logger.debug(
       'Fetching Alert Channels (organization=%s, project=%s)',
-      selector.organizationId,
-      selector.projectId,
+      selector.organization,
+      selector.project,
     );
     await this.authManager.ensureProjectAccess({
       ...selector,
@@ -126,32 +107,19 @@ export class AlertsManager {
     return this.storage.getAlertChannels(selector);
   }
 
-  async addAlert(input: {
-    type: Alert['type'];
-    organizationId: string;
-    projectId: string;
-    targetId: string;
-    channelId: string;
-  }): Promise<Alert> {
+  async addAlert(input: AlertsModule.AddAlertInput): Promise<Alert> {
     this.logger.debug(
       'Adding Alert (organization=%s, project=%s, type=%s)',
-      input.organizationId,
-      input.projectId,
+      input.organization,
+      input.project,
       input.type,
     );
     await this.authManager.ensureProjectAccess({
+      ...input,
       scope: ProjectAccessScope.ALERTS,
-      organizationId: input.organizationId,
-      projectId: input.projectId,
     });
 
-    return this.storage.addAlert({
-      type: input.type,
-      channelId: input.channelId,
-      organizationId: input.organizationId,
-      projectId: input.projectId,
-      targetId: input.targetId,
-    });
+    return this.storage.addAlert(input);
   }
 
   async deleteAlerts(
@@ -161,26 +129,22 @@ export class AlertsManager {
   ): Promise<readonly Alert[]> {
     this.logger.debug(
       'Deleting Alerts (organization=%s, project=%s, size=%s)',
-      input.organizationId,
-      input.projectId,
+      input.organization,
+      input.project,
       input.alerts.length,
     );
     await this.authManager.ensureProjectAccess({
       ...input,
       scope: ProjectAccessScope.ALERTS,
     });
-    return this.storage.deleteAlerts({
-      organizationId: input.organizationId,
-      projectId: input.projectId,
-      alertIds: input.alerts,
-    });
+    return this.storage.deleteAlerts(input);
   }
 
   async getAlerts(selector: ProjectSelector): Promise<readonly Alert[]> {
     this.logger.debug(
       'Fetching Alerts (organization=%s, project=%s)',
-      selector.organizationId,
-      selector.projectId,
+      selector.organization,
+      selector.project,
     );
     await this.authManager.ensureProjectAccess({
       ...selector,
@@ -214,15 +178,15 @@ export class AlertsManager {
     );
 
     await this.authManager.ensureTargetAccess({
-      organizationId: organization,
-      projectId: project,
-      targetId: target,
+      organization,
+      project,
+      target,
       scope: TargetAccessScope.REGISTRY_WRITE,
     });
 
     const [channels, alerts] = await Promise.all([
-      this.getChannels({ organizationId: organization, projectId: project }),
-      this.getAlerts({ organizationId: organization, projectId: project }),
+      this.getChannels({ organization, project }),
+      this.getAlerts({ organization, project }),
     ]);
 
     const matchingAlerts = alerts.filter(
@@ -236,9 +200,9 @@ export class AlertsManager {
     });
 
     const slackToken = await this.slackIntegrationManager.getToken({
-      organizationId: event.organization.id,
-      projectId: event.project.id,
-      targetId: event.target.id,
+      organization: event.organization.id,
+      project: event.project.id,
+      target: event.target.id,
       context: IntegrationsAccessContext.SchemaPublishing,
     });
 
@@ -318,11 +282,11 @@ export class AlertsManager {
     const { channel } = input;
     const [organization, project] = await Promise.all([
       this.organizationManager.getOrganization({
-        organizationId: input.organization,
+        organization: input.organization,
       }),
       this.projectManager.getProject({
-        organizationId: input.organization,
-        projectId: input.project,
+        organization: input.organization,
+        project: input.project,
       }),
     ]);
 
@@ -352,8 +316,8 @@ export class AlertsManager {
 
     if (channel.type === 'SLACK') {
       const slackToken = await this.slackIntegrationManager.getToken({
-        organizationId: organization.id,
-        projectId: project.id,
+        organization: organization.id,
+        project: project.id,
         context: IntegrationsAccessContext.ChannelConfirmation,
       });
       if (!slackToken) {

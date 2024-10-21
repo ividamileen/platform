@@ -36,9 +36,9 @@ export function withUsedByClients<
   T & {
     usedByClients: () => PromiseOrValue<Array<string>>;
     period: DateRange;
-    organizationId: string;
-    projectId: string;
-    targetId: string;
+    organization: string;
+    project: string;
+    target: string;
     typename: string;
   }
 > {
@@ -49,9 +49,9 @@ export function withUsedByClients<
         selector: deps.selector,
         period: deps.period,
         typename: deps.typename,
-        organizationId: deps.selector.organizationId,
-        projectId: deps.selector.projectId,
-        targetId: deps.selector.targetId,
+        organization: deps.selector.organization,
+        project: deps.selector.project,
+        target: deps.selector.target,
         ...record,
         usedByClients() {
           if (record.isUsed === false) {
@@ -335,9 +335,9 @@ export function usage(
         isUsed: true,
         usedByClients: () => [],
         period: usage.period,
-        organizationId: usage.organizationId,
-        projectId: usage.projectId,
-        targetId: usage.targetId,
+        organization: usage.organization,
+        project: usage.project,
+        target: usage.target,
         coordinate: coordinate,
       };
     }
@@ -358,9 +358,9 @@ export function usage(
           isUsed: true,
           usedByClients: coordinateUsage.usedByClients,
           period: coordinateUsage.period,
-          organizationId: coordinateUsage.organizationId,
-          projectId: coordinateUsage.projectId,
-          targetId: coordinateUsage.targetId,
+          organization: coordinateUsage.organization,
+          project: coordinateUsage.project,
+          target: coordinateUsage.target,
           coordinate: coordinate,
         }
       : {

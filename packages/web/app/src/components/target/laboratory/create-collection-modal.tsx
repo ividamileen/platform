@@ -140,9 +140,9 @@ export function CreateCollectionModal(props: {
   isOpen: boolean;
   toggleModalOpen: () => void;
   collectionId?: string;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }): ReactElement {
   const { isOpen, toggleModalOpen, collectionId } = props;
   const [mutationCreate, mutateCreate] = useMutation(CreateCollectionMutation);
@@ -153,9 +153,9 @@ export function CreateCollectionModal(props: {
     variables: {
       id: collectionId!,
       selector: {
-        targetSlug: props.targetSlug,
-        organizationSlug: props.organizationSlug,
-        projectSlug: props.projectSlug,
+        target: props.targetId,
+        organization: props.organizationId,
+        project: props.projectId,
       },
     },
     pause: !collectionId,
@@ -189,9 +189,9 @@ export function CreateCollectionModal(props: {
     const { error } = collectionId
       ? await mutateUpdate({
           selector: {
-            targetSlug: props.targetSlug,
-            organizationSlug: props.organizationSlug,
-            projectSlug: props.projectSlug,
+            target: props.targetId,
+            organization: props.organizationId,
+            project: props.projectId,
           },
           input: {
             collectionId,
@@ -201,9 +201,9 @@ export function CreateCollectionModal(props: {
         })
       : await mutateCreate({
           selector: {
-            targetSlug: props.targetSlug,
-            organizationSlug: props.organizationSlug,
-            projectSlug: props.projectSlug,
+            target: props.targetId,
+            organization: props.organizationId,
+            project: props.projectId,
           },
           input: values,
         });

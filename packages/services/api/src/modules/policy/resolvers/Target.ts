@@ -8,9 +8,9 @@ export const Target: Pick<TargetResolvers, 'schemaPolicy' | '__isTypeOf'> = {
     const { mergedPolicy, orgLevel, projectLevel } = await injector
       .get(SchemaPolicyProvider)
       .getCalculatedTargetPolicyForApi({
-        projectId: target.projectId,
-        organizationId: target.orgId,
-        targetId: target.id,
+        project: target.projectId,
+        organization: target.orgId,
+        target: target.id,
       });
 
     if (!mergedPolicy) {

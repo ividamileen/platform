@@ -5,10 +5,9 @@ import type { MutationResolvers } from './../../../../__generated__/types.next';
 export const migrateUnassignedMembers: NonNullable<
   MutationResolvers['migrateUnassignedMembers']
 > = async (_, { input }, { injector }) => {
-  const organizationSlugFromInput =
-    input.assignRole?.organizationSlug ?? input.createRole?.organizationSlug;
+  const organizationIdFromInput = input.assignRole?.organization ?? input.createRole?.organization;
 
-  if (!organizationSlugFromInput) {
+  if (!organizationIdFromInput) {
     return {
       error: {
         message: 'Assign a role or create a new one',
@@ -17,7 +16,7 @@ export const migrateUnassignedMembers: NonNullable<
   }
 
   const organizationId = await injector.get(IdTranslator).translateOrganizationId({
-    organizationSlug: organizationSlugFromInput,
+    organization: organizationIdFromInput,
   });
 
   return injector.get(OrganizationManager).migrateUnassignedMembers({

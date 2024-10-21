@@ -1,11 +1,11 @@
 import { useRouter } from '@tanstack/react-router';
 import { Button } from '../ui/button';
 
-export function ProjectMigrationToast(props: { projectSlug: string; organizationSlug: string }) {
+export function ProjectMigrationToast({ projectId, orgId }: { projectId: string; orgId: string }) {
   const router = useRouter();
   const handleOnClick = () => {
     void router.navigate({
-      to: `/${props.organizationSlug}/${props.projectSlug}/view/settings`,
+      to: `/${orgId}/${projectId}/view/settings`,
     });
   };
   return (

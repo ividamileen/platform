@@ -14,18 +14,18 @@ export const lab: NonNullable<QueryResolvers['lab']> = async (_, { selector }, {
   ]);
 
   await injector.get(AuthManager).ensureTargetAccess({
-    organizationId: organization,
-    projectId: project,
-    targetId: target,
+    organization,
+    project,
+    target,
     scope: TargetAccessScope.REGISTRY_READ,
   });
 
   const schemaManager = injector.get(SchemaManager);
 
   const latestSchema = await schemaManager.getMaybeLatestValidVersion({
-    organizationId: organization,
-    projectId: project,
-    targetId: target,
+    organization,
+    project,
+    target,
   });
 
   if (!latestSchema) {

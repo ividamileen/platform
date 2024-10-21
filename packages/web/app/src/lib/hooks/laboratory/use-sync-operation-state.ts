@@ -1,18 +1,18 @@
 import { useCurrentOperation } from './use-current-operation';
 
 export function useSyncOperationState(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }): {
   savedOperation: { query: string; variables: string; updatedAt: number } | null;
   setSavedOperation: (value: { query: string; variables: string }) => void;
   clearOperation: () => void;
 } {
   const currentOperation = useCurrentOperation({
-    organizationSlug: props.organizationSlug,
-    projectSlug: props.projectSlug,
-    targetSlug: props.targetSlug,
+    organizationId: props.organizationId,
+    projectId: props.projectId,
+    targetId: props.targetId,
   });
   const storageKey = currentOperation ? `hive:operation-${currentOperation.id}` : null;
   const savedOperationData = storageKey ? localStorage.getItem(storageKey) : null;

@@ -10,21 +10,21 @@ export const deleteProject: NonNullable<MutationResolvers['deleteProject']> = as
   const translator = injector.get(IdTranslator);
   const [organizationId, projectId] = await Promise.all([
     translator.translateOrganizationId({
-      organizationSlug: selector.organizationSlug,
+      organization: selector.organization,
     }),
     translator.translateProjectId({
-      organizationSlug: selector.organizationSlug,
-      projectSlug: selector.projectSlug,
+      organization: selector.organization,
+      project: selector.project,
     }),
   ]);
   const deletedProject = await injector.get(ProjectManager).deleteProject({
-    organizationId: organizationId,
-    projectId: projectId,
+    organization: organizationId,
+    project: projectId,
   });
   return {
     selector: {
-      organizationSlug: selector.organizationSlug,
-      projectSlug: selector.projectSlug,
+      organization: organizationId,
+      project: projectId,
     },
     deletedProject,
   };

@@ -67,8 +67,8 @@ export default gql`
   }
 
   input UpdateNativeFederationInput {
-    organizationSlug: String!
-    projectSlug: String!
+    organization: ID!
+    project: ID!
     enabled: Boolean!
   }
 
@@ -85,8 +85,8 @@ export default gql`
   }
 
   input DisableExternalSchemaCompositionInput {
-    organizationSlug: String!
-    projectSlug: String!
+    organization: ID!
+    project: ID!
   }
 
   """
@@ -98,8 +98,8 @@ export default gql`
   }
 
   input EnableExternalSchemaCompositionInput {
-    organizationSlug: String!
-    projectSlug: String!
+    organization: ID!
+    project: ID!
     endpoint: String!
     secret: String!
   }
@@ -117,8 +117,8 @@ export default gql`
   }
 
   input TestExternalSchemaCompositionInput {
-    organizationSlug: String!
-    projectSlug: String!
+    organization: ID!
+    project: ID!
   }
 
   """
@@ -134,8 +134,8 @@ export default gql`
   }
 
   input UpdateProjectRegistryModelInput {
-    organizationSlug: String!
-    projectSlug: String!
+    organization: ID!
+    project: ID!
     model: RegistryModel!
   }
 
@@ -654,25 +654,25 @@ export default gql`
   }
 
   input SchemaCompareInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
+    organization: ID!
+    project: ID!
+    target: ID!
     after: ID!
     before: ID!
   }
 
   input SchemaVersionUpdateInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
-    versionId: ID!
+    organization: ID!
+    project: ID!
+    target: ID!
+    version: ID!
     valid: Boolean!
   }
 
   input UpdateBaseSchemaInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
+    organization: ID!
+    project: ID!
+    target: ID!
     newBase: String
   }
 
@@ -1317,9 +1317,9 @@ export default gql`
   }
 
   input ApproveFailedSchemaCheckInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
+    organization: ID!
+    project: ID!
+    target: ID!
     schemaCheckId: ID!
     """
     Optional comment visible in the schema check.

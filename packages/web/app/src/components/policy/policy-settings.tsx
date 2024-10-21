@@ -164,7 +164,7 @@ export function PolicySettings({
   const activePolicy = useFragment(PolicySettings_SchemaPolicyFragment, currentState);
 
   return (
-    <DataWrapper query={availableRules} organizationSlug={null}>
+    <DataWrapper query={availableRules} organizationId={null}>
       {query => (
         <PolicySettingsListForm
           saving={saving}

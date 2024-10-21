@@ -19,9 +19,9 @@ export const SchemaVersion: SchemaVersionResolvers = {
   log: async (version, _, { injector }) => {
     const log = await injector.get(SchemaManager).getSchemaLog({
       commit: version.actionId,
-      organizationId: version.organizationId,
-      projectId: version.projectId,
-      targetId: version.targetId,
+      organization: version.organization,
+      project: version.project,
+      target: version.target,
     });
 
     if (log.kind === 'single') {
@@ -65,10 +65,10 @@ export const SchemaVersion: SchemaVersionResolvers = {
   },
   schemas: (version, _, { injector }) => {
     return injector.get(SchemaManager).getMaybeSchemasOfVersion({
-      versionId: version.id,
-      organizationId: version.organizationId,
-      projectId: version.projectId,
-      targetId: version.targetId,
+      version: version.id,
+      organization: version.organization,
+      project: version.project,
+      target: version.target,
     });
   },
   schemaCompositionErrors: async (version, _, { injector }) => {
@@ -105,9 +105,9 @@ export const SchemaVersion: SchemaVersionResolvers = {
       schema: buildASTSchema(schemaAst),
       usage: {
         period: usage?.period ? parseDateRangeInput(usage.period) : createPeriod('30d'),
-        organizationId: version.organizationId,
-        projectId: version.projectId,
-        targetId: version.targetId,
+        organization: version.organization,
+        project: version.project,
+        target: version.target,
       },
       supergraph,
     };
@@ -123,9 +123,9 @@ export const SchemaVersion: SchemaVersionResolvers = {
     }
 
     const usedCoordinates = await injector.get(OperationsManager).getReportedSchemaCoordinates({
-      targetId: version.targetId,
-      projectId: version.projectId,
-      organizationId: version.organizationId,
+      targetId: version.target,
+      projectId: version.project,
+      organizationId: version.organization,
       period: usage?.period ? parseDateRangeInput(usage.period) : createPeriod('30d'),
     });
 
@@ -135,9 +135,9 @@ export const SchemaVersion: SchemaVersionResolvers = {
       sdl: stripUsedSchemaCoordinatesFromDocumentNode(schemaAst, usedCoordinates),
       usage: {
         period: usage?.period ? parseDateRangeInput(usage.period) : createPeriod('30d'),
-        organizationId: version.organizationId,
-        projectId: version.projectId,
-        targetId: version.targetId,
+        organization: version.organization,
+        project: version.project,
+        target: version.target,
         usedCoordinates,
       },
       supergraph,
@@ -159,9 +159,9 @@ export const SchemaVersion: SchemaVersionResolvers = {
       sdl: onlyDeprecatedDocumentNode(schemaAst),
       usage: {
         period: usage?.period ? parseDateRangeInput(usage.period) : createPeriod('30d'),
-        organizationId: version.organizationId,
-        projectId: version.projectId,
-        targetId: version.targetId,
+        organization: version.organization,
+        project: version.project,
+        target: version.target,
       },
       supergraph,
     };

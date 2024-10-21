@@ -36,8 +36,8 @@ export const TargetCalculatedPolicy = graphql(`
 `);
 
 export const OrganizationAndProjectsWithSchemaPolicy = graphql(`
-  query OrganizationAndProjectsWithSchemaPolicy($organization: String!) {
-    organization(selector: { organizationSlug: $organization }) {
+  query OrganizationAndProjectsWithSchemaPolicy($organization: ID!) {
+    organization(selector: { organization: $organization }) {
       organization {
         id
         schemaPolicy {

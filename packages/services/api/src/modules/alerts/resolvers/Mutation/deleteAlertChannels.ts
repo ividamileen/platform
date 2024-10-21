@@ -16,15 +16,15 @@ export const deleteAlertChannels: NonNullable<MutationResolvers['deleteAlertChan
   ]);
 
   const project = await injector.get(ProjectManager).getProject({
-    organizationId: organizationId,
-    projectId: projectId,
+    organization: organizationId,
+    project: projectId,
   });
 
   try {
     await injector.get(AlertsManager).deleteChannels({
-      organizationId,
-      projectId,
-      channelIds: input.channelIds,
+      organization: organizationId,
+      project: projectId,
+      channels: input.channels,
     });
 
     return {

@@ -31,7 +31,7 @@ export const createOrganization: NonNullable<MutationResolvers['createOrganizati
       ok: {
         createdOrganizationPayload: {
           selector: {
-            organizationSlug: result.organization.slug,
+            organization: result.organization.slug,
           },
           organization: result.organization,
         },

@@ -63,7 +63,7 @@ export const ManagePaymentMethod = (props: {
             onClick={() => {
               void mutate({
                 selector: {
-                  organizationSlug: organization.slug,
+                  organization: organization.slug,
                 },
               }).then(result => {
                 if (result.data?.generateStripePortalLink) {

@@ -13,11 +13,11 @@ export const usageEstimation: NonNullable<QueryResolvers['usageEstimation']> = a
   { injector },
 ) => {
   const organizationId = await injector.get(IdTranslator).translateOrganizationId({
-    organizationSlug: args.input.organizationSlug,
+    organization: args.input.organization,
   });
 
   await injector.get(AuthManager).ensureOrganizationAccess({
-    organizationId: organizationId,
+    organization: organizationId,
     scope: OrganizationAccessScope.SETTINGS,
   });
 

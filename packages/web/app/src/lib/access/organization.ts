@@ -25,14 +25,14 @@ export function canAccessOrganization(
 
 export function useOrganizationAccess({
   scope,
-  organizationSlug,
+  organizationId,
   member: mmember,
   redirect = false,
 }: {
   scope: OrganizationAccessScope;
   member: null | FragmentType<typeof CanAccessOrganization_MemberFragment>;
   redirect?: boolean;
-  organizationSlug: string;
+  organizationId: string;
 }) {
   const member = useFragment(CanAccessOrganization_MemberFragment, mmember);
   const canAccess = canAccessOrganization(scope, mmember);
@@ -42,9 +42,9 @@ export function useOrganizationAccess({
     redirectTo: redirect
       ? router => {
           void router.navigate({
-            to: '/$organizationSlug',
+            to: '/$organizationId',
             params: {
-              organizationSlug,
+              organizationId,
             },
           });
         }

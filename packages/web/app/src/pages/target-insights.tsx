@@ -19,14 +19,14 @@ import { useDateRangeController } from '@/lib/hooks/use-date-range-controller';
 import { useSearchParamsFilter } from '@/lib/hooks/use-search-params-filters';
 
 function OperationsView({
-  organizationSlug,
-  projectSlug,
-  targetSlug,
+  organizationCleanId,
+  projectCleanId,
+  targetCleanId,
   dataRetentionInDays,
 }: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationCleanId: string;
+  projectCleanId: string;
+  targetCleanId: string;
   dataRetentionInDays: number;
 }): ReactElement {
   const [selectedOperations, setSelectedOperations] = useSearchParamsFilter<string[]>(
@@ -48,17 +48,17 @@ function OperationsView({
         </div>
         <div className="flex justify-end gap-x-4">
           <OperationsFilterTrigger
-            organizationSlug={organizationSlug}
-            projectSlug={projectSlug}
-            targetSlug={targetSlug}
+            organizationId={organizationCleanId}
+            projectId={projectCleanId}
+            targetId={targetCleanId}
             period={dateRangeController.resolvedRange}
             selected={selectedOperations}
             onFilter={setSelectedOperations}
           />
           <ClientsFilterTrigger
-            organizationSlug={organizationSlug}
-            projectSlug={projectSlug}
-            targetSlug={targetSlug}
+            organizationId={organizationCleanId}
+            projectId={projectCleanId}
+            targetId={targetCleanId}
             period={dateRangeController.resolvedRange}
             selected={selectedClients}
             onFilter={setSelectedClients}
@@ -76,9 +76,9 @@ function OperationsView({
         </div>
       </div>
       <OperationsStats
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organization={organizationCleanId}
+        project={projectCleanId}
+        target={targetCleanId}
         period={dateRangeController.resolvedRange}
         operationsFilter={selectedOperations}
         clientNamesFilter={selectedClients}
@@ -89,9 +89,9 @@ function OperationsView({
       <OperationsList
         className="mt-12"
         period={dateRangeController.resolvedRange}
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organization={organizationCleanId}
+        project={projectCleanId}
+        target={targetCleanId}
         operationsFilter={selectedOperations}
         clientNamesFilter={selectedClients}
         selectedPeriod={dateRangeController.selectedPreset.range}
@@ -101,12 +101,8 @@ function OperationsView({
 }
 
 const TargetOperationsPageQuery = graphql(`
-  query TargetOperationsPageQuery(
-    $organizationSlug: String!
-    $projectSlug: String!
-    $targetSlug: String!
-  ) {
-    organization(selector: { organizationSlug: $organizationSlug }) {
+  query TargetOperationsPageQuery($organizationId: ID!, $projectId: ID!, $targetId: ID!) {
+    organization(selector: { organization: $organizationId }) {
       organization {
         id
         slug
@@ -116,31 +112,27 @@ const TargetOperationsPageQuery = graphql(`
       }
     }
     hasCollectedOperations(
-      selector: {
-        organizationSlug: $organizationSlug
-        projectSlug: $projectSlug
-        targetSlug: $targetSlug
-      }
+      selector: { organization: $organizationId, project: $projectId, target: $targetId }
     )
   }
 `);
 
 function TargetOperationsPageContent(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   const [query] = useQuery({
     query: TargetOperationsPageQuery,
     variables: {
-      organizationSlug: props.organizationSlug,
-      projectSlug: props.projectSlug,
-      targetSlug: props.targetSlug,
+      organizationId: props.organizationId,
+      projectId: props.projectId,
+      targetId: props.targetId,
     },
   });
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationId} error={query.error} />;
   }
 
   const currentOrganization = query.data?.organization?.organization;
@@ -148,17 +140,17 @@ function TargetOperationsPageContent(props: {
 
   return (
     <TargetLayout
-      organizationSlug={props.organizationSlug}
-      projectSlug={props.projectSlug}
-      targetSlug={props.targetSlug}
+      organizationId={props.organizationId}
+      projectId={props.projectId}
+      targetId={props.targetId}
       page={Page.Insights}
     >
       {currentOrganization ? (
         hasCollectedOperations ? (
           <OperationsView
-            organizationSlug={props.organizationSlug}
-            projectSlug={props.projectSlug}
-            targetSlug={props.targetSlug}
+            organizationCleanId={props.organizationId}
+            projectCleanId={props.projectId}
+            targetCleanId={props.targetId}
             dataRetentionInDays={currentOrganization.rateLimit.retentionInDays}
           />
         ) : (
@@ -176,9 +168,9 @@ function TargetOperationsPageContent(props: {
 }
 
 export function TargetInsightsPage(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   return (
     <>

@@ -39,7 +39,7 @@ export class OIDCIntegrationsProvider {
 
     try {
       await this.authManager.ensureOrganizationAccess({
-        organizationId: organizationId,
+        organization: organizationId,
         scope: OrganizationAccessScope.INTEGRATIONS,
       });
       return true;
@@ -61,7 +61,7 @@ export class OIDCIntegrationsProvider {
     }
 
     await this.authManager.ensureOrganizationAccess({
-      organizationId: args.organizationId,
+      organization: args.organizationId,
       scope: OrganizationAccessScope.INTEGRATIONS,
     });
 
@@ -91,13 +91,11 @@ export class OIDCIntegrationsProvider {
     }
 
     await this.authManager.ensureOrganizationAccess({
-      organizationId: args.organizationId,
+      organization: args.organizationId,
       scope: OrganizationAccessScope.INTEGRATIONS,
     });
 
-    const organization = await this.storage.getOrganization({
-      organizationId: args.organizationId,
-    });
+    const organization = await this.storage.getOrganization({ organization: args.organizationId });
 
     if (!organization) {
       throw new Error(`Failed to locate organization ${args.organizationId}`);
@@ -195,7 +193,7 @@ export class OIDCIntegrationsProvider {
     }
 
     await this.authManager.ensureOrganizationAccess({
-      organizationId: integration.linkedOrganizationId,
+      organization: integration.linkedOrganizationId,
       scope: OrganizationAccessScope.INTEGRATIONS,
     });
 
@@ -272,7 +270,7 @@ export class OIDCIntegrationsProvider {
     }
 
     await this.authManager.ensureOrganizationAccess({
-      organizationId: integration.linkedOrganizationId,
+      organization: integration.linkedOrganizationId,
       scope: OrganizationAccessScope.INTEGRATIONS,
     });
 
@@ -304,7 +302,7 @@ export class OIDCIntegrationsProvider {
     }
 
     await this.authManager.ensureOrganizationAccess({
-      organizationId: oidcIntegration.linkedOrganizationId,
+      organization: oidcIntegration.linkedOrganizationId,
       scope: OrganizationAccessScope.INTEGRATIONS,
     });
 
@@ -349,7 +347,7 @@ export class OIDCIntegrationsProvider {
     }
 
     await this.authManager.ensureOrganizationAccess({
-      organizationId: integration.linkedOrganizationId,
+      organization: integration.linkedOrganizationId,
       scope: OrganizationAccessScope.INTEGRATIONS,
     });
 

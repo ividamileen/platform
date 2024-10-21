@@ -9,7 +9,7 @@ export const leaveOrganization: NonNullable<MutationResolvers['leaveOrganization
 ) => {
   const translator = injector.get(IdTranslator);
   const organizationId = await translator.translateOrganizationId({
-    organizationSlug: input.organizationSlug,
+    organization: input.organization,
   });
 
   const result = await injector.get(OrganizationManager).leaveOrganization(organizationId);

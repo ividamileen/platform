@@ -139,8 +139,8 @@ const createTarget: TypedDocumentNodeUpdateResolver<typeof CreateTarget_CreateTa
       query: TargetsDocument,
       variables: {
         selector: {
-          organizationSlug: selector.organizationSlug,
-          projectSlug: selector.projectSlug,
+          organization: selector.organization,
+          project: selector.project,
         },
       },
     },
@@ -181,9 +181,9 @@ const createToken: TypedDocumentNodeUpdateResolver<typeof CreateAccessToken_Crea
       query: TokensDocument,
       variables: {
         selector: {
-          organizationSlug: selector.organizationSlug,
-          projectSlug: selector.projectSlug,
-          targetSlug: selector.targetSlug,
+          organization: selector.organization,
+          project: selector.project,
+          target: selector.target,
         },
       },
     },
@@ -207,9 +207,9 @@ const deleteTokens: TypedDocumentNodeUpdateResolver<typeof DeleteTokensDocument>
       query: TokensDocument,
       variables: {
         selector: {
-          organizationSlug: selector.organizationSlug,
-          projectSlug: selector.projectSlug,
-          targetSlug: selector.targetSlug,
+          organization: selector.organization,
+          project: selector.project,
+          target: selector.target,
         },
       },
     },

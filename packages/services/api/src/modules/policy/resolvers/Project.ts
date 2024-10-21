@@ -5,12 +5,12 @@ export const Project: Pick<ProjectResolvers, 'parentSchemaPolicy' | 'schemaPolic
   {
     schemaPolicy: async (project, _, { injector }) =>
       injector.get(SchemaPolicyProvider).getProjectPolicy({
-        projectId: project.id,
-        organizationId: project.orgId,
+        project: project.id,
+        organization: project.orgId,
       }),
     parentSchemaPolicy: async (project, _, { injector }) =>
       injector.get(SchemaPolicyProvider).getOrganizationPolicyForProject({
-        projectId: project.id,
-        organizationId: project.orgId,
+        project: project.id,
+        organization: project.orgId,
       }),
   };

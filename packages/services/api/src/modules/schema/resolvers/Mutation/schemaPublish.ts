@@ -27,9 +27,9 @@ export const schemaPublish: NonNullable<MutationResolvers['schemaPublish']> = as
     {
       ...input,
       service: input.service?.toLowerCase(),
-      organizationId: organization,
-      projectId: project,
-      targetId: target,
+      organization,
+      project,
+      target,
       isSchemaPublishMissingUrlErrorSelected,
     },
     request.signal,

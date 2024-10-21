@@ -18,19 +18,13 @@ import { Outlet, Link as RouterLink, useParams, useRouter } from '@tanstack/reac
 
 const SchemaChecks_NavigationQuery = graphql(`
   query SchemaChecks_NavigationQuery(
-    $organizationSlug: String!
-    $projectSlug: String!
-    $targetSlug: String!
+    $organizationId: ID!
+    $projectId: ID!
+    $targetId: ID!
     $after: String
     $filters: SchemaChecksFilter
   ) {
-    target(
-      selector: {
-        organizationSlug: $organizationSlug
-        projectSlug: $projectSlug
-        targetSlug: $targetSlug
-      }
-    ) {
+    target(selector: { organization: $organizationId, project: $projectId, target: $targetId }) {
       id
       schemaChecks(first: 20, after: $after, filters: $filters) {
         edges {
@@ -72,17 +66,17 @@ const Navigation = (props: {
   isLastPage: boolean;
   onLoadMore: (cursor: string) => void;
   filters?: SchemaCheckFilters;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
   schemaCheckId?: string;
 }) => {
   const [query] = useQuery({
     query: SchemaChecks_NavigationQuery,
     variables: {
-      organizationSlug: props.organizationSlug,
-      projectSlug: props.projectSlug,
-      targetSlug: props.targetSlug,
+      organizationId: props.organizationId,
+      projectId: props.projectId,
+      targetId: props.targetId,
       after: props.after,
       filters: {
         changed: props.filters?.showOnlyChanged ?? false,
@@ -105,11 +99,11 @@ const Navigation = (props: {
             >
               <RouterLink
                 key={edge.node.id}
-                to="/$organizationSlug/$projectSlug/$targetSlug/checks/$schemaCheckId"
+                to="/$organizationId/$projectId/$targetId/checks/$schemaCheckId"
                 params={{
-                  organizationSlug: props.organizationSlug,
-                  projectSlug: props.projectSlug,
-                  targetSlug: props.targetSlug,
+                  organizationId: props.organizationId,
+                  projectId: props.projectId,
+                  targetId: props.targetId,
                   schemaCheckId: edge.node.id,
                 }}
                 search={{
@@ -175,12 +169,12 @@ const Navigation = (props: {
 
 const ChecksPageQuery = graphql(`
   query ChecksPageQuery(
-    $organizationSlug: String!
-    $projectSlug: String!
-    $targetSlug: String!
+    $organizationId: ID!
+    $projectId: ID!
+    $targetId: ID!
     $filters: SchemaChecksFilter
   ) {
-    organization(selector: { organizationSlug: $organizationSlug }) {
+    organization(selector: { organization: $organizationId }) {
       organization {
         id
         rateLimit {
@@ -188,13 +182,7 @@ const ChecksPageQuery = graphql(`
         }
       }
     }
-    target(
-      selector: {
-        organizationSlug: $organizationSlug
-        projectSlug: $projectSlug
-        targetSlug: $targetSlug
-      }
-    ) {
+    target(selector: { organization: $organizationId, project: $projectId, target: $targetId }) {
       id
       schemaChecks(first: 1) {
         edges {
@@ -214,11 +202,7 @@ const ChecksPageQuery = graphql(`
   }
 `);
 
-function ChecksPageContent(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
-}) {
+function ChecksPageContent(props: { organizationId: string; projectId: string; targetId: string }) {
   const [paginationVariables, setPaginationVariables] = useState<Array<string | null>>(() => [
     null,
   ]);
@@ -242,9 +226,9 @@ function ChecksPageContent(props: {
   const [query] = useQuery({
     query: ChecksPageQuery,
     variables: {
-      organizationSlug: props.organizationSlug,
-      projectSlug: props.projectSlug,
-      targetSlug: props.targetSlug,
+      organizationId: props.organizationId,
+      projectId: props.projectId,
+      targetId: props.targetId,
       filters: {
         changed: filters.showOnlyChanged ?? false,
         failed: filters.showOnlyFailed ?? false,
@@ -253,7 +237,7 @@ function ChecksPageContent(props: {
   });
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationId} error={query.error} />;
   }
 
   const hasSchemaChecks = !!query.data?.target?.schemaChecks?.edges?.length;
@@ -294,9 +278,9 @@ function ChecksPageContent(props: {
   return (
     <>
       <TargetLayout
-        organizationSlug={props.organizationSlug}
-        projectSlug={props.projectSlug}
-        targetSlug={props.targetSlug}
+        organizationId={props.organizationId}
+        projectId={props.projectId}
+        targetId={props.targetId}
         page={Page.Checks}
         className={cn('flex', hasSchemaChecks || hasActiveSchemaCheck ? 'flex-row gap-x-6' : '')}
       >
@@ -339,9 +323,9 @@ function ChecksPageContent(props: {
                 <div className="flex w-[300px] grow flex-col gap-2.5 overflow-y-auto rounded-md border border-gray-800/50 p-2.5">
                   {paginationVariables.map((cursor, index) => (
                     <Navigation
-                      organizationSlug={props.organizationSlug}
-                      projectSlug={props.projectSlug}
-                      targetSlug={props.targetSlug}
+                      organizationId={props.organizationId}
+                      projectId={props.projectId}
+                      targetId={props.targetId}
                       schemaCheckId={schemaCheckId}
                       after={cursor}
                       isLastPage={index + 1 === paginationVariables.length}
@@ -388,9 +372,9 @@ function ChecksPageContent(props: {
 }
 
 export function TargetChecksPage(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   return (
     <>

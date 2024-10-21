@@ -25,8 +25,8 @@ export const Project: Pick<
   },
   schemaVersionsCount: (project, { period }, { injector }) => {
     return injector.get(SchemaManager).countSchemaVersionsOfProject({
-      organizationId: project.orgId,
-      projectId: project.id,
+      organization: project.orgId,
+      project: project.id,
       period: period ? parseDateRangeInput(period) : null,
     });
   },

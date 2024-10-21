@@ -26,18 +26,18 @@ export const createTarget: NonNullable<MutationResolvers['createTarget']> = asyn
   }
 
   const translator = injector.get(IdTranslator);
-  const [organizationId, projectId] = await Promise.all([
+  const [organization, project] = await Promise.all([
     translator.translateOrganizationId({
-      organizationSlug: input.organizationSlug,
+      organization: input.organization,
     }),
     translator.translateProjectId({
-      organizationSlug: input.organizationSlug,
-      projectSlug: input.projectSlug,
+      organization: input.organization,
+      project: input.project,
     }),
   ]);
   const result = await injector.get(TargetManager).createTarget({
-    organizationId: organizationId,
-    projectId: projectId,
+    organization,
+    project,
     slug: inputParseResult.data.slug,
   });
 
@@ -45,9 +45,9 @@ export const createTarget: NonNullable<MutationResolvers['createTarget']> = asyn
     return {
       ok: {
         selector: {
-          organizationSlug: input.organizationSlug,
-          projectSlug: input.projectSlug,
-          targetSlug: result.target.slug,
+          organization: input.organization,
+          project: input.project,
+          target: result.target.slug,
         },
         createdTarget: result.target,
       },

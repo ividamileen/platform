@@ -13,20 +13,20 @@ export const Member: Pick<
 > = {
   organizationAccessScopes: (member, _, { injector }) => {
     return injector.get(AuthManager).getMemberOrganizationScopes({
-      userId: member.user.id,
-      organizationId: member.organization,
+      user: member.user.id,
+      organization: member.organization,
     });
   },
   projectAccessScopes: (member, _, { injector }) => {
     return injector.get(AuthManager).getMemberProjectScopes({
-      userId: member.user.id,
-      organizationId: member.organization,
+      user: member.user.id,
+      organization: member.organization,
     });
   },
   targetAccessScopes: (member, _, { injector }) => {
     return injector.get(AuthManager).getMemberTargetScopes({
-      userId: member.user.id,
-      organizationId: member.organization,
+      user: member.user.id,
+      organization: member.organization,
     });
   },
 };

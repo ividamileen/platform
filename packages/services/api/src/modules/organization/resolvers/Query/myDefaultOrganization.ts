@@ -6,7 +6,7 @@ import type { QueryResolvers } from './../../../../__generated__/types.next';
 
 export const myDefaultOrganization: NonNullable<QueryResolvers['myDefaultOrganization']> = async (
   _,
-  { previouslyVisitedOrganizationId: previouslyVisitedOrganizationSlug },
+  { previouslyVisitedOrganizationId },
   { injector },
 ) => {
   const user = await injector.get(AuthManager).getCurrentUser();
@@ -19,12 +19,12 @@ export const myDefaultOrganization: NonNullable<QueryResolvers['myDefaultOrganiz
     });
     if (oidcIntegration.type === 'ok') {
       const org = await organizationManager.getOrganization({
-        organizationId: oidcIntegration.organizationId,
+        organization: oidcIntegration.organizationId,
       });
 
       return {
         selector: {
-          organizationSlug: org.slug,
+          organization: org.slug,
         },
         organization: org,
       };
@@ -35,20 +35,20 @@ export const myDefaultOrganization: NonNullable<QueryResolvers['myDefaultOrganiz
 
   // This is the organization that got stored as an cookie
   // We make sure it actually exists before directing to it.
-  if (previouslyVisitedOrganizationSlug) {
+  if (previouslyVisitedOrganizationId) {
     const orgId = await injector.get(IdTranslator).translateOrganizationIdSafe({
-      organizationSlug: previouslyVisitedOrganizationSlug,
+      organization: previouslyVisitedOrganizationId,
     });
 
     if (orgId) {
       const org = await organizationManager.getOrganization({
-        organizationId: orgId,
+        organization: orgId,
       });
 
       if (org) {
         return {
           selector: {
-            organizationSlug: org.slug,
+            organization: org.slug,
           },
           organization: org,
         };
@@ -64,7 +64,7 @@ export const myDefaultOrganization: NonNullable<QueryResolvers['myDefaultOrganiz
 
       return {
         selector: {
-          organizationSlug: firstOrg.slug,
+          organization: firstOrg.slug,
         },
         organization: firstOrg,
       };

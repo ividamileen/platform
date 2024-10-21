@@ -20,13 +20,13 @@ export const DeleteChannelsButton_DeleteChannelsMutation = graphql(`
 export function DeleteChannelsButton({
   selected,
   onSuccess,
-  organizationSlug,
-  projectSlug,
+  organizationId,
+  projectId,
 }: {
   selected: string[];
   onSuccess(): void;
-  organizationSlug: string;
-  projectSlug: string;
+  organizationId: string;
+  projectId: string;
 }) {
   const [mutation, mutate] = useMutation(DeleteChannelsButton_DeleteChannelsMutation);
 
@@ -37,9 +37,9 @@ export function DeleteChannelsButton({
       onClick={async () => {
         await mutate({
           input: {
-            organizationSlug,
-            projectSlug,
-            channelIds: selected,
+            organization: organizationId,
+            project: projectId,
+            channels: selected,
           },
         });
         onSuccess();

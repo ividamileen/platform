@@ -39,9 +39,9 @@ export class SingleLegacyModel {
       sdl: string;
     };
     selector: {
-      organizationId: string;
-      projectId: string;
-      targetId: string;
+      organization: string;
+      project: string;
+      target: string;
     };
     latest: {
       isComposable: boolean;
@@ -58,7 +58,7 @@ export class SingleLegacyModel {
       id: temp,
       author: temp,
       commit: temp,
-      target: selector.targetId,
+      target: selector.target,
       date: Date.now(),
       sdl: input.sdl,
       metadata: null,
@@ -89,7 +89,7 @@ export class SingleLegacyModel {
 
     const compositionCheck = await this.checks.composition({
       orchestrator: this.orchestrator,
-      targetId: selector.targetId,
+      targetId: selector.target,
       project,
       organization,
       schemas,
@@ -102,7 +102,7 @@ export class SingleLegacyModel {
       version: latestVersion,
       organization,
       project,
-      targetId: selector.targetId,
+      targetId: selector.target,
     });
 
     const diffCheck = await this.checks.diff({

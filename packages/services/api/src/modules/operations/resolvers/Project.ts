@@ -6,15 +6,15 @@ export const Project: Pick<ProjectResolvers, 'requestsOverTime' | 'totalRequests
   {
     totalRequests: (project, { period }, { injector }) => {
       return injector.get(OperationsManager).countRequestsOfProject({
-        projectId: project.id,
-        organizationId: project.orgId,
+        project: project.id,
+        organization: project.orgId,
         period: parseDateRangeInput(period),
       });
     },
     requestsOverTime: (project, { resolution, period }, { injector }) => {
       return injector.get(OperationsManager).readRequestsOverTimeOfProject({
-        projectId: project.id,
-        organizationId: project.orgId,
+        project: project.id,
+        organization: project.orgId,
         period: parseDateRangeInput(period),
         resolution,
       });

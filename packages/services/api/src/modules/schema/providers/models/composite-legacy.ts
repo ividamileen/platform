@@ -49,9 +49,9 @@ export class CompositeLegacyModel {
       serviceName: string;
     };
     selector: {
-      organizationId: string;
-      projectId: string;
-      targetId: string;
+      organization: string;
+      project: string;
+      target: string;
     };
     latest: {
       isComposable: boolean;
@@ -68,7 +68,7 @@ export class CompositeLegacyModel {
       id: temp,
       author: temp,
       commit: temp,
-      target: selector.targetId,
+      target: selector.target,
       date: Date.now(),
       sdl: input.sdl,
       service_name: input.serviceName,
@@ -104,7 +104,7 @@ export class CompositeLegacyModel {
 
     const compositionCheck = await this.checks.composition({
       orchestrator,
-      targetId: selector.targetId,
+      targetId: selector.target,
       project,
       organization,
       schemas,
@@ -117,7 +117,7 @@ export class CompositeLegacyModel {
       version: latest,
       organization,
       project,
-      targetId: selector.targetId,
+      targetId: selector.target,
     });
 
     const diffCheck = await this.checks.diff({

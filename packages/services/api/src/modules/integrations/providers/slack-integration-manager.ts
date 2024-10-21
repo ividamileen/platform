@@ -37,34 +37,34 @@ export class SlackIntegrationManager {
       token: string;
     },
   ): Promise<void> {
-    this.logger.debug('Registering Slack integration (organization=%s)', input.organizationId);
+    this.logger.debug('Registering Slack integration (organization=%s)', input.organization);
     await this.authManager.ensureOrganizationAccess({
       ...input,
       scope: OrganizationAccessScope.INTEGRATIONS,
     });
     this.logger.debug('Updating organization');
     await this.storage.addSlackIntegration({
-      organizationId: input.organizationId,
+      organization: input.organization,
       token: this.crypto.encrypt(input.token),
     });
   }
 
   async unregister(input: OrganizationSelector): Promise<void> {
-    this.logger.debug('Removing Slack integration (organization=%s)', input.organizationId);
+    this.logger.debug('Removing Slack integration (organization=%s)', input.organization);
     await this.authManager.ensureOrganizationAccess({
       ...input,
       scope: OrganizationAccessScope.INTEGRATIONS,
     });
     this.logger.debug('Updating organization');
     await this.storage.deleteSlackIntegration({
-      organizationId: input.organizationId,
+      organization: input.organization,
     });
   }
 
   async isAvailable(selector: OrganizationSelector): Promise<boolean> {
-    this.logger.debug('Checking Slack integration (organization=%s)', selector.organizationId);
+    this.logger.debug('Checking Slack integration (organization=%s)', selector.organization);
     const token = await this.getToken({
-      organizationId: selector.organizationId,
+      organization: selector.organization,
       context: IntegrationsAccessContext.Integrations,
     });
 
@@ -102,7 +102,7 @@ export class SlackIntegrationManager {
       case IntegrationsAccessContext.Integrations: {
         this.logger.debug(
           'Fetching Slack integration token (organization=%s, context: %s)',
-          selector.organizationId,
+          selector.organization,
           selector.context,
         );
         await this.authManager.ensureOrganizationAccess({
@@ -114,8 +114,8 @@ export class SlackIntegrationManager {
       case IntegrationsAccessContext.ChannelConfirmation: {
         this.logger.debug(
           'Fetching Slack integration token (organization=%s, project=%s, context: %s)',
-          selector.organizationId,
-          selector.projectId,
+          selector.organization,
+          selector.project,
           selector.context,
         );
         await this.authManager.ensureProjectAccess({
@@ -127,9 +127,9 @@ export class SlackIntegrationManager {
       case IntegrationsAccessContext.SchemaPublishing: {
         this.logger.debug(
           'Fetching Slack integration token (organization=%s, project=%s, target=%s context: %s)',
-          selector.organizationId,
-          selector.projectId,
-          selector.targetId,
+          selector.organization,
+          selector.project,
+          selector.target,
           selector.context,
         );
         await this.authManager.ensureTargetAccess({
@@ -144,7 +144,7 @@ export class SlackIntegrationManager {
     }
 
     let token = await this.storage.getSlackIntegrationToken({
-      organizationId: selector.organizationId,
+      organization: selector.organization,
     });
 
     if (token) {

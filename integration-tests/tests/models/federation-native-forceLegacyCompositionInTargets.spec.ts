@@ -878,9 +878,9 @@ async function prepare(targetPick: TargetOption) {
   // force legacy composition
   await updateTargetSchemaComposition(
     {
-      organizationSlug: organization.slug,
-      projectSlug: project.slug,
-      targetSlug: targetWithLegacyComposition.slug,
+      organization: organization.slug,
+      project: project.slug,
+      target: targetWithLegacyComposition.slug,
       nativeComposition: false,
     },
     targetWithLegacyComposition.tokens.secrets.settings,

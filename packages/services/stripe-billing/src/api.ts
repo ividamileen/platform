@@ -34,7 +34,7 @@ export const stripeBillingApiRouter = t.router({
     .query(async ({ ctx, input }) => {
       const storage = await ctx.storage$;
       const organizationBillingRecord = await storage.getOrganizationBilling({
-        organizationId: input.organizationId,
+        organization: input.organizationId,
       });
 
       if (!organizationBillingRecord) {
@@ -57,7 +57,7 @@ export const stripeBillingApiRouter = t.router({
     .query(async ({ ctx, input }) => {
       const storage = await ctx.storage$;
       const organizationBillingRecord = await storage.getOrganizationBilling({
-        organizationId: input.organizationId,
+        organization: input.organizationId,
       });
 
       if (!organizationBillingRecord) {
@@ -83,7 +83,7 @@ export const stripeBillingApiRouter = t.router({
     .query(async ({ ctx, input }) => {
       const storage = await ctx.storage$;
       const organizationBillingRecord = await storage.getOrganizationBilling({
-        organizationId: input.organizationId,
+        organization: input.organizationId,
       });
 
       if (!organizationBillingRecord) {
@@ -96,7 +96,7 @@ export const stripeBillingApiRouter = t.router({
 
       if (customer.deleted === true) {
         await storage.deleteOrganizationBilling({
-          organizationId: input.organizationId,
+          organization: input.organizationId,
         });
 
         return null;
@@ -136,10 +136,10 @@ export const stripeBillingApiRouter = t.router({
       const storage = await ctx.storage$;
       const [organizationBillingRecord, organization, stripePrices] = await Promise.all([
         storage.getOrganizationBilling({
-          organizationId: input.organizationId,
+          organization: input.organizationId,
         }),
         storage.getOrganization({
-          organizationId: input.organizationId,
+          organization: input.organizationId,
         }),
         ctx.stripeData$,
       ]);
@@ -188,7 +188,7 @@ export const stripeBillingApiRouter = t.router({
     .mutation(async ({ ctx, input }) => {
       const storage = await ctx.storage$;
       const organizationBillingRecord = await storage.getOrganizationBilling({
-        organizationId: input.organizationId,
+        organization: input.organizationId,
       });
 
       if (organizationBillingRecord === null) {
@@ -213,7 +213,7 @@ export const stripeBillingApiRouter = t.router({
     .mutation(async ({ ctx, input }) => {
       const storage = await ctx.storage$;
       const organizationBillingRecord = await storage.getOrganizationBilling({
-        organizationId: input.organizationId,
+        organization: input.organizationId,
       });
 
       if (organizationBillingRecord === null) {
@@ -258,14 +258,14 @@ export const stripeBillingApiRouter = t.router({
     .mutation(async ({ ctx, input }) => {
       const storage = await ctx.storage$;
       let organizationBillingRecord = await storage.getOrganizationBilling({
-        organizationId: input.organizationId,
+        organization: input.organizationId,
       });
       const organization = await storage.getOrganization({
-        organizationId: input.organizationId,
+        organization: input.organizationId,
       });
 
       const orgOwner = await storage.getOrganizationOwner({
-        organizationId: input.organizationId,
+        organization: input.organizationId,
       });
 
       const customerId = organizationBillingRecord?.externalBillingReference

@@ -196,26 +196,26 @@ function OperationsFilterContainer({
   onClose,
   onFilter,
   selected,
-  organizationSlug,
-  projectSlug,
-  targetSlug,
+  organizationId,
+  projectId,
+  targetId,
 }: {
   onFilter(keys: string[]): void;
   onClose(): void;
   isOpen: boolean;
   period: DateRangeInput;
   selected?: string[];
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }): ReactElement | null {
   const [query, refresh] = useQuery({
     query: OperationsFilterContainer_OperationStatsQuery,
     variables: {
       selector: {
-        organizationSlug,
-        projectSlug,
-        targetSlug,
+        organization: organizationId,
+        project: projectId,
+        target: targetId,
         period,
         operations: [],
       },
@@ -296,16 +296,16 @@ export function OperationsFilterTrigger({
   period,
   onFilter,
   selected,
-  organizationSlug,
-  projectSlug,
-  targetSlug,
+  organizationId,
+  projectId,
+  targetId,
 }: {
   period: DateRangeInput;
   onFilter(keys: string[]): void;
   selected?: string[];
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }): ReactElement {
   const [isOpen, toggle] = useToggle();
 
@@ -316,9 +316,9 @@ export function OperationsFilterTrigger({
         <FilterIcon className="ml-2 size-4" />
       </Button>
       <OperationsFilterContainer
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         isOpen={isOpen}
         onClose={toggle}
         period={period}
@@ -545,26 +545,26 @@ function ClientsFilterContainer({
   onClose,
   onFilter,
   selected,
-  organizationSlug,
-  projectSlug,
-  targetSlug,
+  organizationId,
+  projectId,
+  targetId,
 }: {
   onFilter(keys: string[]): void;
   onClose(): void;
   isOpen: boolean;
   period: DateRangeInput;
   selected?: string[];
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }): ReactElement | null {
   const [query, refresh] = useQuery({
     query: ClientsFilterContainer_ClientStatsQuery,
     variables: {
       selector: {
-        organizationSlug,
-        projectSlug,
-        targetSlug,
+        organization: organizationId,
+        project: projectId,
+        target: targetId,
         period,
         operations: [],
       },
@@ -604,16 +604,16 @@ export function ClientsFilterTrigger({
   period,
   onFilter,
   selected,
-  organizationSlug,
-  projectSlug,
-  targetSlug,
+  organizationId,
+  projectId,
+  targetId,
 }: {
   period: DateRangeInput;
   onFilter(keys: string[]): void;
   selected?: string[];
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }): ReactElement {
   const [isOpen, toggle] = useToggle();
 
@@ -624,9 +624,9 @@ export function ClientsFilterTrigger({
         <FilterIcon className="ml-2 size-4" />
       </Button>
       <ClientsFilterContainer
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         isOpen={isOpen}
         onClose={toggle}
         period={period}

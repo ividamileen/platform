@@ -54,15 +54,13 @@ async function validateTargetAccess(
   ]);
 
   await injector.get(AuthManager).ensureTargetAccess({
-    organizationId: organization,
-    projectId: project,
-    targetId: target,
+    organization,
+    project,
+    target,
     scope,
   });
 
-  return await injector
-    .get(Storage)
-    .getTarget({ targetId: target, organizationId: organization, projectId: project });
+  return await injector.get(Storage).getTarget({ target, organization, project });
 }
 
 export const resolvers: CollectionModule.Resolvers = {

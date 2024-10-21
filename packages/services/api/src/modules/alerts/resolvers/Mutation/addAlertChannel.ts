@@ -43,16 +43,16 @@ export const addAlertChannel: NonNullable<MutationResolvers['addAlertChannel']> 
   return {
     ok: {
       updatedProject: await injector.get(ProjectManager).getProject({
-        organizationId: organizationId,
-        projectId: projectId,
+        organization: organizationId,
+        project: projectId,
       }),
       addedAlertChannel: await injector.get(AlertsManager).addChannel({
-        organizationId,
-        projectId,
+        organization: organizationId,
+        project: projectId,
         name: input.name,
         type: input.type,
-        slackChannel: input.slack?.channel,
-        webhookEndpoint: input.webhook?.endpoint,
+        slack: input.slack,
+        webhook: input.webhook,
       }),
     },
   };

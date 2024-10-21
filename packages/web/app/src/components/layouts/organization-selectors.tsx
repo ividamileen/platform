@@ -12,7 +12,7 @@ const OrganizationSelector_OrganizationConnectionFragment = graphql(`
 `);
 
 export function OrganizationSelector(props: {
-  currentOrganizationSlug: string;
+  currentOrganizationCleanId: string;
   organizations: FragmentType<typeof OrganizationSelector_OrganizationConnectionFragment> | null;
 }) {
   const router = useRouter();
@@ -22,17 +22,17 @@ export function OrganizationSelector(props: {
   )?.nodes;
 
   const currentOrganization = organizations?.find(
-    node => node.slug === props.currentOrganizationSlug,
+    node => node.slug === props.currentOrganizationCleanId,
   );
 
   return organizations ? (
     <Select
-      value={props.currentOrganizationSlug}
+      value={props.currentOrganizationCleanId}
       onValueChange={id => {
         void router.navigate({
-          to: '/$organizationSlug',
+          to: '/$organizationId',
           params: {
-            organizationSlug: id,
+            organizationId: id,
           },
         });
       }}

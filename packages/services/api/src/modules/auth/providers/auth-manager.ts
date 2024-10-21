@@ -16,20 +16,20 @@ import { ApiToken } from './tokens';
 import { UserManager } from './user-manager';
 
 export interface OrganizationAccessSelector {
-  organizationId: string;
+  organization: string;
   scope: OrganizationAccessScope;
 }
 
 export interface ProjectAccessSelector {
-  organizationId: string;
-  projectId: string;
+  organization: string;
+  project: string;
   scope: ProjectAccessScope;
 }
 
 export interface TargetAccessSelector {
-  organizationId: string;
-  projectId: string;
-  targetId: string;
+  organization: string;
+  project: string;
+  target: string;
   scope: TargetAccessScope;
 }
 
@@ -65,15 +65,15 @@ export class AuthManager {
   }
 
   async ensureTargetAccess(
-    selector: Listify<TargetAccessSelector, 'targetId'>,
+    selector: Listify<TargetAccessSelector, 'target'>,
   ): Promise<void | never> {
     if (this.apiToken) {
       if (hasManyTargets(selector)) {
         await Promise.all(
-          selector.targetId.map(target =>
+          selector.target.map(target =>
             this.ensureTargetAccess({
               ...selector,
-              targetId: target,
+              target,
             }),
           ),
         );
@@ -85,10 +85,10 @@ export class AuthManager {
       }
     } else if (hasManyTargets(selector)) {
       await Promise.all(
-        selector.targetId.map(target =>
+        selector.target.map(target =>
           this.ensureTargetAccess({
             ...selector,
-            targetId: target,
+            target,
           }),
         ),
       );
@@ -96,7 +96,7 @@ export class AuthManager {
       const user = await this.getCurrentUser();
       await this.targetAccess.ensureAccessForUser({
         ...(selector as TargetAccessSelector),
-        userId: user.id,
+        user: user.id,
       });
     }
   }
@@ -111,7 +111,7 @@ export class AuthManager {
       const user = await this.getCurrentUser();
       await this.projectAccess.ensureAccessForUser({
         ...selector,
-        userId: user.id,
+        user: user.id,
       });
     }
   }
@@ -132,7 +132,7 @@ export class AuthManager {
 
       await this.organizationAccess.ensureAccessForUser({
         ...selector,
-        userId: user.id,
+        user: user.id,
       });
     }
   }
@@ -146,15 +146,15 @@ export class AuthManager {
 
     return this.organizationAccess.checkAccessForUser({
       ...selector,
-      userId: user.id,
+      user: user.id,
     });
   }
 
   async ensureOrganizationOwnership(selector: { organization: string }): Promise<void | never> {
     const user = await this.getCurrentUser();
     const isOwner = await this.organizationAccess.checkOwnershipForUser({
-      organizationId: selector.organization,
-      userId: user.id,
+      organization: selector.organization,
+      user: user.id,
     });
 
     if (!isOwner) {
@@ -175,12 +175,12 @@ export class AuthManager {
     const result = await this.tokenStorage.getToken({ token });
 
     await this.ensureOrganizationAccess({
-      organizationId: result.organization,
+      organization: result.organization,
       scope: OrganizationAccessScope.READ,
     });
 
     const member = await this.storage.getOrganizationOwner({
-      organizationId: result.organization,
+      organization: result.organization,
     });
 
     return member.user;
@@ -211,16 +211,16 @@ export class AuthManager {
 
     const [organizationScopes, projectScopes, targetScopes] = await Promise.all([
       this.getMemberOrganizationScopes({
-        organizationId: organizationId,
-        userId: user.id,
+        organization: organizationId,
+        user: user.id,
       }),
       this.getMemberProjectScopes({
-        organizationId: organizationId,
-        userId: user.id,
+        organization: organizationId,
+        user: user.id,
       }),
       this.getMemberTargetScopes({
-        organizationId: organizationId,
-        userId: user.id,
+        organization: organizationId,
+        user: user.id,
       }),
     ]);
 
@@ -259,7 +259,7 @@ export class AuthManager {
 }
 
 function hasManyTargets(
-  selector: Listify<TargetAccessSelector, 'targetId'>,
-): selector is MapToArray<TargetAccessSelector, 'targetId'> {
-  return Array.isArray(selector.targetId);
+  selector: Listify<TargetAccessSelector, 'target'>,
+): selector is MapToArray<TargetAccessSelector, 'target'> {
+  return Array.isArray(selector.target);
 }

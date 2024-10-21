@@ -18,9 +18,9 @@ export const schemaCheck: NonNullable<MutationResolvers['schemaCheck']> = async 
   const result = await injector.get(SchemaPublisher).check({
     ...input,
     service: input.service?.toLowerCase(),
-    organizationId: organization,
-    projectId: project,
-    targetId: target,
+    organization,
+    project,
+    target,
   });
 
   if ('changes' in result && result.changes) {

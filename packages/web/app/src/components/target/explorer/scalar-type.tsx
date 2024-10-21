@@ -18,9 +18,9 @@ const GraphQLScalarTypeComponent_TypeFragment = graphql(`
 export function GraphQLScalarTypeComponent(props: {
   type: FragmentType<typeof GraphQLScalarTypeComponent_TypeFragment>;
   totalRequests?: number;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationCleanId: string;
+  projectCleanId: string;
+  targetCleanId: string;
 }) {
   const ttype = useFragment(GraphQLScalarTypeComponent_TypeFragment, props.type);
   return (
@@ -28,9 +28,9 @@ export function GraphQLScalarTypeComponent(props: {
       name={ttype.name}
       kind="scalar"
       supergraphMetadata={ttype.supergraphMetadata}
-      targetSlug={props.targetSlug}
-      projectSlug={props.projectSlug}
-      organizationSlug={props.organizationSlug}
+      targetCleanId={props.targetCleanId}
+      projectCleanId={props.projectCleanId}
+      organizationCleanId={props.organizationCleanId}
     >
       <div className="flex flex-row gap-4 p-4">
         <div className="grow text-sm">
@@ -40,9 +40,9 @@ export function GraphQLScalarTypeComponent(props: {
           <SchemaExplorerUsageStats
             totalRequests={props.totalRequests}
             usage={ttype.usage}
-            targetSlug={props.targetSlug}
-            projectSlug={props.projectSlug}
-            organizationSlug={props.organizationSlug}
+            targetCleanId={props.targetCleanId}
+            projectCleanId={props.projectCleanId}
+            organizationCleanId={props.organizationCleanId}
           />
         ) : null}
       </div>

@@ -115,7 +115,7 @@ export class SchemaPolicyProvider {
     }
 
     const results = await this.api.checkPolicy({
-      target: selector.targetId,
+      target: selector.target,
       policy: mergedPolicy,
       schema: completeSchema,
       source: modifiedSdl,
@@ -149,7 +149,7 @@ export class SchemaPolicyProvider {
     });
 
     return await this.storage.setSchemaPolicyForOrganization({
-      organizationId: selector.organizationId,
+      organizationId: selector.organization,
       policy,
       allowOverrides,
     });
@@ -162,7 +162,7 @@ export class SchemaPolicyProvider {
     });
 
     return await this.storage.setSchemaPolicyForProject({
-      projectId: selector.projectId,
+      projectId: selector.project,
       policy,
     });
   }
@@ -173,7 +173,7 @@ export class SchemaPolicyProvider {
       scope: OrganizationAccessScope.SETTINGS,
     });
 
-    return this.storage.getSchemaPolicyForOrganization(selector.organizationId);
+    return this.storage.getSchemaPolicyForOrganization(selector.organization);
   }
 
   async getOrganizationPolicyForProject(selector: ProjectSelector) {
@@ -182,7 +182,7 @@ export class SchemaPolicyProvider {
       scope: ProjectAccessScope.SETTINGS,
     });
 
-    return this.storage.getSchemaPolicyForOrganization(selector.organizationId);
+    return this.storage.getSchemaPolicyForOrganization(selector.organization);
   }
 
   async getProjectPolicy(selector: ProjectSelector) {
@@ -191,6 +191,6 @@ export class SchemaPolicyProvider {
       scope: ProjectAccessScope.SETTINGS,
     });
 
-    return this.storage.getSchemaPolicyForProject(selector.projectId);
+    return this.storage.getSchemaPolicyForProject(selector.project);
   }
 }

@@ -34,13 +34,13 @@ export const CreateChannel_AddAlertChannelMutation = graphql(`
 export const CreateChannelModal = ({
   isOpen,
   toggleModalOpen,
-  organizationSlug,
-  projectSlug,
+  organizationId,
+  projectId,
 }: {
   isOpen: boolean;
   toggleModalOpen: () => void;
-  organizationSlug: string;
-  projectSlug: string;
+  organizationId: string;
+  projectId: string;
 }): ReactElement => {
   const [mutation, mutate] = useMutation(CreateChannel_AddAlertChannelMutation);
   const { errors, values, touched, handleChange, handleBlur, handleSubmit, isSubmitting } =
@@ -68,8 +68,8 @@ export const CreateChannelModal = ({
       async onSubmit(values) {
         const { data, error } = await mutate({
           input: {
-            organizationSlug,
-            projectSlug,
+            organization: organizationId,
+            project: projectId,
             name: values.name,
             type: values.type,
             slack: values.type === AlertChannelType.Slack ? { channel: values.slackChannel } : null,

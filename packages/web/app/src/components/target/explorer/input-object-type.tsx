@@ -20,9 +20,9 @@ const GraphQLInputObjectTypeComponent_TypeFragment = graphql(`
 export function GraphQLInputObjectTypeComponent(props: {
   type: FragmentType<typeof GraphQLInputObjectTypeComponent_TypeFragment>;
   totalRequests?: number;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationCleanId: string;
+  projectCleanId: string;
+  targetCleanId: string;
   styleDeprecated: boolean;
 }) {
   const ttype = useFragment(GraphQLInputObjectTypeComponent_TypeFragment, props.type);
@@ -34,17 +34,17 @@ export function GraphQLInputObjectTypeComponent(props: {
       totalRequests={props.totalRequests}
       usage={ttype.usage}
       supergraphMetadata={ttype.supergraphMetadata}
-      targetSlug={props.targetSlug}
-      projectSlug={props.projectSlug}
-      organizationSlug={props.organizationSlug}
+      targetCleanId={props.targetCleanId}
+      projectCleanId={props.projectCleanId}
+      organizationCleanId={props.organizationCleanId}
     >
       <GraphQLInputFields
         typeName={ttype.name}
         fields={ttype.fields}
         totalRequests={props.totalRequests}
-        targetSlug={props.targetSlug}
-        projectSlug={props.projectSlug}
-        organizationSlug={props.organizationSlug}
+        targetCleanId={props.targetCleanId}
+        projectCleanId={props.projectCleanId}
+        organizationCleanId={props.organizationCleanId}
         styleDeprecated={props.styleDeprecated}
       />
     </GraphQLTypeCard>

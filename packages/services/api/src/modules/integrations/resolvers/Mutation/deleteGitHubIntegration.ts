@@ -9,11 +9,11 @@ export const deleteGitHubIntegration: NonNullable<
   const organizationId = await injector.get(IdTranslator).translateOrganizationId(input);
 
   await injector.get(GitHubIntegrationManager).unregister({
-    organizationId: organizationId,
+    organization: organizationId,
   });
 
   const organization = await injector.get(OrganizationManager).getOrganization({
-    organizationId: organizationId,
+    organization: organizationId,
   });
   return { organization };
 };

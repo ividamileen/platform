@@ -27,9 +27,9 @@ export type SchemaVersionConnectionMapper = Readonly<{
   edges: ReadonlyArray<{
     cursor: string;
     node: SchemaVersion & {
-      organizationId: string;
-      projectId: string;
-      targetId: string;
+      organization: string;
+      project: string;
+      target: string;
     };
   }>;
   pageInfo: Readonly<{
@@ -40,9 +40,9 @@ export type SchemaVersionConnectionMapper = Readonly<{
   }>;
 }>;
 export interface SchemaVersionMapper extends SchemaVersion {
-  projectId: string;
-  targetId: string;
-  organizationId: string;
+  project: string;
+  target: string;
+  organization: string;
 }
 export type SingleSchemaMapper = SingleSchema;
 export type CompositeSchemaMapper = PushedCompositeSchema;
@@ -51,9 +51,9 @@ export type SchemaExplorerMapper = {
   schema: GraphQLSchema;
   usage: {
     period: DateRange;
-    organizationId: string;
-    projectId: string;
-    targetId: string;
+    organization: string;
+    project: string;
+    target: string;
   };
   supergraph: null | SuperGraphInformation;
 };
@@ -61,9 +61,9 @@ export type UnusedSchemaExplorerMapper = {
   sdl: DocumentNode;
   usage: {
     period: DateRange;
-    organizationId: string;
-    projectId: string;
-    targetId: string;
+    organization: string;
+    project: string;
+    target: string;
     usedCoordinates: Set<string>;
   };
   supergraph: null | SuperGraphInformation;
@@ -72,9 +72,9 @@ export type DeprecatedSchemaExplorerMapper = {
   sdl: DocumentNode;
   usage: {
     period: DateRange;
-    organizationId: string;
-    projectId: string;
-    targetId: string;
+    organization: string;
+    project: string;
+    target: string;
   };
   supergraph: null | SuperGraphInformation;
 };
@@ -99,9 +99,9 @@ export type SchemaCoordinateUsageForUnusedExplorer = {
   isUsed: false;
   usedCoordinates: Set<string>;
   period: DateRange;
-  organizationId: string;
-  projectId: string;
-  targetId: string;
+  organization: string;
+  project: string;
+  target: string;
 };
 export type WithSchemaCoordinatesUsage<T> = T & {
   usage: // explorer
@@ -111,9 +111,9 @@ export type WithSchemaCoordinatesUsage<T> = T & {
           total: number;
           usedByClients: () => PromiseOrValue<Array<string>>;
           period: DateRange;
-          organizationId: string;
-          projectId: string;
-          targetId: string;
+          organization: string;
+          project: string;
+          target: string;
           typename: string;
         };
       }>
@@ -255,9 +255,9 @@ export type SchemaCoordinateUsageMapper =
       total: number;
       usedByClients: () => PromiseOrValue<Array<string>>;
       period: DateRange;
-      organizationId: string;
-      projectId: string;
-      targetId: string;
+      organization: string;
+      project: string;
+      target: string;
       coordinate: string;
     }
   | {

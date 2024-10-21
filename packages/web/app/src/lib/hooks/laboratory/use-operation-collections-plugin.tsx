@@ -77,12 +77,8 @@ const CreateOperationMutation = graphql(`
 `);
 
 export const TargetLaboratoryPageQuery = graphql(`
-  query TargetLaboratoryPageQuery(
-    $organizationSlug: String!
-    $projectSlug: String!
-    $targetSlug: String!
-  ) {
-    organization(selector: { organizationSlug: $organizationSlug }) {
+  query TargetLaboratoryPageQuery($organizationId: ID!, $projectId: ID!, $targetId: ID!) {
+    organization(selector: { organization: $organizationId }) {
       organization {
         id
         me {
@@ -91,13 +87,7 @@ export const TargetLaboratoryPageQuery = graphql(`
         }
       }
     }
-    target(
-      selector: {
-        organizationSlug: $organizationSlug
-        projectSlug: $projectSlug
-        targetSlug: $targetSlug
-      }
-    ) {
+    target(selector: { organization: $organizationId, project: $projectId, target: $targetId }) {
       id
       graphqlEndpointUrl
       latestSchemaVersion {
@@ -123,18 +113,14 @@ export const operationCollectionsPlugin: GraphiQLPlugin = {
 };
 
 export function Content() {
-  const { organizationSlug, projectSlug, targetSlug } = useParams({ strict: false }) as {
-    organizationSlug: string;
-    projectSlug: string;
-    targetSlug: string;
+  const { organizationId, projectId, targetId } = useParams({ strict: false }) as {
+    organizationId: string;
+    projectId: string;
+    targetId: string;
   };
   const [query] = useQuery({
     query: TargetLaboratoryPageQuery,
-    variables: {
-      organizationSlug,
-      projectSlug,
-      targetSlug,
-    },
+    variables: { organizationId, projectId, targetId },
   });
   const currentOrganization = query.data?.organization?.organization;
   const canEdit = canAccessTarget(TargetAccessScope.Settings, currentOrganization?.me ?? null);
@@ -142,9 +128,9 @@ export function Content() {
 
   const [isCollectionModalOpen, toggleCollectionModal] = useToggle();
   const { collections, fetching: loading } = useCollections({
-    organizationSlug,
-    projectSlug,
-    targetSlug,
+    organizationId,
+    projectId,
+    targetId,
   });
   const [collectionId, setCollectionId] = useState('');
   const [isDeleteCollectionModalOpen, toggleDeleteCollectionModalOpen] = useToggle();
@@ -152,9 +138,9 @@ export function Content() {
   const [operationToDeleteId, setOperationToDeleteId] = useState<null | string>(null);
   const [operationToEditId, setOperationToEditId] = useState<null | string>(null);
   const { clearOperation, savedOperation, setSavedOperation } = useSyncOperationState({
-    organizationSlug,
-    projectSlug,
-    targetSlug,
+    organizationId,
+    projectId,
+    targetId,
   });
   const router = useRouter();
   const [accordionValue, setAccordionValue] = useState<string[]>([]);
@@ -163,9 +149,9 @@ export function Content() {
   const copyToClipboard = useClipboard();
 
   const currentOperation = useCurrentOperation({
-    organizationSlug,
-    projectSlug,
-    targetSlug,
+    organizationId,
+    projectId,
+    targetId,
   });
   const { queryEditor, variableEditor, headerEditor, tabs, changeTab, addTab } = useEditorContext({
     nonNull: true,
@@ -268,9 +254,9 @@ export function Content() {
         variables: '',
       },
       selector: {
-        targetSlug,
-        organizationSlug,
-        projectSlug,
+        target: targetId,
+        organization: organizationId,
+        project: projectId,
       },
     });
     if (result.error) {
@@ -281,12 +267,8 @@ export function Content() {
     }
     if (result.data?.createOperationInDocumentCollection.ok) {
       void router.navigate({
-        to: '/$organizationSlug/$projectSlug/$targetSlug/laboratory',
-        params: {
-          organizationSlug,
-          projectSlug,
-          targetSlug,
-        },
+        to: '/$organizationId/$projectId/$targetId/laboratory',
+        params: { organizationId, projectId, targetId },
         search: {
           operation: result.data.createOperationInDocumentCollection.ok.operation.id,
         },
@@ -353,12 +335,8 @@ export function Content() {
           collection.operations.edges.map(({ node }) => (
             <div key={node.id} className="flex items-center">
               <Link
-                to="/$organizationSlug/$projectSlug/$targetSlug/laboratory"
-                params={{
-                  organizationSlug,
-                  projectSlug,
-                  targetSlug,
-                }}
+                to="/$organizationId/$projectId/$targetId/laboratory"
+                params={{ organizationId, projectId, targetId }}
                 search={{ operation: node.id }}
                 className={cn(
                   'flex w-full items-center gap-x-3 rounded p-2 font-normal text-white/50 hover:bg-gray-100/10 hover:text-white hover:no-underline',
@@ -492,26 +470,26 @@ export function Content() {
         </div>
       )}
       <CreateCollectionModal
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         isOpen={isCollectionModalOpen}
         toggleModalOpen={toggleCollectionModal}
         collectionId={collectionId}
       />
       <DeleteCollectionModal
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organizationId={organizationId}
+        projectId={projectId}
+        targetId={targetId}
         isOpen={isDeleteCollectionModalOpen}
         toggleModalOpen={toggleDeleteCollectionModalOpen}
         collectionId={collectionId}
       />
       {operationToDeleteId && (
         <DeleteOperationModal
-          organizationSlug={organizationSlug}
-          projectSlug={projectSlug}
-          targetSlug={targetSlug}
+          organizationId={organizationId}
+          projectId={projectId}
+          targetId={targetId}
           isOpen={isDeleteOperationModalOpen}
           toggleModalOpen={toggleDeleteOperationModalOpen}
           operationId={operationToDeleteId}
@@ -519,9 +497,9 @@ export function Content() {
       )}
       {operationToEditId && (
         <EditOperationModal
-          organizationSlug={organizationSlug}
-          projectSlug={projectSlug}
-          targetSlug={targetSlug}
+          organizationId={organizationId}
+          projectId={projectId}
+          targetId={targetId}
           operationId={operationToEditId}
           close={() => setOperationToEditId(null)}
         />

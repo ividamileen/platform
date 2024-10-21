@@ -47,15 +47,16 @@ const OrganizationTransferPage_AnswerRequest = graphql(`
   }
 `);
 
-export function OrganizationTransferPage(props: { organizationSlug: string; code: string }) {
+export function OrganizationTransferPage(props: { organizationId: string; code: string }) {
   const router = useRouter();
   const notify = useNotifications();
+  const orgId = props.organizationId;
   const code = props.code;
   const [query] = useQuery({
     query: OrganizationTransferPage_GetRequest,
     variables: {
       selector: {
-        organizationSlug: props.organizationSlug,
+        organization: orgId,
         code,
       },
     },
@@ -66,7 +67,7 @@ export function OrganizationTransferPage(props: { organizationSlug: string; code
       const result = await mutate({
         input: {
           code,
-          organizationSlug: props.organizationSlug,
+          organization: orgId,
           accept,
         },
       });
@@ -76,9 +77,9 @@ export function OrganizationTransferPage(props: { organizationSlug: string; code
             notify('The organization is now yours!', 'success');
           }
           void router.navigate({
-            to: '/$organizationSlug',
+            to: '/$organizationId',
             params: {
-              organizationSlug: props.organizationSlug,
+              organizationId: orgId,
             },
           });
         } else {
@@ -90,7 +91,7 @@ export function OrganizationTransferPage(props: { organizationSlug: string; code
         notify('Failed to answer', 'error');
       }
     },
-    [mutate, props.organizationSlug, code, router, notify],
+    [mutate, orgId, code, router, notify],
   );
 
   const accept = useCallback(() => answer(true), [answer]);

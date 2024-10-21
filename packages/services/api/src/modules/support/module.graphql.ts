@@ -28,7 +28,7 @@ export default gql`
   }
 
   input SupportTicketCreateInput {
-    organizationSlug: String!
+    organization: String!
     subject: String!
     description: String!
     priority: SupportTicketPriority!
@@ -51,7 +51,7 @@ export default gql`
   }
 
   input SupportTicketReplyInput {
-    organizationSlug: String!
+    organization: String!
     ticketId: String!
     body: String!
   }

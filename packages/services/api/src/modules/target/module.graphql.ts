@@ -32,16 +32,16 @@ export default gql`
   }
 
   input Experimental__UpdateTargetSchemaCompositionInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
+    organization: ID!
+    project: ID!
+    target: ID!
     nativeComposition: Boolean!
   }
 
   input UpdateTargetGraphQLEndpointUrlInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
+    organization: ID!
+    project: ID!
+    target: ID!
     graphqlEndpointUrl: String
   }
 
@@ -59,9 +59,9 @@ export default gql`
   }
 
   input UpdateTargetSlugInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
+    organization: ID!
+    project: ID!
+    target: ID!
     slug: String!
   }
 
@@ -99,18 +99,18 @@ export default gql`
   }
 
   input TargetSelectorInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
+    organization: ID!
+    project: ID!
+    target: ID!
   }
 
   input UpdateTargetValidationSettingsInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
+    organization: ID!
+    project: ID!
+    target: ID!
     period: Int!
     percentage: Float!
-    targetIds: [ID!]!
+    targets: [ID!]!
     excludedClients: [String!]
   }
 
@@ -134,16 +134,16 @@ export default gql`
   }
 
   input SetTargetValidationInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
+    organization: ID!
+    project: ID!
+    target: ID!
     enabled: Boolean!
   }
 
   type TargetSelector {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
+    organization: ID!
+    project: ID!
+    target: ID!
   }
 
   extend type Project {
@@ -157,7 +157,7 @@ export default gql`
 
   type Target {
     id: ID!
-    slug: String!
+    slug: ID!
     cleanId: ID! @deprecated(reason: "Use the 'slug' field instead.")
     name: String! @deprecated(reason: "Use the 'slug' field instead.")
     project: Project!
@@ -178,8 +178,8 @@ export default gql`
   }
 
   input CreateTargetInput {
-    organizationSlug: String!
-    projectSlug: String!
+    organization: ID!
+    project: ID!
     slug: String!
   }
 

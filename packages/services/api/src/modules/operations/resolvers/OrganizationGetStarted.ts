@@ -11,7 +11,7 @@ export const OrganizationGetStarted: Pick<
     }
 
     return injector.get(OperationsManager).hasOperationsForOrganization({
-      organizationId: organization.id,
+      organization: organization.id,
     });
   },
 };

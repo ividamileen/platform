@@ -5,17 +5,17 @@ import type { AlertResolvers } from './../../../__generated__/types.next';
 export const Alert: AlertResolvers = {
   channel: async (alert, _, { injector }) => {
     const channels = await injector.get(AlertsManager).getChannels({
-      organizationId: alert.organizationId,
-      projectId: alert.projectId,
+      organization: alert.organizationId,
+      project: alert.projectId,
     });
 
     return channels.find(c => c.id === alert.channelId)!;
   },
   target: (alert, _, { injector }) => {
     return injector.get(TargetManager).getTarget({
-      organizationId: alert.organizationId,
-      projectId: alert.projectId,
-      targetId: alert.targetId,
+      organization: alert.organizationId,
+      project: alert.projectId,
+      target: alert.targetId,
     });
   },
 };

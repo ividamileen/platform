@@ -48,9 +48,9 @@ const ClientView_ClientStatsQuery = graphql(`
 function ClientView(props: {
   clientName: string;
   dataRetentionInDays: number;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationCleanId: string;
+  projectCleanId: string;
+  targetCleanId: string;
 }) {
   const styles = useChartStyles();
   const dateRangeController = useDateRangeController({
@@ -62,9 +62,9 @@ function ClientView(props: {
     query: ClientView_ClientStatsQuery,
     variables: {
       selector: {
-        organizationSlug: props.organizationSlug,
-        projectSlug: props.projectSlug,
-        targetSlug: props.targetSlug,
+        organization: props.organizationCleanId,
+        project: props.projectCleanId,
+        target: props.targetCleanId,
         client: props.clientName,
         period: dateRangeController.resolvedRange,
       },
@@ -93,7 +93,7 @@ function ClientView(props: {
   const totalOperations = query.data?.clientStats?.operations.nodes.length ?? 0;
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationCleanId} error={query.error} />;
   }
 
   return (
@@ -273,11 +273,11 @@ function ClientView(props: {
                         <p className="truncate text-sm font-medium">
                           <Link
                             className="text-orange-500 hover:text-orange-500 hover:underline hover:underline-offset-2"
-                            to="/$organizationSlug/$projectSlug/$targetSlug/insights/$operationName/$operationHash"
+                            to="/$organizationId/$projectId/$targetId/insights/$operationName/$operationHash"
                             params={{
-                              organizationSlug: props.organizationSlug,
-                              projectSlug: props.projectSlug,
-                              targetSlug: props.targetSlug,
+                              organizationId: props.organizationCleanId,
+                              projectId: props.projectCleanId,
+                              targetId: props.targetCleanId,
                               operationName: operation.name,
                               operationHash: operation.operationHash ?? '_',
                             }}
@@ -335,12 +335,8 @@ function ClientView(props: {
 }
 
 const ClientInsightsPageQuery = graphql(`
-  query ClientInsightsPageQuery(
-    $organizationSlug: String!
-    $projectSlug: String!
-    $targetSlug: String!
-  ) {
-    organization(selector: { organizationSlug: $organizationSlug }) {
+  query ClientInsightsPageQuery($organizationId: ID!, $projectId: ID!, $targetId: ID!) {
+    organization(selector: { organization: $organizationId }) {
       organization {
         id
         slug
@@ -350,32 +346,28 @@ const ClientInsightsPageQuery = graphql(`
       }
     }
     hasCollectedOperations(
-      selector: {
-        organizationSlug: $organizationSlug
-        projectSlug: $projectSlug
-        targetSlug: $targetSlug
-      }
+      selector: { organization: $organizationId, project: $projectId, target: $targetId }
     )
   }
 `);
 
 function ClientInsightsPageContent(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
   name: string;
 }) {
   const [query] = useQuery({
     query: ClientInsightsPageQuery,
     variables: {
-      organizationSlug: props.organizationSlug,
-      projectSlug: props.projectSlug,
-      targetSlug: props.targetSlug,
+      organizationId: props.organizationId,
+      projectId: props.projectId,
+      targetId: props.targetId,
     },
   });
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationId} error={query.error} />;
   }
 
   const currentOrganization = query.data?.organization?.organization;
@@ -383,9 +375,9 @@ function ClientInsightsPageContent(props: {
 
   return (
     <TargetLayout
-      organizationSlug={props.organizationSlug}
-      projectSlug={props.projectSlug}
-      targetSlug={props.targetSlug}
+      organizationId={props.organizationId}
+      projectId={props.projectId}
+      targetId={props.targetId}
       page={Page.Insights}
     >
       {currentOrganization ? (
@@ -393,9 +385,9 @@ function ClientInsightsPageContent(props: {
           <ClientView
             clientName={props.name}
             dataRetentionInDays={currentOrganization.rateLimit.retentionInDays}
-            organizationSlug={props.organizationSlug}
-            projectSlug={props.projectSlug}
-            targetSlug={props.targetSlug}
+            organizationCleanId={props.organizationId}
+            projectCleanId={props.projectId}
+            targetCleanId={props.targetId}
           />
         ) : (
           <div className="py-8">
@@ -412,9 +404,9 @@ function ClientInsightsPageContent(props: {
 }
 
 export function TargetInsightsClientPage(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
   name: string;
 }) {
   return (

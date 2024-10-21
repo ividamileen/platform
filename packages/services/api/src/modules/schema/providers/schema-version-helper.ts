@@ -42,17 +42,17 @@ export class SchemaVersionHelper {
   private async composeSchemaVersion(schemaVersion: SchemaVersion) {
     const [schemas, project, organization] = await Promise.all([
       this.schemaManager.getMaybeSchemasOfVersion({
-        versionId: schemaVersion.id,
-        organizationId: schemaVersion.organizationId,
-        projectId: schemaVersion.projectId,
-        targetId: schemaVersion.targetId,
+        version: schemaVersion.id,
+        organization: schemaVersion.organization,
+        project: schemaVersion.project,
+        target: schemaVersion.target,
       }),
       this.projectManager.getProject({
-        organizationId: schemaVersion.organizationId,
-        projectId: schemaVersion.projectId,
+        organization: schemaVersion.organization,
+        project: schemaVersion.project,
       }),
       this.organizationManager.getOrganization({
-        organizationId: schemaVersion.organizationId,
+        organization: schemaVersion.organization,
       }),
     ]);
 
@@ -68,7 +68,7 @@ export class SchemaVersionHelper {
         native: this.schemaManager.checkProjectNativeFederationSupport({
           project,
           organization,
-          targetId: schemaVersion.targetId,
+          targetId: schemaVersion.target,
         }),
         contracts: null,
       },
@@ -156,9 +156,9 @@ export class SchemaVersionHelper {
 
     if (schemaVersion.hasPersistedSchemaChanges) {
       const changes = await this.schemaManager.getSchemaChangesForVersion({
-        organizationId: schemaVersion.organizationId,
-        projectId: schemaVersion.projectId,
-        targetId: schemaVersion.targetId,
+        organization: schemaVersion.organization,
+        project: schemaVersion.project,
+        target: schemaVersion.target,
         version: schemaVersion.id,
       });
 
@@ -190,16 +190,16 @@ export class SchemaVersionHelper {
 
     const [schemaBefore, schemasAfter] = await Promise.all([
       this.schemaManager.getMaybeSchemasOfVersion({
-        organizationId: schemaVersion.organizationId,
-        projectId: schemaVersion.projectId,
-        targetId: schemaVersion.targetId,
-        versionId: schemaVersion.id,
+        organization: schemaVersion.organization,
+        project: schemaVersion.project,
+        target: schemaVersion.target,
+        version: schemaVersion.id,
       }),
       this.schemaManager.getMaybeSchemasOfVersion({
-        organizationId: schemaVersion.organizationId,
-        projectId: schemaVersion.projectId,
-        targetId: schemaVersion.targetId,
-        versionId: previousVersion.id,
+        organization: schemaVersion.organization,
+        project: schemaVersion.project,
+        target: schemaVersion.target,
+        version: previousVersion.id,
       }),
     ]);
 
@@ -208,8 +208,8 @@ export class SchemaVersionHelper {
     }
 
     const project = await this.projectManager.getProject({
-      organizationId: schemaVersion.organizationId,
-      projectId: schemaVersion.projectId,
+      organization: schemaVersion.organization,
+      project: schemaVersion.project,
     });
 
     const diffCheck = await this.registryChecks.diff({
@@ -237,19 +237,19 @@ export class SchemaVersionHelper {
     if (schemaVersion.recordVersion === '2024-01-10') {
       if (schemaVersion.diffSchemaVersionId) {
         return await this.schemaManager.getSchemaVersion({
-          organizationId: schemaVersion.organizationId,
-          projectId: schemaVersion.projectId,
-          targetId: schemaVersion.targetId,
-          versionId: schemaVersion.diffSchemaVersionId,
+          organization: schemaVersion.organization,
+          project: schemaVersion.project,
+          target: schemaVersion.target,
+          version: schemaVersion.diffSchemaVersionId,
         });
       }
       return null;
     }
 
     return await this.schemaManager.getVersionBeforeVersionId({
-      organization: schemaVersion.organizationId,
-      project: schemaVersion.projectId,
-      target: schemaVersion.targetId,
+      organization: schemaVersion.organization,
+      project: schemaVersion.project,
+      target: schemaVersion.target,
       beforeVersionId: schemaVersion.id,
       beforeVersionCreatedAt: schemaVersion.createdAt,
     });
@@ -284,9 +284,9 @@ export class SchemaVersionHelper {
 
     const composableVersion =
       await this.schemaManager.getFirstComposableSchemaVersionBeforeVersionId({
-        organization: schemaVersion.organizationId,
-        project: schemaVersion.projectId,
-        target: schemaVersion.targetId,
+        organization: schemaVersion.organization,
+        project: schemaVersion.project,
+        target: schemaVersion.target,
         beforeVersionId: schemaVersion.id,
         beforeVersionCreatedAt: schemaVersion.createdAt,
       });

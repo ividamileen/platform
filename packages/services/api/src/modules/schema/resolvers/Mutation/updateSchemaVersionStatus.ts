@@ -13,10 +13,10 @@ export const updateSchemaVersionStatus: NonNullable<
   ]);
 
   return injector.get(SchemaPublisher).updateVersionStatus({
-    versionId: input.versionId,
+    version: input.version,
     valid: input.valid,
-    organizationId: organization,
-    projectId: project,
-    targetId: target,
+    organization,
+    project,
+    target,
   });
 };

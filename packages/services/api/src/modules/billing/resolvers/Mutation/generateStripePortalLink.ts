@@ -8,11 +8,11 @@ export const generateStripePortalLink: NonNullable<
   MutationResolvers['generateStripePortalLink']
 > = async (_, args, { injector }) => {
   const organizationId = await injector.get(IdTranslator).translateOrganizationId({
-    organizationSlug: args.selector.organizationSlug,
+    organization: args.selector.organization,
   });
   const organization = await injector.get(OrganizationManager).getOrganization(
     {
-      organizationId: organizationId,
+      organization: organizationId,
     },
     OrganizationAccessScope.SETTINGS,
   );

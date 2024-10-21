@@ -28,8 +28,8 @@ export default gql`
 
   input UpdateProjectSlugInput {
     slug: String!
-    organizationSlug: String!
-    projectSlug: String!
+    organization: ID!
+    project: ID!
   }
 
   type UpdateProjectSlugResult {
@@ -66,13 +66,13 @@ export default gql`
   }
 
   input ProjectSelectorInput {
-    organizationSlug: String!
-    projectSlug: String!
+    organization: ID!
+    project: ID!
   }
 
   type ProjectSelector {
-    organizationSlug: String!
-    projectSlug: String!
+    organization: ID!
+    project: ID!
   }
 
   enum ProjectType {
@@ -87,7 +87,7 @@ export default gql`
 
   type Project {
     id: ID!
-    slug: String!
+    slug: ID!
     cleanId: ID! @deprecated(reason: "Use the 'slug' field instead.")
     name: String! @deprecated(reason: "Use the 'slug' field instead.")
     type: ProjectType!
@@ -104,13 +104,13 @@ export default gql`
   input CreateProjectInput {
     slug: String!
     type: ProjectType!
-    organizationSlug: String!
+    organization: ID!
   }
 
   input UpdateProjectGitRepositoryInput {
     gitRepository: String
-    organizationSlug: String!
-    projectSlug: String!
+    organization: ID!
+    project: ID!
   }
 
   type UpdateProjectPayload {

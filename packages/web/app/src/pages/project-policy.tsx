@@ -12,8 +12,8 @@ import { ProjectAccessScope, RegistryModel } from '@/gql/graphql';
 import { useProjectAccess } from '@/lib/access/project';
 
 const ProjectPolicyPageQuery = graphql(`
-  query ProjectPolicyPageQuery($organizationSlug: String!, $projectSlug: String!) {
-    organization(selector: { organizationSlug: $organizationSlug }) {
+  query ProjectPolicyPageQuery($organizationId: ID!, $projectId: ID!) {
+    organization(selector: { organization: $organizationId }) {
       organization {
         id
         me {
@@ -22,7 +22,7 @@ const ProjectPolicyPageQuery = graphql(`
         }
       }
     }
-    project(selector: { organizationSlug: $organizationSlug, projectSlug: $projectSlug }) {
+    project(selector: { organization: $organizationId, project: $projectId }) {
       id
       registryModel
       schemaPolicy {
@@ -67,13 +67,13 @@ const UpdateSchemaPolicyForProject = graphql(`
   }
 `);
 
-function ProjectPolicyContent(props: { organizationSlug: string; projectSlug: string }) {
+function ProjectPolicyContent(props: { organizationId: string; projectId: string }) {
   const [mutation, mutate] = useMutation(UpdateSchemaPolicyForProject);
   const [query] = useQuery({
     query: ProjectPolicyPageQuery,
     variables: {
-      organizationSlug: props.organizationSlug,
-      projectSlug: props.projectSlug,
+      organizationId: props.organizationId,
+      projectId: props.projectId,
     },
     requestPolicy: 'cache-and-network',
   });
@@ -86,20 +86,20 @@ function ProjectPolicyContent(props: { organizationSlug: string; projectSlug: st
     scope: ProjectAccessScope.Settings,
     member: currentOrganization?.me ?? null,
     redirect: true,
-    organizationSlug: props.organizationSlug,
-    projectSlug: props.projectSlug,
+    organizationId: props.organizationId,
+    projectId: props.projectId,
   });
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationId} error={query.error} />;
   }
 
   const isLegacyProject = currentProject?.registryModel === RegistryModel.Legacy;
 
   return (
     <ProjectLayout
-      organizationSlug={props.organizationSlug}
-      projectSlug={props.projectSlug}
+      organizationId={props.organizationId}
+      projectId={props.projectId}
       page={Page.Policy}
       className="flex flex-col gap-y-10"
     >
@@ -159,8 +159,8 @@ function ProjectPolicyContent(props: { organizationSlug: string; projectSlug: st
                   onSave={async newPolicy => {
                     await mutate({
                       selector: {
-                        organizationSlug: props.organizationSlug,
-                        projectSlug: props.projectSlug,
+                        organization: props.organizationId,
+                        project: props.projectId,
                       },
                       policy: newPolicy,
                     }).then(result => {
@@ -198,14 +198,11 @@ function ProjectPolicyContent(props: { organizationSlug: string; projectSlug: st
   );
 }
 
-export function ProjectPolicyPage(props: { organizationSlug: string; projectSlug: string }) {
+export function ProjectPolicyPage(props: { organizationId: string; projectId: string }) {
   return (
     <>
       <Meta title="Project Schema Policy" />
-      <ProjectPolicyContent
-        organizationSlug={props.organizationSlug}
-        projectSlug={props.projectSlug}
-      />
+      <ProjectPolicyContent organizationId={props.organizationId} projectId={props.projectId} />
     </>
   );
 }

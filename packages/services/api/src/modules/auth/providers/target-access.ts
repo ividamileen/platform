@@ -8,23 +8,23 @@ import { TargetAccessScope } from './scopes';
 export { TargetAccessScope } from './scopes';
 
 export interface TargetUserAccessSelector {
-  userId: string;
-  organizationId: string;
-  projectId: string;
-  targetId: string;
+  user: string;
+  organization: string;
+  project: string;
+  target: string;
   scope: TargetAccessScope;
 }
 
 export interface TargetUserScopesSelector {
-  userId: string;
-  organizationId: string;
+  user: string;
+  organization: string;
 }
 
 interface TargetTokenAccessSelector {
   token: string;
-  organizationId: string;
-  projectId: string;
-  targetId: string;
+  organization: string;
+  project: string;
+  target: string;
   scope: TargetAccessScope;
 }
 
@@ -73,10 +73,10 @@ export class TargetAccess {
         cacheKeyFn(selector) {
           return JSON.stringify({
             type: 'TargetAccess:user',
-            organization: selector.organizationId,
-            project: selector.projectId,
-            target: selector.targetId,
-            user: selector.userId,
+            organization: selector.organization,
+            project: selector.project,
+            target: selector.target,
+            user: selector.user,
             scope: selector.scope,
           });
         },
@@ -89,9 +89,9 @@ export class TargetAccess {
             const tokenInfo = await this.organizationAccess.tokenInfo.load(selector);
 
             if (
-              tokenInfo?.organization === selector.organizationId &&
-              tokenInfo?.project === selector.projectId &&
-              tokenInfo?.target === selector.targetId
+              tokenInfo?.organization === selector.organization &&
+              tokenInfo?.project === selector.project &&
+              tokenInfo?.target === selector.target
             ) {
               return tokenInfo.scopes.includes(selector.scope);
             }
@@ -103,9 +103,9 @@ export class TargetAccess {
         cacheKeyFn(selector) {
           return JSON.stringify({
             type: 'TargetAccess:token',
-            organization: selector.organizationId,
-            project: selector.projectId,
-            target: selector.targetId,
+            organization: selector.organization,
+            project: selector.project,
+            target: selector.target,
             token: selector.token,
             scope: selector.scope,
           });
@@ -136,8 +136,8 @@ export class TargetAccess {
         cacheKeyFn(selector) {
           return JSON.stringify({
             type: 'TargetAccess:scopes',
-            organization: selector.organizationId,
-            user: selector.userId,
+            organization: selector.organization,
+            user: selector.user,
           });
         },
       },

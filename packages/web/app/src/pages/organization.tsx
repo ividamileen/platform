@@ -82,10 +82,10 @@ const ProjectCard = (props: {
   return (
     <Card className="h-full self-start bg-gray-900/50 p-5 px-0 pt-4 hover:bg-gray-800/40 hover:shadow-md hover:shadow-gray-800/50">
       <Link
-        to="/$organizationSlug/$projectSlug"
+        to="/$organizationId/$projectId"
         params={{
-          organizationSlug: props.cleanOrganizationId ?? 'unknown-yet',
-          projectSlug: project?.slug ?? 'unknown-yet',
+          organizationId: props.cleanOrganizationId ?? 'unknown-yet',
+          projectId: project?.slug ?? 'unknown-yet',
         }}
       >
         <TooltipProvider>
@@ -225,17 +225,17 @@ const ProjectCard = (props: {
 
 const OrganizationProjectsPageQuery = graphql(`
   query OrganizationProjectsPageQuery(
-    $organizationSlug: String!
+    $organizationId: ID!
     $chartResolution: Int!
     $period: DateRangeInput!
   ) {
-    organization(selector: { organizationSlug: $organizationSlug }) {
+    organization(selector: { organization: $organizationId }) {
       organization {
         id
         slug
       }
     }
-    projects(selector: { organizationSlug: $organizationSlug }) {
+    projects(selector: { organization: $organizationId }) {
       total
       nodes {
         id
@@ -254,7 +254,7 @@ const OrganizationProjectsPageQuery = graphql(`
 
 function OrganizationPageContent(
   props: {
-    organizationSlug: string;
+    organizationId: string;
   } & RouteSearchProps,
 ) {
   const days = 14;
@@ -288,7 +288,7 @@ function OrganizationPageContent(
   const [query] = useQuery({
     query: OrganizationProjectsPageQuery,
     variables: {
-      organizationSlug: props.organizationSlug,
+      organizationId: props.organizationId,
       chartResolution: days, // 14 days = 14 data points
       period: period.current,
     },
@@ -348,13 +348,13 @@ function OrganizationPageContent(
   }, [projectsConnection, props.search, sortKey, sortOrder]);
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationId} error={query.error} />;
   }
 
   return (
     <OrganizationLayout
       page={Page.Overview}
-      organizationSlug={props.organizationSlug}
+      organizationId={props.organizationId}
       className="flex justify-between gap-12"
     >
       <>
@@ -494,14 +494,14 @@ function OrganizationPageContent(
 
 export function OrganizationPage(
   props: {
-    organizationSlug: string;
+    organizationId: string;
   } & RouteSearchProps,
 ) {
   return (
     <>
       <Meta title="Organization" />
       <OrganizationPageContent
-        organizationSlug={props.organizationSlug}
+        organizationId={props.organizationId}
         search={props.search}
         sortBy={props.sortBy}
         sortOrder={props.sortOrder}

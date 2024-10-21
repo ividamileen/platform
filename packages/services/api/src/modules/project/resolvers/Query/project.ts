@@ -13,7 +13,7 @@ export const project: NonNullable<QueryResolvers['project']> = async (
     translator.translateProjectId(selector),
   ]);
   return injector.get(ProjectManager).getProject({
-    projectId: project,
-    organizationId: organization,
+    project,
+    organization,
   });
 };

@@ -61,23 +61,25 @@ export class TokenStorage {
 
     const response = await this.tokensService.createToken.mutate({
       name: input.name,
-      target: input.targetId,
-      project: input.projectId,
-      organization: input.organizationId,
+      target: input.target,
+      project: input.project,
+      organization: input.organization,
       scopes: input.scopes,
     });
 
     return response;
   }
 
-  async deleteTokens(input: { tokenIds: readonly string[] }): Promise<readonly string[]> {
+  async deleteTokens(
+    input: {
+      tokens: readonly string[];
+    } & TargetSelector,
+  ): Promise<readonly string[]> {
     this.logger.debug('Deleting tokens (input=%o)', input);
 
-    await Promise.all(
-      input.tokenIds.map(token => this.tokensService.deleteToken.mutate({ token })),
-    );
+    await Promise.all(input.tokens.map(token => this.tokensService.deleteToken.mutate({ token })));
 
-    return input.tokenIds;
+    return input.tokens;
   }
 
   async invalidateTokens(tokens: string[]) {
@@ -96,7 +98,7 @@ export class TokenStorage {
     this.logger.debug('Fetching tokens (selector=%o)', selector);
 
     const response = await this.tokensService.targetTokens.query({
-      targetId: selector.targetId,
+      targetId: selector.target,
     });
 
     return response || [];

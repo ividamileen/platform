@@ -32,7 +32,7 @@ export const addSlackIntegration: NonNullable<MutationResolvers['addSlackIntegra
   const organization = await injector.get(IdTranslator).translateOrganizationId(input);
 
   await injector.get(SlackIntegrationManager).register({
-    organizationId: organization,
+    organization,
     token: input.token,
   });
 

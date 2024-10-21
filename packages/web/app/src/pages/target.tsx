@@ -188,9 +188,9 @@ function SchemaView(props: {
     scope: TargetAccessScope.RegistryWrite,
     member: organization.me,
     redirect: false,
-    organizationSlug: organization.slug,
-    projectSlug: project.slug,
-    targetSlug: target.slug,
+    organizationId: organization.slug,
+    projectId: project.slug,
+    targetId: target.slug,
   });
 
   const { latestSchemaVersion } = target;
@@ -272,9 +272,9 @@ function SchemaView(props: {
           {canMarkAsValid ? (
             <>
               <MarkAsValid
-                organizationSlug={organization.slug}
-                projectSlug={project.slug}
-                targetSlug={target.slug}
+                organizationId={organization.slug}
+                projectId={project.slug}
+                targetId={target.slug}
                 version={latestSchemaVersion}
               />{' '}
             </>
@@ -287,47 +287,33 @@ function SchemaView(props: {
 }
 
 const TargetSchemaPageQuery = graphql(`
-  query TargetSchemaPageQuery(
-    $organizationSlug: String!
-    $projectSlug: String!
-    $targetSlug: String!
-  ) {
-    organization(selector: { organizationSlug: $organizationSlug }) {
+  query TargetSchemaPageQuery($organizationId: ID!, $projectId: ID!, $targetId: ID!) {
+    organization(selector: { organization: $organizationId }) {
       organization {
         ...SchemaView_OrganizationFragment
       }
     }
-    project(selector: { organizationSlug: $organizationSlug, projectSlug: $projectSlug }) {
+    project(selector: { organization: $organizationId, project: $projectId }) {
       ...SchemaView_ProjectFragment
     }
-    target(
-      selector: {
-        organizationSlug: $organizationSlug
-        projectSlug: $projectSlug
-        targetSlug: $targetSlug
-      }
-    ) {
+    target(selector: { organization: $organizationId, project: $projectId, target: $targetId }) {
       ...SchemaView_TargetFragment
     }
   }
 `);
 
-function TargetSchemaPage(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
-}) {
+function TargetSchemaPage(props: { organizationId: string; projectId: string; targetId: string }) {
   const [query] = useQuery({
     query: TargetSchemaPageQuery,
     variables: {
-      organizationSlug: props.organizationSlug,
-      projectSlug: props.projectSlug,
-      targetSlug: props.targetSlug,
+      organizationId: props.organizationId,
+      projectId: props.projectId,
+      targetId: props.targetId,
     },
   });
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationId} error={query.error} />;
   }
 
   const currentOrganization = query.data?.organization?.organization;
@@ -336,9 +322,9 @@ function TargetSchemaPage(props: {
 
   return (
     <TargetLayout
-      targetSlug={props.targetSlug}
-      projectSlug={props.projectSlug}
-      organizationSlug={props.organizationSlug}
+      targetId={props.targetId}
+      projectId={props.projectId}
+      organizationId={props.organizationId}
       page={Page.Schema}
     >
       <div className="flex flex-row items-center justify-between py-6">
@@ -349,11 +335,11 @@ function TargetSchemaPage(props: {
         <div className="flex flex-row items-center gap-x-4">
           <Button variant="outline" asChild>
             <Link
-              to="/$organizationSlug/$projectSlug/$targetSlug/explorer/unused"
+              to="/$organizationId/$projectId/$targetId/explorer/unused"
               params={{
-                organizationSlug: props.organizationSlug,
-                projectSlug: props.projectSlug,
-                targetSlug: props.targetSlug,
+                organizationId: props.organizationId,
+                projectId: props.projectId,
+                targetId: props.targetId,
               }}
             >
               Unused schema
@@ -362,11 +348,11 @@ function TargetSchemaPage(props: {
           <span className="italic">|</span>
           <Button variant="outline" asChild>
             <Link
-              to="/$organizationSlug/$projectSlug/$targetSlug/explorer/deprecated"
+              to="/$organizationId/$projectId/$targetId/explorer/deprecated"
               params={{
-                organizationSlug: props.organizationSlug,
-                projectSlug: props.projectSlug,
-                targetSlug: props.targetSlug,
+                organizationId: props.organizationId,
+                projectId: props.projectId,
+                targetId: props.targetId,
               }}
             >
               Deprecated schema
@@ -383,18 +369,14 @@ function TargetSchemaPage(props: {
   );
 }
 
-export function TargetPage(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
-}) {
+export function TargetPage(props: { organizationId: string; projectId: string; targetId: string }) {
   return (
     <>
       <Meta title="Schema" />
       <TargetSchemaPage
-        organizationSlug={props.organizationSlug}
-        projectSlug={props.projectSlug}
-        targetSlug={props.targetSlug}
+        organizationId={props.organizationId}
+        projectId={props.projectId}
+        targetId={props.targetId}
       />
     </>
   );

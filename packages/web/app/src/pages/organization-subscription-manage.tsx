@@ -70,8 +70,8 @@ const BillingsPlanQuery = graphql(`
 `);
 
 const BillingDowngradeMutation = graphql(`
-  mutation ManageSubscription_DowngradeToHobby($organizationSlug: String!) {
-    downgradeToHobby(input: { organization: { organizationSlug: $organizationSlug } }) {
+  mutation ManageSubscription_DowngradeToHobby($organization: ID!) {
+    downgradeToHobby(input: { organization: { organization: $organization } }) {
       previousPlan
       newPlan
       organization {
@@ -83,7 +83,7 @@ const BillingDowngradeMutation = graphql(`
 
 const BillingUpgradeToProMutation = graphql(`
   mutation ManageSubscription_UpgradeToPro(
-    $organizationSlug: String!
+    $organization: ID!
     $paymentMethodId: String
     $couponCode: String
     $monthlyLimits: RateLimitInput!
@@ -92,7 +92,7 @@ const BillingUpgradeToProMutation = graphql(`
       input: {
         paymentMethodId: $paymentMethodId
         couponCode: $couponCode
-        organization: { organizationSlug: $organizationSlug }
+        organization: { organization: $organization }
         monthlyLimits: $monthlyLimits
       }
     ) {
@@ -106,11 +106,8 @@ const BillingUpgradeToProMutation = graphql(`
 `);
 
 const UpdateOrgRateLimitMutation = graphql(`
-  mutation updateOrgRateLimit($organizationSlug: String!, $monthlyLimits: RateLimitInput!) {
-    updateOrgRateLimit(
-      monthlyLimits: $monthlyLimits
-      selector: { organizationSlug: $organizationSlug }
-    ) {
+  mutation updateOrgRateLimit($organization: ID!, $monthlyLimits: RateLimitInput!) {
+    updateOrgRateLimit(monthlyLimits: $monthlyLimits, selector: { organization: $organization }) {
       ...ManageSubscriptionInner_OrganizationFragment
     }
   }
@@ -130,7 +127,7 @@ function Inner(props: {
     scope: OrganizationAccessScope.Settings,
     member: organization?.me,
     redirect: true,
-    organizationSlug: organization.slug,
+    organizationId: organization.slug,
   });
 
   const [query] = useQuery({ query: BillingsPlanQuery });
@@ -231,7 +228,7 @@ function Inner(props: {
     }
 
     await upgradeToProMutation({
-      organizationSlug: organization.slug,
+      organization: organization.slug,
       monthlyLimits: {
         operations: operationsRateLimit * 1_000_000,
       },
@@ -254,7 +251,7 @@ function Inner(props: {
     }
 
     await downgradeToHobbyMutation({
-      organizationSlug: organization.slug,
+      organization: organization.slug,
     });
   }, [organization.slug, downgradeToHobbyMutation, isFetching]);
 
@@ -264,7 +261,7 @@ function Inner(props: {
     }
 
     await updateOrgRateLimitMutation({
-      organizationSlug: organization.slug,
+      organization: organization.slug,
       monthlyLimits: {
         operations: operationsRateLimit * 1_000_000,
       },
@@ -418,7 +415,7 @@ function Inner(props: {
                 </>
               )}
 
-            {error && <QueryError organizationSlug={organization.slug} showError error={error} />}
+            {error && <QueryError organizationId={organization.slug} showError error={error} />}
             <div>{renderActions()}</div>
           </div>
         </div>
@@ -441,12 +438,12 @@ const ManageSubscriptionPageQuery = graphql(`
   }
 `);
 
-function ManageSubscriptionPageContent(props: { organizationSlug: string }) {
+function ManageSubscriptionPageContent(props: { organizationId: string }) {
   const [query] = useQuery({
     query: ManageSubscriptionPageQuery,
     variables: {
       selector: {
-        organizationSlug: props.organizationSlug,
+        organization: props.organizationId,
       },
     },
   });
@@ -462,17 +459,17 @@ function ManageSubscriptionPageContent(props: { organizationSlug: string }) {
     scope: OrganizationAccessScope.Settings,
     member: organization?.me ?? null,
     redirect: true,
-    organizationSlug: props.organizationSlug,
+    organizationId: props.organizationId,
   });
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationId} error={query.error} />;
   }
 
   return (
     <OrganizationLayout
       page={Page.Subscription}
-      organizationSlug={props.organizationSlug}
+      organizationId={props.organizationId}
       className="flex flex-col gap-y-10"
     >
       <div className="grow">
@@ -485,8 +482,8 @@ function ManageSubscriptionPageContent(props: { organizationSlug: string }) {
             <div>
               <Button asChild>
                 <Link
-                  to="/$organizationSlug/view/subscription"
-                  params={{ organizationSlug: currentOrganization.slug }}
+                  to="/$organizationId/view/subscription"
+                  params={{ organizationId: currentOrganization.slug }}
                 >
                   Subscription usage
                 </Link>
@@ -505,13 +502,13 @@ function ManageSubscriptionPageContent(props: { organizationSlug: string }) {
 }
 
 export function OrganizationSubscriptionManagePage(props: {
-  organizationSlug: string;
+  organizationId: string;
 }): ReactElement {
   return (
     <>
       <Meta title="Manage Subscription" />
-      <RenderIfStripeAvailable organizationSlug={props.organizationSlug}>
-        <ManageSubscriptionPageContent organizationSlug={props.organizationSlug} />
+      <RenderIfStripeAvailable organizationId={props.organizationId}>
+        <ManageSubscriptionPageContent organizationId={props.organizationId} />
       </RenderIfStripeAvailable>
     </>
   );

@@ -13,8 +13,8 @@ export const updateNativeFederation: NonNullable<
 
   return {
     ok: await injector.get(SchemaManager).updateNativeSchemaComposition({
-      projectId: project,
-      organizationId: organization,
+      project,
+      organization,
       enabled: input.enabled,
     }),
   };

@@ -41,15 +41,15 @@ interface Operation {
 
 function OperationRow({
   operation,
-  organizationSlug,
-  projectSlug,
-  targetSlug,
+  organization,
+  project,
+  target,
   selectedPeriod,
 }: {
   operation: Operation;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organization: string;
+  project: string;
+  target: string;
   selectedPeriod: null | { to: string; from: string };
 }): ReactElement {
   const count = useFormattedNumber(operation.requests);
@@ -67,11 +67,11 @@ function OperationRow({
             <Button variant="orangeLink" className="h-auto p-0" asChild>
               <Link
                 className="block max-w-[300px] truncate"
-                to="/$organizationSlug/$projectSlug/$targetSlug/insights/$operationName/$operationHash"
+                to="/$organizationId/$projectId/$targetId/insights/$operationName/$operationHash"
                 params={{
-                  organizationSlug,
-                  projectSlug,
-                  targetSlug,
+                  organizationId: organization,
+                  projectId: project,
+                  targetId: target,
                   operationName: operation.name,
                   operationHash: operation.hash,
                 }}
@@ -174,9 +174,9 @@ function OperationsTable({
   pagination,
   setPagination,
   className,
-  organizationSlug,
-  projectSlug,
-  targetSlug,
+  organization,
+  project,
+  target,
   selectedPeriod,
 }: {
   operations: Operation[];
@@ -185,9 +185,9 @@ function OperationsTable({
   sorting: SortingState;
   setSorting: OnChangeFn<SortingState>;
   className?: string;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organization: string;
+  project: string;
+  target: string;
   clients: readonly { name: string }[] | null;
   clientFilter: string | null;
   setClientFilter: (filter: string) => void;
@@ -260,9 +260,9 @@ function OperationsTable({
                   <OperationRow
                     operation={row.original}
                     key={row.original.id}
-                    organizationSlug={organizationSlug}
-                    projectSlug={projectSlug}
-                    targetSlug={targetSlug}
+                    organization={organization}
+                    project={project}
+                    target={target}
                     selectedPeriod={selectedPeriod}
                   />
                 ),
@@ -342,9 +342,9 @@ const OperationsTableContainer_OperationsStatsFragment = graphql(`
 
 function OperationsTableContainer({
   operationsFilter,
-  organizationSlug,
-  projectSlug,
-  targetSlug,
+  organization,
+  project,
+  target,
   clientFilter,
   setClientFilter,
   className,
@@ -353,9 +353,9 @@ function OperationsTableContainer({
 }: {
   operationStats: FragmentType<typeof OperationsTableContainer_OperationsStatsFragment> | null;
   operationsFilter: readonly string[];
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organization: string;
+  project: string;
+  target: string;
   selectedPeriod: { from: string; to: string } | null;
   clientFilter: string | null;
   setClientFilter: (client: string) => void;
@@ -424,9 +424,9 @@ function OperationsTableContainer({
       setPagination={safeSetPagination}
       sorting={sorting}
       setSorting={setSorting}
-      organizationSlug={organizationSlug}
-      projectSlug={projectSlug}
-      targetSlug={targetSlug}
+      organization={organization}
+      project={project}
+      target={target}
       clients={operationStats?.clients.nodes ?? null}
       clientFilter={clientFilter}
       setClientFilter={setClientFilter}
@@ -456,18 +456,18 @@ const OperationsList_OperationsStatsQuery = graphql(`
 
 export function OperationsList({
   className,
-  organizationSlug,
-  projectSlug,
-  targetSlug,
+  organization,
+  project,
+  target,
   period,
   operationsFilter = [],
   clientNamesFilter = [],
   selectedPeriod,
 }: {
   className?: string;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organization: string;
+  project: string;
+  target: string;
   period: DateRangeInput;
   operationsFilter: readonly string[];
   clientNamesFilter: string[];
@@ -478,9 +478,9 @@ export function OperationsList({
     query: OperationsList_OperationsStatsQuery,
     variables: {
       selector: {
-        organizationSlug,
-        projectSlug,
-        targetSlug,
+        organization,
+        project,
+        target,
         period,
         operations: [],
         clientNames: clientNamesFilter,
@@ -507,9 +507,9 @@ export function OperationsList({
         className={className}
         setClientFilter={setClientFilter}
         clientFilter={clientFilter}
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        targetSlug={targetSlug}
+        organization={organization}
+        project={project}
+        target={target}
         selectedPeriod={selectedPeriod}
       />
     </OperationsFallback>

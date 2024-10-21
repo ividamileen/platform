@@ -422,9 +422,9 @@ function getLevelOption() {
 
 function ClientsStats(props: {
   operationStats: FragmentType<typeof ClientsStats_OperationsStatsFragment> | null;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }): ReactElement {
   const router = useRouter();
   const styles = useChartStyles();
@@ -560,11 +560,11 @@ function ClientsStats(props: {
         }
 
         void router.navigate({
-          to: '/$organizationSlug/$projectSlug/$targetSlug/insights/client/$name',
+          to: '/$organizationId/$projectId/$targetId/insights/client/$name',
           params: {
-            organizationSlug: props.organizationSlug,
-            projectSlug: props.projectSlug,
-            targetSlug: props.targetSlug,
+            organizationId: props.organizationId,
+            projectId: props.projectId,
+            targetId: props.targetId,
             name: ev.value,
           },
           search(searchParams) {
@@ -1005,9 +1005,9 @@ function RpmOverTimeStats({
 }
 
 export function OperationsStats({
-  organizationSlug,
-  projectSlug,
-  targetSlug,
+  organization,
+  project,
+  target,
   period,
   operationsFilter,
   clientNamesFilter,
@@ -1015,9 +1015,9 @@ export function OperationsStats({
   mode,
   dateRangeText,
 }: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organization: string;
+  project: string;
+  target: string;
   period: {
     from: string;
     to: string;
@@ -1032,17 +1032,17 @@ export function OperationsStats({
     query: Stats_GeneralOperationsStatsQuery,
     variables: {
       selector: {
-        organizationSlug,
-        projectSlug,
-        targetSlug,
+        organization,
+        project,
+        target,
         period,
         operations: operationsFilter,
         clientNames: clientNamesFilter,
       },
       allOperationsSelector: {
-        organizationSlug,
-        projectSlug,
-        targetSlug,
+        organization,
+        project,
+        target,
         period,
       },
       resolution,
@@ -1129,9 +1129,9 @@ export function OperationsStats({
         <OperationsFallback state={state} refetch={refetch}>
           <ClientsStats
             operationStats={operationsStats ?? null}
-            organizationSlug={organizationSlug}
-            projectSlug={projectSlug}
-            targetSlug={targetSlug}
+            organizationId={organization}
+            projectId={project}
+            targetId={target}
           />
         </OperationsFallback>
       </div>

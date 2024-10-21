@@ -144,7 +144,7 @@ export class SupportManager {
   @atomic((organizationId: string) => organizationId)
   private async ensureZendeskOrganizationId(organizationId: string): Promise<string> {
     const organization = await this.organizationManager.getOrganization({
-      organizationId: organizationId,
+      organization: organizationId,
     });
 
     if (organization.zendeskId) {
@@ -196,8 +196,8 @@ export class SupportManager {
   }): Promise<string> {
     const organizationZendeskId = await this.ensureZendeskOrganizationId(input.organizationId);
     const userAsMember = await this.organizationManager.getOrganizationMember({
-      organizationId: input.organizationId,
-      userId: input.userId,
+      organization: input.organizationId,
+      user: input.userId,
     });
 
     if (!userAsMember.user.zendeskId) {
@@ -377,7 +377,7 @@ export class SupportManager {
   async getTickets(organizationId: string) {
     this.logger.info('Fetching support tickets (id: %s)', organizationId);
     await this.authManager.ensureOrganizationAccess({
-      organizationId: organizationId,
+      organization: organizationId,
       scope: OrganizationAccessScope.READ,
     });
     const internalOrganizationId = await this.ensureZendeskOrganizationId(organizationId);
@@ -418,7 +418,7 @@ export class SupportManager {
       ticketId,
     );
     await this.authManager.ensureOrganizationAccess({
-      organizationId: organizationId,
+      organization: organizationId,
       scope: OrganizationAccessScope.READ,
     });
     const zendeskOrganizationId = await this.ensureZendeskOrganizationId(organizationId);
@@ -516,7 +516,7 @@ export class SupportManager {
     }
 
     await this.authManager.ensureOrganizationAccess({
-      organizationId: input.organizationId,
+      organization: input.organizationId,
       scope: OrganizationAccessScope.READ,
     });
     const currentUser = await this.authManager.getCurrentUser();
@@ -541,7 +541,7 @@ export class SupportManager {
       .digest('hex');
 
     const organization = await this.organizationManager.getOrganization({
-      organizationId: input.organizationId,
+      organization: input.organizationId,
     });
     const customerType = this.resolveCustomerType(organization);
 
@@ -604,7 +604,7 @@ export class SupportManager {
     }
 
     await this.authManager.ensureOrganizationAccess({
-      organizationId: input.organizationId,
+      organization: input.organizationId,
       scope: OrganizationAccessScope.READ,
     });
     const currentUser = await this.authManager.getCurrentUser();

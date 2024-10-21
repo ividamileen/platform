@@ -15,8 +15,8 @@ export const tokens: NonNullable<QueryResolvers['tokens']> = async (
   ]);
 
   return injector.get(TokenManager).getTokens({
-    organizationId: organization,
-    projectId: project,
-    targetId: target,
+    organization,
+    project,
+    target,
   });
 };

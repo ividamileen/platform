@@ -64,7 +64,7 @@ function PageContent(props: {
     scope: OrganizationAccessScope.Members,
     redirect: true,
     member: organization.me,
-    organizationSlug: organization.slug,
+    organizationId: organization.slug,
   });
 
   if (!organization || !hasAccess) {
@@ -126,7 +126,7 @@ const OrganizationMembersPageQuery = graphql(`
 `);
 
 function OrganizationMembersPageContent(props: {
-  organizationSlug: string;
+  organizationId: string;
   page: SubPage;
   onPageChange(page: SubPage): void;
 }) {
@@ -134,20 +134,20 @@ function OrganizationMembersPageContent(props: {
     query: OrganizationMembersPageQuery,
     variables: {
       selector: {
-        organizationSlug: props.organizationSlug,
+        organization: props.organizationId,
       },
     },
   });
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationId} error={query.error} />;
   }
 
   const currentOrganization = query.data?.organization?.organization;
 
   return (
     <OrganizationLayout
-      organizationSlug={props.organizationSlug}
+      organizationId={props.organizationId}
       page={Page.Members}
       className="flex flex-col gap-y-10"
     >
@@ -166,7 +166,7 @@ function OrganizationMembersPageContent(props: {
 }
 
 export function OrganizationMembersPage(props: {
-  organizationSlug: string;
+  organizationId: string;
   page: SubPage;
   onPageChange(page: SubPage): void;
 }) {
@@ -174,7 +174,7 @@ export function OrganizationMembersPage(props: {
     <>
       <Meta title="Members" />
       <OrganizationMembersPageContent
-        organizationSlug={props.organizationSlug}
+        organizationId={props.organizationId}
         page={props.page}
         onPageChange={props.onPageChange}
       />

@@ -17,16 +17,16 @@ export const Target: Pick<
 > = {
   project: (target, _args, { injector }) =>
     injector.get(ProjectManager).getProject({
-      projectId: target.projectId,
-      organizationId: target.orgId,
+      project: target.projectId,
+      organization: target.orgId,
     }),
   validationSettings: async (target, _args, { injector }) => {
     const targetManager = injector.get(TargetManager);
 
     const settings = await targetManager.getTargetSettings({
-      organizationId: target.orgId,
-      projectId: target.projectId,
-      targetId: target.id,
+      organization: target.orgId,
+      project: target.projectId,
+      target: target.id,
     });
 
     return {
@@ -34,9 +34,9 @@ export const Target: Pick<
       targets: await Promise.all(
         settings.validation.targets.map(tid =>
           targetManager.getTarget({
-            organizationId: target.orgId,
-            projectId: target.projectId,
-            targetId: tid,
+            organization: target.orgId,
+            project: target.projectId,
+            target: tid,
           }),
         ),
       ),
@@ -46,7 +46,7 @@ export const Target: Pick<
     return injector
       .get(OrganizationManager)
       .getFeatureFlags({
-        organizationId: target.orgId,
+        organization: target.orgId,
       })
       .then(flags => flags.forceLegacyCompositionInTargets.includes(target.id));
   },

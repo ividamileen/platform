@@ -87,9 +87,9 @@ export class CdnProvider {
     }
 
     await this.authManager.ensureTargetAccess({
-      organizationId: args.organizationId,
-      projectId: args.projectId,
-      targetId: args.targetId,
+      organization: args.organizationId,
+      project: args.projectId,
+      target: args.targetId,
       scope: TargetAccessScope.READ,
     });
 
@@ -242,9 +242,9 @@ export class CdnProvider {
     );
 
     await this.authManager.ensureTargetAccess({
-      organizationId: args.organizationId,
-      projectId: args.projectId,
-      targetId: args.targetId,
+      organization: args.organizationId,
+      project: args.projectId,
+      target: args.targetId,
       scope: TargetAccessScope.SETTINGS,
     });
 
@@ -327,9 +327,9 @@ export class CdnProvider {
     cursor: string | null;
   }) {
     await this.authManager.ensureTargetAccess({
-      organizationId: args.organizationId,
-      projectId: args.projectId,
-      targetId: args.targetId,
+      organization: args.organizationId,
+      project: args.projectId,
+      target: args.targetId,
       scope: TargetAccessScope.SETTINGS,
     });
 

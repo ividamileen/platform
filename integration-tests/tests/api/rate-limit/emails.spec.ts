@@ -24,7 +24,7 @@ test('rate limit approaching and reached for organization', async () => {
 
   await updateOrgRateLimit(
     {
-      organizationSlug: organization.slug,
+      organization: organization.slug,
     },
     {
       operations: 11,

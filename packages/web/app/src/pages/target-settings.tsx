@@ -86,9 +86,9 @@ export const DeleteTokensDocument = graphql(`
   mutation deleteTokens($input: DeleteTokensInput!) {
     deleteTokens(input: $input) {
       selector {
-        organizationSlug
-        projectSlug
-        targetSlug
+        organization
+        project
+        target
       }
       deletedTokens
     }
@@ -112,9 +112,9 @@ export const TokensDocument = graphql(`
 
 function RegistryAccessTokens(props: {
   me: FragmentType<typeof RegistryAccessTokens_MeFragment>;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   const me = useFragment(RegistryAccessTokens_MeFragment, props.me);
   const [{ fetching: deleting }, mutate] = useMutation(DeleteTokensDocument);
@@ -125,9 +125,9 @@ function RegistryAccessTokens(props: {
     query: TokensDocument,
     variables: {
       selector: {
-        organizationSlug: props.organizationSlug,
-        projectSlug: props.projectSlug,
-        targetSlug: props.targetSlug,
+        organization: props.organizationId,
+        project: props.projectId,
+        target: props.targetId,
       },
     },
   });
@@ -137,14 +137,14 @@ function RegistryAccessTokens(props: {
   const deleteTokens = useCallback(async () => {
     await mutate({
       input: {
-        organizationSlug: props.organizationSlug,
-        projectSlug: props.projectSlug,
-        targetSlug: props.targetSlug,
-        tokenIds: checked,
+        organization: props.organizationId,
+        project: props.projectId,
+        target: props.targetId,
+        tokens: checked,
       },
     });
     setChecked([]);
-  }, [checked, mutate, props.organizationSlug, props.projectSlug, props.targetSlug]);
+  }, [checked, mutate, props.organizationId, props.projectId, props.targetId]);
 
   const canManage = canAccessTarget(TargetAccessScope.TokensWrite, me);
 
@@ -214,9 +214,9 @@ function RegistryAccessTokens(props: {
       </Table>
       {isModalOpen && (
         <CreateAccessTokenModal
-          organizationSlug={props.organizationSlug}
-          projectSlug={props.projectSlug}
-          targetSlug={props.targetSlug}
+          organizationId={props.organizationId}
+          projectId={props.projectId}
+          targetId={props.targetId}
           isOpen={isModalOpen}
           toggleModalOpen={toggleModalOpen}
         />
@@ -243,9 +243,9 @@ const Settings_UpdateBaseSchemaMutation = graphql(`
 
 const ExtendBaseSchema = (props: {
   baseSchema: string;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) => {
   const [mutation, mutate] = useMutation(Settings_UpdateBaseSchemaMutation);
   const [baseSchema, setBaseSchema] = useState(props.baseSchema);
@@ -296,9 +296,9 @@ const ExtendBaseSchema = (props: {
           onClick={async () => {
             await mutate({
               input: {
-                organizationSlug: props.organizationSlug,
-                projectSlug: props.projectSlug,
-                targetSlug: props.targetSlug,
+                organization: props.organizationId,
+                project: props.projectId,
+                target: props.targetId,
                 newBase: baseSchema,
               },
             }).then(result => {
@@ -348,9 +348,9 @@ const ClientExclusion_AvailableClientNamesQuery = graphql(`
 function ClientExclusion(
   props: PropsWithoutRef<
     {
-      organizationSlug: string;
-      projectSlug: string;
-      selectedTargetIds: string[];
+      organizationId: string;
+      projectId: string;
+      selectedTargets: string[];
       clientsFromSettings: string[];
       value: string[];
     } & Pick<ComponentProps<typeof Combobox>, 'name' | 'disabled' | 'onBlur' | 'onChange'>
@@ -361,9 +361,9 @@ function ClientExclusion(
     query: ClientExclusion_AvailableClientNamesQuery,
     variables: {
       selector: {
-        organizationSlug: props.organizationSlug,
-        projectSlug: props.projectSlug,
-        targetIds: props.selectedTargetIds,
+        organization: props.organizationId,
+        project: props.projectId,
+        targetIds: props.selectedTargets,
         period: {
           from: formatISO(subDays(now, 90)),
           to: formatISO(now),
@@ -462,9 +462,9 @@ function floorDate(date: Date): Date {
 }
 
 const ConditionalBreakingChanges = (props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) => {
   const [targetValidation, setValidation] = useMutation(SetTargetValidationMutation);
   const [mutation, updateValidation] = useMutation(
@@ -474,16 +474,16 @@ const ConditionalBreakingChanges = (props: {
     query: TargetSettingsPage_TargetSettingsQuery,
     variables: {
       selector: {
-        organizationSlug: props.organizationSlug,
-        projectSlug: props.projectSlug,
-        targetSlug: props.targetSlug,
+        organization: props.organizationId,
+        project: props.projectId,
+        target: props.targetId,
       },
       targetsSelector: {
-        organizationSlug: props.organizationSlug,
-        projectSlug: props.projectSlug,
+        organization: props.organizationId,
+        project: props.projectId,
       },
       organizationSelector: {
-        organizationSlug: props.organizationSlug,
+        organization: props.organizationId,
       },
     },
   });
@@ -508,7 +508,7 @@ const ConditionalBreakingChanges = (props: {
     initialValues: {
       percentage: settings?.percentage || 0,
       period: settings?.period || 0,
-      targetIds: settings?.targets.map(t => t.id) || [],
+      targets: settings?.targets.map(t => t.id) || [],
       excludedClients: settings?.excludedClients ?? [],
     },
     validationSchema: Yup.object().shape({
@@ -526,15 +526,15 @@ const ConditionalBreakingChanges = (props: {
           return Number(num.toFixed(2)) === num;
         })
         .required(),
-      targetIds: Yup.array().of(Yup.string()).min(1),
+      targets: Yup.array().of(Yup.string()).min(1),
       excludedClients: Yup.array().of(Yup.string()),
     }),
     onSubmit: values =>
       updateValidation({
         input: {
-          organizationSlug: props.organizationSlug,
-          projectSlug: props.projectSlug,
-          targetSlug: props.targetSlug,
+          organization: props.organizationId,
+          project: props.projectId,
+          target: props.targetId,
           ...values,
         },
       }).then(result => {
@@ -586,9 +586,9 @@ const ConditionalBreakingChanges = (props: {
               onCheckedChange={async enabled => {
                 await setValidation({
                   input: {
-                    targetSlug: props.targetSlug,
-                    projectSlug: props.projectSlug,
-                    organizationSlug: props.organizationSlug,
+                    target: props.targetId, // targetId is the target we are updating
+                    project: props.projectId,
+                    organization: props.organizationId,
                     enabled,
                   },
                 });
@@ -652,11 +652,11 @@ const ConditionalBreakingChanges = (props: {
                   </div>
                 </div>
                 <div className="max-w-[420px]">
-                  {values.targetIds.length > 0 ? (
+                  {values.targets.length > 0 ? (
                     <ClientExclusion
-                      organizationSlug={props.organizationSlug}
-                      projectSlug={props.projectSlug}
-                      selectedTargetIds={values.targetIds}
+                      organizationId={props.organizationId}
+                      projectId={props.projectId}
+                      selectedTargets={values.targets}
                       clientsFromSettings={settings?.excludedClients ?? []}
                       name="excludedClients"
                       value={values.excludedClients}
@@ -689,13 +689,13 @@ const ConditionalBreakingChanges = (props: {
                 {possibleTargets?.map(pt => (
                   <div key={pt.id} className="flex items-center gap-x-2">
                     <Checkbox
-                      checked={values.targetIds.includes(pt.id)}
+                      checked={values.targets.includes(pt.id)}
                       onCheckedChange={async isChecked => {
                         await setFieldValue(
                           'targets',
                           isChecked
-                            ? [...values.targetIds, pt.id]
-                            : values.targetIds.filter(value => value !== pt.id),
+                            ? [...values.targets, pt.id]
+                            : values.targets.filter(value => value !== pt.id),
                         );
                       }}
                       onBlur={() => setFieldTouched('targets', true)}
@@ -706,8 +706,8 @@ const ConditionalBreakingChanges = (props: {
               </div>
             </div>
           </div>
-          {touched.targetIds && errors.targetIds && (
-            <div className="text-red-500">{errors.targetIds}</div>
+          {touched.targets && errors.targets && (
+            <div className="text-red-500">{errors.targets}</div>
           )}
           <div className="mb-3 mt-5 space-y-2 rounded border-l-2 border-l-gray-800 bg-gray-600/10 py-2 pl-5 text-gray-400">
             <div>
@@ -753,7 +753,7 @@ const SlugFormSchema = z.object({
 });
 type SlugFormValues = z.infer<typeof SlugFormSchema>;
 
-function TargetSlug(props: { organizationSlug: string; projectSlug: string; targetSlug: string }) {
+function TargetSlug(props: { organizationId: string; projectId: string; targetId: string }) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -762,7 +762,7 @@ function TargetSlug(props: { organizationSlug: string; projectSlug: string; targ
     mode: 'all',
     resolver: zodResolver(SlugFormSchema),
     defaultValues: {
-      slug: props.targetSlug,
+      slug: props.targetId,
     },
   });
 
@@ -771,9 +771,9 @@ function TargetSlug(props: { organizationSlug: string; projectSlug: string; targ
       try {
         const result = await slugMutate({
           input: {
-            organizationSlug: props.organizationSlug,
-            projectSlug: props.projectSlug,
-            targetSlug: props.targetSlug,
+            organization: props.organizationId,
+            project: props.projectId,
+            target: props.targetId,
             slug: data.slug,
           },
         });
@@ -787,11 +787,11 @@ function TargetSlug(props: { organizationSlug: string; projectSlug: string; targ
             description: 'Target slug updated',
           });
           void router.navigate({
-            to: '/$organizationSlug/$projectSlug/$targetSlug/settings',
+            to: '/$organizationId/$projectId/$targetId/settings',
             params: {
-              organizationSlug: props.organizationSlug,
-              projectSlug: props.projectSlug,
-              targetSlug: result.data.updateTargetSlug.ok.target.slug,
+              organizationId: props.organizationId,
+              projectId: props.projectId,
+              targetId: result.data.updateTargetSlug.ok.target.slug,
             },
             search: {
               page: 'general',
@@ -842,8 +842,8 @@ function TargetSlug(props: { organizationSlug: string; projectSlug: string; targ
                   <FormControl>
                     <div className="flex items-center">
                       <div className="border-input text-muted-foreground h-10 rounded-md rounded-r-none border-y border-l bg-gray-900 px-3 py-2 text-sm">
-                        {env.appBaseUrl.replace(/https?:\/\//i, '')}/{props.organizationSlug}/
-                        {props.projectSlug}/
+                        {env.appBaseUrl.replace(/https?:\/\//i, '')}/{props.organizationId}/
+                        {props.projectId}/
                       </div>
                       <Input placeholder="slug" className="w-48 rounded-l-none" {...field} />
                     </div>
@@ -882,9 +882,9 @@ const TargetSettingsPage_UpdateTargetGraphQLEndpointUrl = graphql(`
 
 function GraphQLEndpointUrl(props: {
   graphqlEndpointUrl: string | null;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   const { toast } = useToast();
   const [mutation, mutate] = useMutation(TargetSettingsPage_UpdateTargetGraphQLEndpointUrl);
@@ -903,9 +903,9 @@ function GraphQLEndpointUrl(props: {
       onSubmit: values =>
         mutate({
           input: {
-            organizationSlug: props.organizationSlug,
-            projectSlug: props.projectSlug,
-            targetSlug: props.targetSlug,
+            organization: props.organizationId,
+            project: props.projectId,
+            target: props.targetId,
             graphqlEndpointUrl: values.graphqlEndpointUrl === '' ? null : values.graphqlEndpointUrl,
           },
         }).then(result => {
@@ -935,11 +935,11 @@ function GraphQLEndpointUrl(props: {
             <CardDescription>
               The endpoint url will be used for querying the target from the{' '}
               <Link
-                to="/$organizationSlug/$projectSlug/$targetSlug/laboratory"
+                to="/$organizationId/$projectId/$targetId/laboratory"
                 params={{
-                  organizationSlug: props.organizationSlug,
-                  projectSlug: props.projectSlug,
-                  targetSlug: props.targetSlug,
+                  organizationId: props.organizationId,
+                  projectId: props.projectId,
+                  targetId: props.targetId,
                 }}
               >
                 Hive Laboratory
@@ -988,9 +988,9 @@ const TargetSettingsPage_UpdateTargetSlugMutation = graphql(`
     updateTargetSlug(input: $input) {
       ok {
         selector {
-          organizationSlug
-          projectSlug
-          targetSlug
+          organization
+          project
+          target
         }
         target {
           id
@@ -1022,11 +1022,7 @@ const TargetSettingsPage_OrganizationFragment = graphql(`
   }
 `);
 
-function TargetDelete(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
-}) {
+function TargetDelete(props: { organizationId: string; projectId: string; targetId: string }) {
   const [isModalOpen, toggleModalOpen] = useToggle();
 
   return (
@@ -1055,9 +1051,9 @@ function TargetDelete(props: {
       </Button>
 
       <DeleteTargetModal
-        organizationSlug={props.organizationSlug}
-        projectSlug={props.projectSlug}
-        targetSlug={props.targetSlug}
+        organizationId={props.organizationId}
+        projectId={props.projectId}
+        targetId={props.targetId}
         isOpen={isModalOpen}
         toggleModalOpen={toggleModalOpen}
       />
@@ -1066,12 +1062,8 @@ function TargetDelete(props: {
 }
 
 const TargetSettingsPageQuery = graphql(`
-  query TargetSettingsPageQuery(
-    $organizationSlug: String!
-    $projectSlug: String!
-    $targetSlug: String!
-  ) {
-    organization(selector: { organizationSlug: $organizationSlug }) {
+  query TargetSettingsPageQuery($organizationId: ID!, $projectId: ID!, $targetId: ID!) {
+    organization(selector: { organization: $organizationId }) {
       organization {
         id
         slug
@@ -1081,18 +1073,12 @@ const TargetSettingsPageQuery = graphql(`
         }
       }
     }
-    project(selector: { organizationSlug: $organizationSlug, projectSlug: $projectSlug }) {
+    project(selector: { organization: $organizationId, project: $projectId }) {
       id
       slug
       type
     }
-    target(
-      selector: {
-        organizationSlug: $organizationSlug
-        projectSlug: $projectSlug
-        targetSlug: $targetSlug
-      }
-    ) {
+    target(selector: { organization: $organizationId, project: $projectId, target: $targetId }) {
       id
       slug
       graphqlEndpointUrl
@@ -1131,18 +1117,18 @@ const subPages = [
 type SubPage = (typeof subPages)[number]['key'];
 
 function TargetSettingsContent(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
   page?: SubPage;
 }) {
   const router = useRouter();
   const [query] = useQuery({
     query: TargetSettingsPageQuery,
     variables: {
-      organizationSlug: props.organizationSlug,
-      projectSlug: props.projectSlug,
-      targetSlug: props.targetSlug,
+      organizationId: props.organizationId,
+      projectId: props.projectId,
+      targetId: props.targetId,
     },
   });
 
@@ -1178,14 +1164,14 @@ function TargetSettingsContent(props: {
   );
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationId} error={query.error} />;
   }
 
   return (
     <TargetLayout
-      targetSlug={props.targetSlug}
-      projectSlug={props.projectSlug}
-      organizationSlug={props.organizationSlug}
+      targetId={props.targetId}
+      projectId={props.projectId}
+      organizationId={props.organizationId}
       page={Page.Settings}
     >
       {currentOrganization && currentProject && currentTarget && organizationForSettings ? (
@@ -1227,21 +1213,21 @@ function TargetSettingsContent(props: {
                 {props.page === 'general' && hasSettingsAccess ? (
                   <>
                     <TargetSlug
-                      targetSlug={props.targetSlug}
-                      projectSlug={props.projectSlug}
-                      organizationSlug={props.organizationSlug}
+                      targetId={props.targetId}
+                      projectId={props.projectId}
+                      organizationId={props.organizationId}
                     />
                     <GraphQLEndpointUrl
-                      targetSlug={currentTarget.slug}
-                      projectSlug={currentProject.slug}
-                      organizationSlug={currentOrganization.slug}
+                      targetId={currentTarget.slug}
+                      projectId={currentProject.slug}
+                      organizationId={currentOrganization.slug}
                       graphqlEndpointUrl={currentTarget.graphqlEndpointUrl ?? null}
                     />
                     {hasDeleteAccess && (
                       <TargetDelete
-                        targetSlug={currentTarget.slug}
-                        projectSlug={currentProject.slug}
-                        organizationSlug={currentOrganization.slug}
+                        targetId={currentTarget.slug}
+                        projectId={currentProject.slug}
+                        organizationId={currentOrganization.slug}
                       />
                     )}
                   </>
@@ -1249,39 +1235,39 @@ function TargetSettingsContent(props: {
                 {props.page === 'cdn' && hasReadAccess ? (
                   <CDNAccessTokens
                     me={organizationForSettings.me}
-                    organizationSlug={props.organizationSlug}
-                    projectSlug={props.projectSlug}
-                    targetSlug={props.targetSlug}
+                    organizationId={props.organizationId}
+                    projectId={props.projectId}
+                    targetId={props.targetId}
                   />
                 ) : null}
                 {props.page === 'registry-token' && hasTokensWriteAccess ? (
                   <RegistryAccessTokens
                     me={organizationForSettings.me}
-                    organizationSlug={props.organizationSlug}
-                    projectSlug={props.projectSlug}
-                    targetSlug={props.targetSlug}
+                    organizationId={props.organizationId}
+                    projectId={props.projectId}
+                    targetId={props.targetId}
                   />
                 ) : null}
                 {props.page === 'breaking-changes' && hasSettingsAccess ? (
                   <ConditionalBreakingChanges
-                    organizationSlug={props.organizationSlug}
-                    projectSlug={props.projectSlug}
-                    targetSlug={props.targetSlug}
+                    organizationId={props.organizationId}
+                    projectId={props.projectId}
+                    targetId={props.targetId}
                   />
                 ) : null}
                 {props.page === 'base-schema' && hasRegistryWriteAccess ? (
                   <ExtendBaseSchema
                     baseSchema={targetForSettings?.baseSchema ?? ''}
-                    organizationSlug={props.organizationSlug}
-                    projectSlug={props.projectSlug}
-                    targetSlug={props.targetSlug}
+                    organizationId={props.organizationId}
+                    projectId={props.projectId}
+                    targetId={props.targetId}
                   />
                 ) : null}
                 {props.page === 'schema-contracts' && hasSettingsAccess ? (
                   <SchemaContracts
-                    organizationSlug={props.organizationSlug}
-                    projectSlug={props.projectSlug}
-                    targetSlug={props.targetSlug}
+                    organizationId={props.organizationId}
+                    projectId={props.projectId}
+                    targetId={props.targetId}
                   />
                 ) : null}
               </div>
@@ -1294,18 +1280,18 @@ function TargetSettingsContent(props: {
 }
 
 export function TargetSettingsPage(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
   page?: SubPage;
 }) {
   return (
     <>
       <Meta title="Settings" />
       <TargetSettingsContent
-        organizationSlug={props.organizationSlug}
-        projectSlug={props.projectSlug}
-        targetSlug={props.targetSlug}
+        organizationId={props.organizationId}
+        projectId={props.projectId}
+        targetId={props.targetId}
         page={props.page}
       />
     </>
@@ -1315,6 +1301,11 @@ export function TargetSettingsPage(props: {
 export const DeleteTargetMutation = graphql(`
   mutation deleteTarget($selector: TargetSelectorInput!) {
     deleteTarget(selector: $selector) {
+      selector {
+        organization
+        project
+        target
+      }
       deletedTarget {
         __typename
         id
@@ -1326,11 +1317,11 @@ export const DeleteTargetMutation = graphql(`
 export function DeleteTargetModal(props: {
   isOpen: boolean;
   toggleModalOpen: () => void;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
-  const { organizationSlug, projectSlug, targetSlug } = props;
+  const { organizationId, projectId, targetId } = props;
   const [, mutate] = useMutation(DeleteTargetMutation);
   const { toast } = useToast();
   const router = useRouter();
@@ -1338,9 +1329,9 @@ export function DeleteTargetModal(props: {
   const handleDelete = async () => {
     const { error } = await mutate({
       selector: {
-        organizationSlug,
-        projectSlug,
-        targetSlug,
+        organization: organizationId,
+        project: projectId,
+        target: targetId,
       },
     });
     if (error) {
@@ -1356,10 +1347,10 @@ export function DeleteTargetModal(props: {
       });
       props.toggleModalOpen();
       void router.navigate({
-        to: '/$organizationSlug/$projectSlug',
+        to: '/$organizationId/$projectId',
         params: {
-          organizationSlug,
-          projectSlug,
+          organizationId,
+          projectId,
         },
       });
     }

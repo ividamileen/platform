@@ -69,16 +69,16 @@ export type EditOperationModalFormValues = z.infer<typeof editOperationModalForm
 export const EditOperationModal = (props: {
   operationId: string;
   close: () => void;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }): ReactElement => {
   const { toast } = useToast();
   const [updateOperationNameState, mutate] = useMutation(UpdateOperationNameMutation);
   const { collections } = useCollections({
-    organizationSlug: props.organizationSlug,
-    projectSlug: props.projectSlug,
-    targetSlug: props.targetSlug,
+    organizationId: props.organizationId,
+    projectId: props.projectId,
+    targetId: props.targetId,
   });
   const { setTabState } = useEditorContext({ nonNull: true });
 
@@ -105,9 +105,9 @@ export const EditOperationModal = (props: {
   async function onSubmit(values: EditOperationModalFormValues) {
     const response = await mutate({
       selector: {
-        targetSlug: props.targetSlug,
-        organizationSlug: props.organizationSlug,
-        projectSlug: props.projectSlug,
+        target: props.targetId,
+        organization: props.organizationId,
+        project: props.projectId,
       },
       input: {
         collectionId: values.collectionId,

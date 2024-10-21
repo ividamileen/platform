@@ -116,16 +116,16 @@ export class SchemaManager {
 
     const [organization, project, latestSchemas] = await Promise.all([
       this.organizationManager.getOrganization({
-        organizationId: input.organizationId,
+        organization: input.organization,
       }),
       this.projectManager.getProject({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
+        organization: input.organization,
+        project: input.project,
       }),
       this.getLatestSchemas({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
-        targetId: input.targetId,
+        organization: input.organization,
+        project: input.project,
+        target: input.target,
         onlyComposable: input.onlyComposable,
       }),
     ]);
@@ -163,7 +163,7 @@ export class SchemaManager {
       native: this.checkProjectNativeFederationSupport({
         project,
         organization,
-        targetId: input.targetId,
+        targetId: input.target,
       }),
       contracts: null,
     });
@@ -188,7 +188,7 @@ export class SchemaManager {
   @atomic(stringifySelector)
   async getSchemasOfVersion(
     selector: {
-      versionId: string;
+      version: string;
       includeMetadata?: boolean;
     } & TargetSelector,
   ) {
@@ -209,7 +209,7 @@ export class SchemaManager {
   @atomic(stringifySelector)
   async getMaybeSchemasOfVersion(
     selector: {
-      versionId: string;
+      version: string;
       includeMetadata?: boolean;
     } & TargetSelector,
   ) {
@@ -223,7 +223,7 @@ export class SchemaManager {
 
   async getSchemasOfPreviousVersion(
     selector: {
-      versionId: string;
+      version: string;
       onlyComposable: boolean;
     } & TargetSelector,
   ) {
@@ -272,9 +272,9 @@ export class SchemaManager {
 
     return {
       ...version,
-      projectId: selector.projectId,
-      targetId: selector.targetId,
-      organizationId: selector.organizationId,
+      project: selector.project,
+      target: selector.target,
+      organization: selector.organization,
     };
   }
 
@@ -286,9 +286,9 @@ export class SchemaManager {
     });
     return {
       ...(await this.storage.getLatestValidVersion(selector)),
-      projectId: selector.projectId,
-      targetId: selector.targetId,
-      organizationId: selector.organizationId,
+      project: selector.project,
+      target: selector.target,
+      organization: selector.organization,
     };
   }
 
@@ -300,9 +300,9 @@ export class SchemaManager {
     });
     return {
       ...(await this.storage.getLatestVersion(selector)),
-      projectId: selector.projectId,
-      targetId: selector.targetId,
-      organizationId: selector.organizationId,
+      project: selector.project,
+      target: selector.target,
+      organization: selector.organization,
     };
   }
 
@@ -321,13 +321,13 @@ export class SchemaManager {
 
     return {
       ...latest,
-      projectId: selector.projectId,
-      targetId: selector.targetId,
-      organizationId: selector.organizationId,
+      project: selector.project,
+      target: selector.target,
+      organization: selector.organization,
     };
   }
 
-  async getSchemaVersion(selector: TargetSelector & { versionId: string }) {
+  async getSchemaVersion(selector: TargetSelector & { version: string }) {
     this.logger.debug('Fetching single schema version (selector=%o)', selector);
     await this.authManager.ensureTargetAccess({
       ...selector,
@@ -336,9 +336,9 @@ export class SchemaManager {
     const result = await this.storage.getVersion(selector);
 
     return {
-      projectId: selector.projectId,
-      targetId: selector.targetId,
-      organizationId: selector.organizationId,
+      project: selector.project,
+      target: selector.target,
+      organization: selector.organization,
       ...result,
     };
   }
@@ -368,16 +368,16 @@ export class SchemaManager {
         ...edge,
         node: {
           ...edge.node,
-          organizationId: args.organizationId,
-          projectId: args.projectId,
-          targetId: args.targetId,
+          organization: args.organizationId,
+          project: args.projectId,
+          target: args.targetId,
         },
       })),
     };
   }
 
   async updateSchemaVersionStatus(
-    input: TargetSelector & { versionId: string; valid: boolean },
+    input: TargetSelector & { version: string; valid: boolean },
   ): Promise<SchemaVersion> {
     this.logger.debug('Updating schema version status (input=%o)', input);
     await this.authManager.ensureTargetAccess({
@@ -386,16 +386,16 @@ export class SchemaManager {
     });
 
     const project = await this.storage.getProject({
-      organizationId: input.organizationId,
-      projectId: input.projectId,
+      organization: input.organization,
+      project: input.project,
     });
 
     if (project.legacyRegistryModel) {
       return {
         ...(await this.storage.updateVersionStatus(input)),
-        organizationId: input.organizationId,
-        projectId: input.projectId,
-        targetId: input.targetId,
+        organization: input.organization,
+        project: input.project,
+        target: input.target,
       };
     }
 
@@ -410,7 +410,7 @@ export class SchemaManager {
     });
     return this.storage.getSchemaLog({
       commit: selector.commit,
-      targetId: selector.targetId,
+      target: selector.target,
     });
   }
 
@@ -478,9 +478,9 @@ export class SchemaManager {
     );
 
     await this.authManager.ensureTargetAccess({
-      projectId: input.projectId,
-      organizationId: input.organizationId,
-      targetId: input.targetId,
+      project: input.project,
+      organization: input.organization,
+      target: input.target,
       scope: TargetAccessScope.REGISTRY_WRITE,
     });
 
@@ -492,18 +492,18 @@ export class SchemaManager {
 
   async testExternalSchemaComposition(selector: { projectId: string; organizationId: string }) {
     await this.authManager.ensureProjectAccess({
-      projectId: selector.projectId,
-      organizationId: selector.organizationId,
+      project: selector.projectId,
+      organization: selector.organizationId,
       scope: ProjectAccessScope.SETTINGS,
     });
 
     const [project, organization] = await Promise.all([
       this.storage.getProject({
-        organizationId: selector.organizationId,
-        projectId: selector.projectId,
+        organization: selector.organizationId,
+        project: selector.projectId,
       }),
       this.storage.getOrganization({
-        organizationId: selector.organizationId,
+        organization: selector.organizationId,
       }),
     ]);
 
@@ -638,8 +638,8 @@ export class SchemaManager {
 
     return {
       ok: await this.projectManager.getProject({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
+        organization: input.organization,
+        project: input.project,
       }),
     };
   }
@@ -676,16 +676,16 @@ export class SchemaManager {
     const encryptedSecret = this.crypto.encrypt(input.secret);
 
     await this.storage.enableExternalSchemaComposition({
-      projectId: input.projectId,
-      organizationId: input.organizationId,
+      project: input.project,
+      organization: input.organization,
       endpoint: input.endpoint.trim(),
       encryptedSecret,
     });
 
     return {
       ok: await this.projectManager.getProject({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
+        organization: input.organization,
+        project: input.project,
       }),
     };
   }
@@ -702,8 +702,8 @@ export class SchemaManager {
     });
 
     const project = await this.projectManager.getProject({
-      organizationId: input.organizationId,
-      projectId: input.projectId,
+      organization: input.organization,
+      project: input.project,
     });
 
     if (project.type !== ProjectType.FEDERATION) {
@@ -711,8 +711,8 @@ export class SchemaManager {
     }
 
     return this.storage.updateNativeSchemaComposition({
-      projectId: input.projectId,
-      organizationId: input.organizationId,
+      project: input.project,
+      organization: input.organization,
       enabled: input.enabled,
     });
   }
@@ -741,9 +741,9 @@ export class SchemaManager {
     filters: SchemaChecksFilter | null;
   }) {
     await this.authManager.ensureTargetAccess({
-      organizationId: args.organizationId,
-      projectId: args.projectId,
-      targetId: args.targetId,
+      organization: args.organizationId,
+      project: args.projectId,
+      target: args.targetId,
       scope: TargetAccessScope.REGISTRY_READ,
     });
 
@@ -766,9 +766,9 @@ export class SchemaManager {
   }) {
     this.logger.debug('Find schema check (args=%o)', args);
     await this.authManager.ensureTargetAccess({
-      targetId: args.targetId,
-      projectId: args.projectId,
-      organizationId: args.organizationId,
+      target: args.targetId,
+      project: args.projectId,
+      organization: args.organizationId,
       scope: TargetAccessScope.REGISTRY_READ,
     });
 
@@ -810,13 +810,13 @@ export class SchemaManager {
 
     return this.schemaModuleConfig.schemaCheckLink({
       organization: {
-        slug: breadcrumb.organizationSlug,
+        slug: breadcrumb.organization,
       },
       project: {
-        slug: breadcrumb.projectSlug,
+        slug: breadcrumb.project,
       },
       target: {
-        slug: breadcrumb.targetSlug,
+        slug: breadcrumb.target,
       },
       schemaCheckId: args.schemaCheckId,
     });
@@ -894,8 +894,8 @@ export class SchemaManager {
     const user = await this.authManager.getCurrentUser();
 
     const scopes = await this.authManager.getMemberTargetScopes({
-      userId: user.id,
-      organizationId: schemaCheck.selector.organizationId,
+      user: user.id,
+      organization: schemaCheck.selector.organizationId,
     });
 
     if (scopes.includes(TargetAccessScope.REGISTRY_WRITE)) {
@@ -919,9 +919,9 @@ export class SchemaManager {
     this.logger.debug('Manually approve failed schema check (args=%o)', args);
 
     await this.authManager.ensureTargetAccess({
-      targetId: args.targetId,
-      projectId: args.projectId,
-      organizationId: args.organizationId,
+      target: args.targetId,
+      project: args.projectId,
+      organization: args.organizationId,
       scope: TargetAccessScope.REGISTRY_WRITE,
     });
 
@@ -959,8 +959,8 @@ export class SchemaManager {
     if (schemaCheck.githubCheckRunId) {
       this.logger.debug('Attempt updating GitHub schema check. (args=%o).', args);
       const project = await this.projectManager.getProject({
-        organizationId: args.organizationId,
-        projectId: args.projectId,
+        organization: args.organizationId,
+        project: args.projectId,
       });
       const gitRepository = schemaCheck.githubRepository ?? project.gitRepository;
       if (!gitRepository) {
@@ -1035,9 +1035,9 @@ export class SchemaManager {
     });
 
     await this.authManager.ensureTargetAccess({
-      organizationId: organization.id,
-      projectId: target.projectId,
-      targetId: target.id,
+      organization: organization.id,
+      project: target.projectId,
+      target: target.id,
       scope: TargetAccessScope.REGISTRY_READ,
     });
 
@@ -1053,9 +1053,9 @@ export class SchemaManager {
 
     return {
       ...record,
-      projectId: target.projectId,
-      targetId: target.id,
-      organizationId: organization.id,
+      project: target.projectId,
+      target: target.id,
+      organization: organization.id,
     };
   }
 
@@ -1070,16 +1070,16 @@ export class SchemaManager {
 
     const [organization, project] = await Promise.all([
       this.organizationManager.getOrganization({
-        organizationId: args.organization,
+        organization: args.organization,
       }),
       this.projectManager.getProject({
-        organizationId: args.organization,
-        projectId: args.project,
+        organization: args.organization,
+        project: args.project,
       }),
     ]);
 
     const schemaVersion = await this.storage.getVersionBeforeVersionId({
-      targetId: args.target,
+      target: args.target,
       beforeVersionId: args.beforeVersionId,
       beforeVersionCreatedAt: args.beforeVersionCreatedAt,
       onlyComposable: shouldUseLatestComposableVersion(args.target, project, organization),
@@ -1091,9 +1091,9 @@ export class SchemaManager {
 
     return {
       ...schemaVersion,
-      organizationId: args.organization,
-      projectId: args.project,
-      targetId: args.target,
+      organization: args.organization,
+      project: args.project,
+      target: args.target,
     };
   }
 
@@ -1105,7 +1105,7 @@ export class SchemaManager {
     beforeVersionCreatedAt: string;
   }) {
     const schemaVersion = await this.storage.getVersionBeforeVersionId({
-      targetId: args.target,
+      target: args.target,
       beforeVersionId: args.beforeVersionId,
       beforeVersionCreatedAt: args.beforeVersionCreatedAt,
       onlyComposable: true,
@@ -1117,9 +1117,9 @@ export class SchemaManager {
 
     return {
       ...schemaVersion,
-      organizationId: args.organization,
-      projectId: args.project,
-      targetId: args.target,
+      organization: args.organization,
+      project: args.project,
+      target: args.target,
     };
   }
 
@@ -1174,16 +1174,16 @@ export class SchemaManager {
     }
 
     const targets = await this.targetManager.getTargets({
-      organizationId: project.orgId,
-      projectId: project.id,
+      organization: project.orgId,
+      project: project.id,
     });
 
     const possibleVersions = await Promise.all(
       targets.map(t =>
         this.getMaybeLatestValidVersion({
-          organizationId: project.orgId,
-          projectId: project.id,
-          targetId: t.id,
+          organization: project.orgId,
+          project: project.id,
+          target: t.id,
         }),
       ),
     );
@@ -1206,10 +1206,10 @@ export class SchemaManager {
     const schemasPerVersion = await Promise.all(
       versions.map(async version =>
         this.getSchemasOfVersion({
-          organizationId: version.organizationId,
-          projectId: version.projectId,
-          targetId: version.targetId,
-          versionId: version.id,
+          organization: version.organization,
+          project: version.project,
+          target: version.target,
+          version: version.id,
         }),
       ),
     );
@@ -1304,15 +1304,15 @@ export class SchemaManager {
 
     const log = await this.getSchemaLog({
       commit: schemaVersion.actionId,
-      organizationId: schemaVersion.organizationId,
-      projectId: schemaVersion.projectId,
-      targetId: schemaVersion.targetId,
+      organization: schemaVersion.organization,
+      project: schemaVersion.project,
+      target: schemaVersion.target,
     });
 
     if ('commit' in log && log.commit) {
       const project = await this.storage.getProject({
-        organizationId: schemaVersion.organizationId,
-        projectId: schemaVersion.projectId,
+        organization: schemaVersion.organization,
+        project: schemaVersion.project,
       });
 
       if (project.gitRepository) {

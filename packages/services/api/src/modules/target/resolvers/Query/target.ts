@@ -15,8 +15,8 @@ export const target: NonNullable<QueryResolvers['target']> = async (
   ]);
 
   return injector.get(TargetManager).getTarget({
-    organizationId: organization,
-    targetId: target,
-    projectId: project,
+    organization,
+    target,
+    project,
   });
 };

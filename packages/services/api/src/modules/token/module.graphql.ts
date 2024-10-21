@@ -56,9 +56,9 @@ export default gql`
   }
 
   input CreateTokenInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
+    organization: ID!
+    project: ID!
+    target: ID!
     name: String!
     organizationScopes: [OrganizationAccessScope!]!
     projectScopes: [ProjectAccessScope!]!
@@ -66,10 +66,10 @@ export default gql`
   }
 
   input DeleteTokensInput {
-    organizationSlug: String!
-    projectSlug: String!
-    targetSlug: String!
-    tokenIds: [ID!]!
+    organization: ID!
+    project: ID!
+    target: ID!
+    tokens: [ID!]!
   }
 
   type DeleteTokensPayload {

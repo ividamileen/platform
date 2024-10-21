@@ -21,7 +21,7 @@ export const Organization: Pick<
 
     const billingRecord = await injector
       .get(BillingProvider)
-      .getOrganizationBillingParticipant({ organizationId: org.id });
+      .getOrganizationBillingParticipant({ organization: org.id });
 
     if (!billingRecord) {
       return {

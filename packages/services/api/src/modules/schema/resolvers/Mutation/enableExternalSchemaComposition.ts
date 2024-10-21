@@ -12,8 +12,8 @@ export const enableExternalSchemaComposition: NonNullable<
   ]);
 
   return injector.get(SchemaManager).enableExternalSchemaComposition({
-    projectId: project,
-    organizationId: organization,
+    project,
+    organization,
     endpoint: input.endpoint,
     secret: input.secret,
   });

@@ -30,24 +30,24 @@ export const Organization: Pick<
   owner: (organization, _, { injector }) => {
     return injector
       .get(OrganizationManager)
-      .getOrganizationOwner({ organizationId: organization.id });
+      .getOrganizationOwner({ organization: organization.id });
   },
   me: async (organization, _, { injector }) => {
     const me = await injector.get(AuthManager).getCurrentUser();
     const members = await injector
       .get(OrganizationManager)
-      .getOrganizationMembers({ organizationId: organization.id });
+      .getOrganizationMembers({ organization: organization.id });
 
     return members.find(m => m.id === me.id)!;
   },
   members: (organization, _, { injector }) => {
     return injector
       .get(OrganizationManager)
-      .getOrganizationMembers({ organizationId: organization.id });
+      .getOrganizationMembers({ organization: organization.id });
   },
   invitations: async (organization, _, { injector }) => {
     const invitations = await injector.get(OrganizationManager).getInvitations({
-      organizationId: organization.id,
+      organization: organization.id,
     });
 
     return {

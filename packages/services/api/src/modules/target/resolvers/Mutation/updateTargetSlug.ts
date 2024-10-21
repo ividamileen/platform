@@ -26,33 +26,33 @@ export const updateTargetSlug: NonNullable<MutationResolvers['updateTargetSlug']
   const translator = injector.get(IdTranslator);
   const [organizationId, projectId, targetId] = await Promise.all([
     translator.translateOrganizationId({
-      organizationSlug: input.organizationSlug,
+      organization: input.organization,
     }),
     translator.translateProjectId({
-      organizationSlug: input.organizationSlug,
-      projectSlug: input.projectSlug,
+      organization: input.organization,
+      project: input.project,
     }),
     translator.translateTargetId({
-      organizationSlug: input.organizationSlug,
-      projectSlug: input.projectSlug,
-      targetSlug: input.targetSlug,
+      organization: input.organization,
+      project: input.project,
+      target: input.target,
     }),
   ]);
 
   const result = await injector.get(TargetManager).updateSlug({
     slug: input.slug,
-    organizationId: organizationId,
-    projectId: projectId,
-    targetId: targetId,
+    organization: organizationId,
+    project: projectId,
+    target: targetId,
   });
 
   if (result.ok) {
     return {
       ok: {
         selector: {
-          organizationSlug: input.organizationSlug,
-          projectSlug: input.projectSlug,
-          targetSlug: result.target.slug,
+          organization: input.organization,
+          project: input.project,
+          target: result.target.slug,
         },
         target: result.target,
       },

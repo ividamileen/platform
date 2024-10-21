@@ -120,9 +120,9 @@ function MemberInvitationForm(props: {
     try {
       const result = await invite({
         input: {
-          organizationSlug: organization.slug,
+          organization: organization.slug,
           email: data.email,
-          roleId: data.role,
+          role: data.role,
         },
       });
 
@@ -298,7 +298,7 @@ const Members_Invitation = graphql(`
 
 function Invitation(props: {
   invitation: FragmentType<typeof Members_Invitation>;
-  organizationSlug: string;
+  organizationCleanId: string;
   refetchInvitations(): void;
 }) {
   const invitation = useFragment(Members_Invitation, props.invitation);
@@ -336,7 +336,7 @@ function Invitation(props: {
                   try {
                     const result = await deleteInvitation({
                       input: {
-                        organizationSlug: props.organizationSlug,
+                        organization: props.organizationCleanId,
                         email: invitation.email,
                       },
                     });
@@ -453,7 +453,7 @@ export function OrganizationInvitations(props: {
               <Invitation
                 key={node.id}
                 invitation={node}
-                organizationSlug={organization.slug}
+                organizationCleanId={organization.slug}
                 refetchInvitations={props.refetchInvitations}
               />
             ))}

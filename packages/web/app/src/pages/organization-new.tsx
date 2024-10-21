@@ -57,7 +57,7 @@ export const CreateOrganizationMutation = graphql(`
       ok {
         createdOrganizationPayload {
           selector {
-            organizationSlug
+            organization
           }
           organization {
             id
@@ -115,9 +115,9 @@ export const CreateOrganizationForm = (): JSX.Element => {
         description: `You are now an admin of "${values.slug}" organization.`,
       });
       void router.navigate({
-        to: '/$organizationSlug',
+        to: '/$organizationId',
         params: {
-          organizationSlug:
+          organizationId:
             mutation.data.createOrganization.ok.createdOrganizationPayload.organization.slug,
         },
       });

@@ -74,18 +74,18 @@ const ExternalCompositionForm_ProjectFragment = graphql(`
 `);
 
 const ExternalCompositionStatus = ({
-  projectSlug,
-  organizationSlug,
+  projectId,
+  organizationId,
 }: {
-  projectSlug: string;
-  organizationSlug: string;
+  projectId: string;
+  organizationId: string;
 }) => {
   const [query] = useQuery({
     query: ExternalCompositionStatus_TestQuery,
     variables: {
       selector: {
-        projectSlug,
-        organizationSlug,
+        project: projectId,
+        organization: organizationId,
       },
     },
     requestPolicy: 'network-only',
@@ -169,8 +169,8 @@ const ExternalCompositionForm = ({
   function onSubmit(values: FormValues) {
     void enable({
       input: {
-        projectSlug: project.slug,
-        organizationSlug: organization.slug,
+        project: project.slug,
+        organization: organization.slug,
         endpoint: values.endpoint,
         secret: values.secret,
       },
@@ -245,8 +245,8 @@ const ExternalCompositionForm = ({
                     mutation.data?.enableExternalSchemaComposition.ok?.externalSchemaComposition
                       ?.endpoint) ? (
                     <ExternalCompositionStatus
-                      projectSlug={project.slug}
-                      organizationSlug={organization.slug}
+                      projectId={project.slug}
+                      organizationId={organization.slug}
                     />
                   ) : null}
                 </div>
@@ -349,8 +349,8 @@ export const ExternalCompositionSettings = (props: {
     query: ExternalComposition_ProjectConfigurationQuery,
     variables: {
       selector: {
-        organizationSlug: organization.slug,
-        projectSlug: project.slug,
+        organization: organization.slug,
+        project: project.slug,
       },
     },
   });
@@ -363,8 +363,8 @@ export const ExternalCompositionSettings = (props: {
         setEnabled(false);
         const result = await disableComposition({
           input: {
-            projectSlug: project.slug,
-            organizationSlug: organization.slug,
+            project: project.slug,
+            organization: organization.slug,
           },
         });
         const error = result.error?.message || result.data?.disableExternalSchemaComposition.error;

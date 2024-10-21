@@ -82,8 +82,8 @@ const schemaDeleteCount = new promClient.Counter({
 export type CheckInput = Omit<Types.SchemaCheckInput, 'project' | 'organization' | 'target'> &
   TargetSelector;
 
-export type DeleteInput = Types.SchemaDeleteInput &
-  Omit<TargetSelector, 'targetId'> & {
+export type DeleteInput = Omit<Types.SchemaDeleteInput, 'project' | 'organization' | 'target'> &
+  Omit<TargetSelector, 'target'> & {
     checksum: string;
     target: Target;
   };
@@ -185,9 +185,9 @@ export class SchemaPublisher {
     selector,
   }: {
     selector: {
-      organizationId: string;
-      projectId: string;
-      targetId: string;
+      organization: string;
+      project: string;
+      target: string;
     };
   }): Promise<ConditionalBreakingChangeConfiguration | null> {
     try {
@@ -277,9 +277,9 @@ export class SchemaPublisher {
 
   @traceFn('SchemaPublisher.check', {
     initAttributes: input => ({
-      'hive.target.id': input.targetId,
-      'hive.organization.id': input.organizationId,
-      'hive.project.id': input.projectId,
+      'hive.target.id': input.target,
+      'hive.organization.id': input.organization,
+      'hive.project.id': input.project,
     }),
     resultAttributes: result => ({
       'hive.check.result': result.__typename,
@@ -289,9 +289,9 @@ export class SchemaPublisher {
     this.logger.info('Checking schema (input=%o)', lodash.omit(input, ['sdl']));
 
     await this.authManager.ensureTargetAccess({
-      targetId: input.targetId,
-      projectId: input.projectId,
-      organizationId: input.organizationId,
+      target: input.target,
+      project: input.project,
+      organization: input.organization,
       scope: TargetAccessScope.REGISTRY_READ,
     });
 
@@ -305,37 +305,37 @@ export class SchemaPublisher {
       latestComposableSchemaVersion,
     ] = await Promise.all([
       this.targetManager.getTarget({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
-        targetId: input.targetId,
+        organization: input.organization,
+        project: input.project,
+        target: input.target,
       }),
       this.projectManager.getProject({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
+        organization: input.organization,
+        project: input.project,
       }),
       this.organizationManager.getOrganization({
-        organizationId: input.organizationId,
+        organization: input.organization,
       }),
       this.schemaManager.getLatestSchemas({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
-        targetId: input.targetId,
+        organization: input.organization,
+        project: input.project,
+        target: input.target,
       }),
       this.schemaManager.getLatestSchemas({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
-        targetId: input.targetId,
+        organization: input.organization,
+        project: input.project,
+        target: input.target,
         onlyComposable: true,
       }),
       this.schemaManager.getMaybeLatestVersion({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
-        targetId: input.targetId,
+        organization: input.organization,
+        project: input.project,
+        target: input.target,
       }),
       this.schemaManager.getMaybeLatestValidVersion({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
-        targetId: input.targetId,
+        organization: input.organization,
+        project: input.project,
+        target: input.target,
       }),
     ]);
 
@@ -459,20 +459,20 @@ export class SchemaPublisher {
     }
 
     await this.schemaManager.completeGetStartedCheck({
-      organizationId: project.orgId,
+      organization: project.orgId,
       step: 'checkingSchema',
     });
 
     const baseSchema = await this.schemaManager.getBaseSchema({
-      organizationId: input.organizationId,
-      projectId: input.projectId,
-      targetId: input.targetId,
+      organization: input.organization,
+      project: input.project,
+      target: input.target,
     });
 
     const selector = {
-      organizationId: input.organizationId,
-      projectId: input.projectId,
-      targetId: input.targetId,
+      organization: input.organization,
+      project: input.project,
+      target: input.target,
     };
 
     const sdl = tryPrettifySDL(input.sdl);
@@ -616,7 +616,7 @@ export class SchemaPublisher {
         serviceName: input.service ?? null,
         meta: input.meta ?? null,
         targetId: target.id,
-        schemaVersionId: latestVersion?.versionId ?? null,
+        schemaVersionId: latestVersion?.version ?? null,
         isSuccess: false,
         breakingSchemaChanges: checkResult.state.schemaChanges?.breaking ?? null,
         safeSchemaChanges: checkResult.state.schemaChanges?.safe ?? null,
@@ -668,7 +668,7 @@ export class SchemaPublisher {
         serviceName: input.service ?? null,
         meta: input.meta ?? null,
         targetId: target.id,
-        schemaVersionId: latestVersion?.versionId ?? null,
+        schemaVersionId: latestVersion?.version ?? null,
         isSuccess: true,
         breakingSchemaChanges: checkResult.state?.schemaChanges?.breaking ?? null,
         safeSchemaChanges: checkResult.state?.schemaChanges?.safe ?? null,
@@ -996,9 +996,9 @@ export class SchemaPublisher {
 
   @traceFn('SchemaPublisher.publish', {
     initAttributes: (input, _) => ({
-      'hive.target.id': input.targetId,
-      'hive.organization.id': input.organizationId,
-      'hive.project.id': input.projectId,
+      'hive.target.id': input.target,
+      'hive.organization.id': input.organization,
+      'hive.project.id': input.project,
     }),
     resultAttributes: result => ({
       'hive.publish.result': result.__typename,
@@ -1007,25 +1007,25 @@ export class SchemaPublisher {
   async publish(input: PublishInput, signal: AbortSignal): Promise<PublishResult> {
     this.logger.debug(
       'Schema publication (organization=%s, project=%s, target=%s)',
-      input.organizationId,
-      input.projectId,
-      input.targetId,
+      input.organization,
+      input.project,
+      input.target,
     );
 
     this.logger.debug(
       'Compute hash (organization=%s, project=%s, target=%s)',
-      input.organizationId,
-      input.projectId,
-      input.targetId,
+      input.organization,
+      input.project,
+      input.target,
     );
 
     const token = this.authManager.ensureApiToken();
     const [contracts, latestVersion] = await Promise.all([
-      this.contracts.getActiveContractsByTargetId({ targetId: input.targetId }),
+      this.contracts.getActiveContractsByTargetId({ targetId: input.target }),
       this.schemaManager.getMaybeLatestVersion({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
-        targetId: input.targetId,
+        organization: input.organization,
+        project: input.project,
+        target: input.target,
       }),
     ]);
 
@@ -1033,9 +1033,9 @@ export class SchemaPublisher {
       .update(
         stringify({
           ...input,
-          organization: input.organizationId,
-          project: input.projectId,
-          target: input.targetId,
+          organization: input.organization,
+          project: input.project,
+          target: input.target,
           service: input.service?.toLowerCase(),
           contracts: contracts?.map(contract => ({
             contractId: contract.id,
@@ -1052,14 +1052,14 @@ export class SchemaPublisher {
 
     this.logger.debug(
       'Hash computation finished (organization=%s, project=%s, target=%s, hash=%s)',
-      input.organizationId,
-      input.projectId,
-      input.targetId,
+      input.organization,
+      input.project,
+      input.target,
     );
 
     return this.mutex
       .perform(
-        registryLockId(input.targetId),
+        registryLockId(input.target),
         {
           /**
            * The global request timeout is 60 seconds.
@@ -1075,9 +1075,9 @@ export class SchemaPublisher {
         },
         async () => {
           await this.authManager.ensureTargetAccess({
-            targetId: input.targetId,
-            projectId: input.projectId,
-            organizationId: input.organizationId,
+            target: input.target,
+            project: input.project,
+            organization: input.organization,
             scope: TargetAccessScope.REGISTRY_WRITE,
           });
           return this.distributedCache.wrap({
@@ -1103,7 +1103,7 @@ export class SchemaPublisher {
       });
   }
 
-  public async updateVersionStatus(input: TargetSelector & { versionId: string; valid: boolean }) {
+  public async updateVersionStatus(input: TargetSelector & { version: string; valid: boolean }) {
     const updateResult = await this.schemaManager.updateSchemaVersionStatus(input);
 
     if (updateResult.isComposable === true) {
@@ -1119,22 +1119,22 @@ export class SchemaPublisher {
         this.logger.info('Version is now promoted to latest valid (version=%s)', latestVersion.id);
         const [organization, project, target, schemas] = await Promise.all([
           this.organizationManager.getOrganization({
-            organizationId: input.organizationId,
+            organization: input.organization,
           }),
           this.projectManager.getProject({
-            organizationId: input.organizationId,
-            projectId: input.projectId,
+            organization: input.organization,
+            project: input.project,
           }),
           this.targetManager.getTarget({
-            organizationId: input.organizationId,
-            projectId: input.projectId,
-            targetId: input.targetId,
+            organization: input.organization,
+            project: input.project,
+            target: input.target,
           }),
           this.schemaManager.getSchemasOfVersion({
-            organizationId: input.organizationId,
-            projectId: input.projectId,
-            targetId: input.targetId,
-            versionId: latestVersion.id,
+            organization: input.organization,
+            project: input.project,
+            target: input.target,
+            version: latestVersion.id,
             includeMetadata: true,
           }),
         ]);
@@ -1173,8 +1173,8 @@ export class SchemaPublisher {
   @traceFn('SchemaPublisher.delete', {
     initAttributes: (input, _) => ({
       'hive.target.id': input.target.id,
-      'hive.organization.id': input.organizationId,
-      'hive.project.id': input.projectId,
+      'hive.organization.id': input.organization,
+      'hive.project.id': input.project,
     }),
     resultAttributes: result => ({
       'hive.delete.result': result.__typename,
@@ -1190,9 +1190,9 @@ export class SchemaPublisher {
       },
       async () => {
         await this.authManager.ensureTargetAccess({
-          organizationId: input.organizationId,
-          projectId: input.projectId,
-          targetId: input.target.id,
+          organization: input.organization,
+          project: input.project,
+          target: input.target.id,
           scope: TargetAccessScope.REGISTRY_WRITE,
         });
         const [
@@ -1205,37 +1205,37 @@ export class SchemaPublisher {
           latestComposableSchemaVersion,
         ] = await Promise.all([
           this.projectManager.getProject({
-            organizationId: input.organizationId,
-            projectId: input.projectId,
+            organization: input.organization,
+            project: input.project,
           }),
           this.organizationManager.getOrganization({
-            organizationId: input.organizationId,
+            organization: input.organization,
           }),
           this.schemaManager.getLatestSchemas({
-            organizationId: input.organizationId,
-            projectId: input.projectId,
-            targetId: input.target.id,
+            organization: input.organization,
+            project: input.project,
+            target: input.target.id,
           }),
           this.schemaManager.getLatestSchemas({
-            organizationId: input.organizationId,
-            projectId: input.projectId,
-            targetId: input.target.id,
+            organization: input.organization,
+            project: input.project,
+            target: input.target.id,
             onlyComposable: true,
           }),
           this.schemaManager.getBaseSchema({
-            organizationId: input.organizationId,
-            projectId: input.projectId,
-            targetId: input.target.id,
+            organization: input.organization,
+            project: input.project,
+            target: input.target.id,
           }),
           this.schemaManager.getMaybeLatestVersion({
-            organizationId: input.organizationId,
-            projectId: input.projectId,
-            targetId: input.target.id,
+            organization: input.organization,
+            project: input.project,
+            target: input.target.id,
           }),
           this.schemaManager.getMaybeLatestValidVersion({
-            organizationId: input.organizationId,
-            projectId: input.projectId,
-            targetId: input.target.id,
+            organization: input.organization,
+            project: input.project,
+            target: input.target.id,
           }),
         ]);
 
@@ -1289,9 +1289,9 @@ export class SchemaPublisher {
         const conditionalBreakingChangeConfiguration =
           await this.getConditionalBreakingChangeConfiguration({
             selector: {
-              targetId: input.target.id,
-              projectId: input.projectId,
-              organizationId: input.organizationId,
+              target: input.target.id,
+              project: input.project,
+              organization: input.organization,
             },
           });
 
@@ -1331,8 +1331,8 @@ export class SchemaPublisher {
           organization,
           selector: {
             target: input.target.id,
-            project: input.projectId,
-            organization: input.organizationId,
+            project: input.project,
+            organization: input.organization,
           },
           conditionalBreakingChangeDiffConfig:
             conditionalBreakingChangeConfiguration?.conditionalBreakingChangeDiffConfig ?? null,
@@ -1352,9 +1352,9 @@ export class SchemaPublisher {
           this.logger.debug('Delete accepted');
           if (input.dryRun !== true) {
             const schemaVersion = await this.storage.deleteSchema({
-              organizationId: input.organizationId,
-              projectId: input.projectId,
-              targetId: input.target.id,
+              organization: input.organization,
+              project: input.project,
+              target: input.target.id,
               serviceName: input.serviceName,
               composable: deleteResult.state.composable,
               diffSchemaVersionId,
@@ -1408,8 +1408,8 @@ export class SchemaPublisher {
               },
               conditionalBreakingChangeMetadata: await this.getConditionalBreakingChangeMetadata({
                 conditionalBreakingChangeConfiguration,
-                organizationId: input.organizationId,
-                projectId: input.projectId,
+                organizationId: input.organization,
+                projectId: input.project,
                 targetId: input.target.id,
               }),
             });
@@ -1490,11 +1490,7 @@ export class SchemaPublisher {
       checksum: string;
     },
   ) {
-    const [organizationId, projectId, targetId] = [
-      input.organizationId,
-      input.projectId,
-      input.targetId,
-    ];
+    const [organizationId, projectId, targetId] = [input.organization, input.project, input.target];
     this.logger.info('Publishing schema (input=%o)', {
       ...lodash.omit(input, ['sdl', 'organization', 'project', 'target', 'metadata']),
       organization: organizationId,
@@ -1517,42 +1513,42 @@ export class SchemaPublisher {
       latestComposableSchemaVersion,
     ] = await Promise.all([
       this.organizationManager.getOrganization({
-        organizationId: organizationId,
+        organization: organizationId,
       }),
       this.projectManager.getProject({
-        organizationId: organizationId,
-        projectId: projectId,
+        organization: organizationId,
+        project: projectId,
       }),
       this.targetManager.getTarget({
-        organizationId: organizationId,
-        projectId: projectId,
-        targetId: targetId,
+        organization: organizationId,
+        project: projectId,
+        target: targetId,
       }),
       this.schemaManager.getLatestSchemas({
-        organizationId: organizationId,
-        projectId: projectId,
-        targetId: targetId,
+        organization: organizationId,
+        project: projectId,
+        target: targetId,
       }),
       this.schemaManager.getLatestSchemas({
-        organizationId: organizationId,
-        projectId: projectId,
-        targetId: targetId,
+        organization: organizationId,
+        project: projectId,
+        target: targetId,
         onlyComposable: true,
       }),
       this.schemaManager.getBaseSchema({
-        organizationId: organizationId,
-        projectId: projectId,
-        targetId: targetId,
+        organization: organizationId,
+        project: projectId,
+        target: targetId,
       }),
       this.schemaManager.getMaybeLatestVersion({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
-        targetId: input.targetId,
+        organization: input.organization,
+        project: input.project,
+        target: input.target,
       }),
       this.schemaManager.getMaybeLatestValidVersion({
-        organizationId: input.organizationId,
-        projectId: input.projectId,
-        targetId: input.targetId,
+        organization: input.organization,
+        project: input.project,
+        target: input.target,
       }),
     ]);
 
@@ -1630,7 +1626,7 @@ export class SchemaPublisher {
     }
 
     await this.schemaManager.completeGetStartedCheck({
-      organizationId: project.orgId,
+      organization: project.orgId,
       step: 'publishingSchema',
     });
 
@@ -1639,9 +1635,9 @@ export class SchemaPublisher {
     const conditionalBreakingChangeConfiguration =
       await this.getConditionalBreakingChangeConfiguration({
         selector: {
-          organizationId: organization.id,
-          projectId: project.id,
-          targetId: target.id,
+          organization: organization.id,
+          project: project.id,
+          target: target.id,
         },
       });
 
@@ -1766,7 +1762,7 @@ export class SchemaPublisher {
               target: {
                 slug: target.slug,
               },
-              version: latestVersion ? { id: latestVersion.versionId } : undefined,
+              version: latestVersion ? { id: latestVersion.version } : undefined,
             })
           : null;
 
@@ -1895,9 +1891,9 @@ export class SchemaPublisher {
 
     const schemaVersion = await this.schemaManager.createVersion({
       valid: composable,
-      organizationId: organizationId,
-      projectId: project.id,
-      targetId: target.id,
+      organization: organizationId,
+      project: project.id,
+      target: target.id,
       commit: input.commit,
       logIds: schemaLogIds,
       service: input.service,
@@ -1934,7 +1930,7 @@ export class SchemaPublisher {
       changes,
       coordinatesDiff: publishResult.state.coordinatesDiff,
       diffSchemaVersionId,
-      previousSchemaVersion: latestVersion?.versionId ?? null,
+      previousSchemaVersion: latestVersion?.version ?? null,
       conditionalBreakingChangeMetadata: await this.getConditionalBreakingChangeMetadata({
         conditionalBreakingChangeConfiguration,
         organizationId,
@@ -2061,7 +2057,7 @@ export class SchemaPublisher {
         includeProjectName: args.project.useProjectNameInGithubCheck,
       }),
       sha: args.github.sha,
-      organizationId: args.project.orgId,
+      organization: args.project.orgId,
       repositoryOwner: args.github.owner,
       repositoryName: args.github.repository,
       output: {
@@ -2312,7 +2308,7 @@ export class SchemaPublisher {
     return await this.gitHubIntegrationManager.createCheckRun({
       name: 'GraphQL Hive - schema:publish',
       sha: args.github.sha,
-      organizationId: args.organizationId,
+      organization: args.organizationId,
       repositoryOwner: args.github.owner,
       repositoryName: args.github.repository,
       output: {

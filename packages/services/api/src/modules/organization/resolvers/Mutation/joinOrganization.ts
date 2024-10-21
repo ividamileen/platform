@@ -15,7 +15,7 @@ export const joinOrganization: NonNullable<MutationResolvers['joinOrganization']
   return {
     __typename: 'OrganizationPayload',
     selector: {
-      organizationSlug: organization.slug,
+      organization: organization.slug,
     },
     organization,
   };

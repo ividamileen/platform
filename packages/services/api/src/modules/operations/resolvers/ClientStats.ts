@@ -5,18 +5,18 @@ import type { ClientStatsResolvers } from './../../../__generated__/types.next';
 export const ClientStats: ClientStatsResolvers = {
   totalRequests: ({ organization, project, target, period, clientName }, _, { injector }) => {
     return injector.get(OperationsManager).countRequestsAndFailures({
-      organizationId: organization,
-      projectId: project,
-      targetId: target,
+      organization,
+      project,
+      target,
       period,
       clients: clientName === 'unknown' ? ['unknown', ''] : [clientName],
     });
   },
   totalVersions: ({ organization, project, target, period, clientName }, _, { injector }) => {
     return injector.get(OperationsManager).countClientVersions({
-      organizationId: organization,
-      projectId: project,
-      targetId: target,
+      organization,
+      project,
+      target,
       period,
       clientName,
     });
@@ -27,9 +27,9 @@ export const ClientStats: ClientStatsResolvers = {
     { injector },
   ) => {
     return injector.get(OperationsManager).readRequestsOverTime({
-      targetId: target,
-      projectId: project,
-      organizationId: organization,
+      target,
+      project,
+      organization,
       period,
       resolution,
       clients: clientName === 'unknown' ? ['unknown', ''] : [clientName],
@@ -39,16 +39,16 @@ export const ClientStats: ClientStatsResolvers = {
     const operationsManager = injector.get(OperationsManager);
     const [operations, durations] = await Promise.all([
       operationsManager.readOperationsStats({
-        organizationId: organization,
-        projectId: project,
-        targetId: target,
+        organization,
+        project,
+        target,
         period,
         clients: clientName === 'unknown' ? ['unknown', ''] : [clientName],
       }),
       operationsManager.readDetailedDurationPercentiles({
-        organizationId: organization,
-        projectId: project,
-        targetId: target,
+        organization,
+        project,
+        target,
         period,
         clients: clientName === 'unknown' ? ['unknown', ''] : [clientName],
       }),
@@ -71,9 +71,9 @@ export const ClientStats: ClientStatsResolvers = {
   },
   versions: ({ organization, project, target, period, clientName }, { limit }, { injector }) => {
     return injector.get(OperationsManager).readClientVersions({
-      targetId: target,
-      projectId: project,
-      organizationId: organization,
+      target,
+      project,
+      organization,
       period,
       clientName,
       limit,

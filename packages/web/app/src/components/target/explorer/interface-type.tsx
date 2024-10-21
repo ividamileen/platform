@@ -21,9 +21,9 @@ const GraphQLInterfaceTypeComponent_TypeFragment = graphql(`
 export function GraphQLInterfaceTypeComponent(props: {
   type: FragmentType<typeof GraphQLInterfaceTypeComponent_TypeFragment>;
   totalRequests?: number;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationCleanId: string;
+  projectCleanId: string;
+  targetCleanId: string;
   warnAboutUnusedArguments: boolean;
   warnAboutDeprecatedArguments: boolean;
   styleDeprecated: boolean;
@@ -36,17 +36,17 @@ export function GraphQLInterfaceTypeComponent(props: {
       description={ttype.description}
       implements={ttype.interfaces}
       supergraphMetadata={ttype.supergraphMetadata}
-      targetSlug={props.targetSlug}
-      projectSlug={props.projectSlug}
-      organizationSlug={props.organizationSlug}
+      targetCleanId={props.targetCleanId}
+      projectCleanId={props.projectCleanId}
+      organizationCleanId={props.organizationCleanId}
     >
       <GraphQLFields
         typeName={ttype.name}
         fields={ttype.fields}
         totalRequests={props.totalRequests}
-        targetSlug={props.targetSlug}
-        projectSlug={props.projectSlug}
-        organizationSlug={props.organizationSlug}
+        targetCleanId={props.targetCleanId}
+        projectCleanId={props.projectCleanId}
+        organizationCleanId={props.organizationCleanId}
         warnAboutDeprecatedArguments={props.warnAboutDeprecatedArguments}
         warnAboutUnusedArguments={props.warnAboutUnusedArguments}
         styleDeprecated={props.styleDeprecated}

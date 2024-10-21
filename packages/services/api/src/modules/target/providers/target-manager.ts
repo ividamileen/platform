@@ -38,8 +38,8 @@ export class TargetManager {
 
   async createTarget({
     slug,
-    projectId: project,
-    organizationId: organization,
+    project,
+    organization,
   }: {
     slug: string;
   } & ProjectSelector): Promise<
@@ -59,8 +59,8 @@ export class TargetManager {
       organization,
     );
     await this.authManager.ensureProjectAccess({
-      projectId: project,
-      organizationId: organization,
+      project,
+      organization,
       scope: ProjectAccessScope.READ,
     });
 
@@ -74,17 +74,17 @@ export class TargetManager {
     // create target
     const result = await this.storage.createTarget({
       slug,
-      projectId: project,
-      organizationId: organization,
+      project,
+      organization,
     });
 
     if (result.ok) {
       await this.activityManager.create({
         type: 'TARGET_CREATED',
         selector: {
-          organizationId: organization,
-          projectId: project,
-          targetId: result.target.id,
+          organization,
+          project,
+          target: result.target.id,
         },
       });
     }
@@ -92,11 +92,7 @@ export class TargetManager {
     return result;
   }
 
-  async deleteTarget({
-    organizationId: organization,
-    projectId: project,
-    targetId: target,
-  }: TargetSelector): Promise<Target> {
+  async deleteTarget({ organization, project, target }: TargetSelector): Promise<Target> {
     this.logger.info(
       'Deleting a target (target=%s, project=%s, organization=%s)',
       target,
@@ -104,24 +100,24 @@ export class TargetManager {
       organization,
     );
     await this.authManager.ensureTargetAccess({
-      projectId: project,
-      organizationId: organization,
-      targetId: target,
+      project,
+      organization,
+      target,
       scope: TargetAccessScope.DELETE,
     });
 
     const deletedTarget = await this.storage.deleteTarget({
-      targetId: target,
-      projectId: project,
-      organizationId: organization,
+      target,
+      project,
+      organization,
     });
     await this.tokenStorage.invalidateTokens(deletedTarget.tokens);
 
     await this.activityManager.create({
       type: 'TARGET_DELETED',
       selector: {
-        organizationId: organization,
-        projectId: project,
+        organization,
+        project,
       },
       meta: {
         name: deletedTarget.name,
@@ -164,16 +160,16 @@ export class TargetManager {
     });
 
     await this.authManager.ensureTargetAccess({
-      organizationId: organization,
-      projectId: project,
-      targetId: target,
+      organization,
+      project,
+      target,
       scope: TargetAccessScope.READ,
     });
 
     return this.storage.getTarget({
-      organizationId: organization,
-      projectId: project,
-      targetId: target,
+      organization,
+      project,
+      target,
     });
   });
 
@@ -199,7 +195,7 @@ export class TargetManager {
     });
 
     await this.storage.completeGetStartedStep({
-      organizationId: input.organizationId,
+      organization: input.organization,
       step: 'enablingUsageBasedBreakingChanges',
     });
 
@@ -236,7 +232,7 @@ export class TargetManager {
         message: string;
       }
   > {
-    const { slug, organizationId: organization, projectId: project, targetId: target } = input;
+    const { slug, organization, project, target } = input;
     this.logger.info('Updating a target slug (input=%o)', input);
     await this.authManager.ensureTargetAccess({
       ...input,
@@ -253,19 +249,19 @@ export class TargetManager {
 
     const result = await this.storage.updateTargetSlug({
       slug,
-      organizationId: organization,
-      projectId: project,
-      targetId: target,
-      userId: user.id,
+      organization,
+      project,
+      target,
+      user: user.id,
     });
 
     if (result.ok) {
       await this.activityManager.create({
         type: 'TARGET_ID_UPDATED',
         selector: {
-          organizationId: organization,
-          projectId: project,
-          targetId: target,
+          organization,
+          project,
+          target,
         },
         meta: {
           value: slug,
@@ -283,9 +279,9 @@ export class TargetManager {
     graphqlEndpointUrl: string | null;
   }) {
     await this.authManager.ensureTargetAccess({
-      organizationId: args.organizationId,
-      projectId: args.projectId,
-      targetId: args.targetId,
+      organization: args.organizationId,
+      project: args.projectId,
+      target: args.targetId,
       scope: TargetAccessScope.SETTINGS,
     });
 
@@ -332,9 +328,9 @@ export class TargetManager {
     ]);
 
     return this.storage.getTarget({
-      organizationId: organizationId,
-      projectId: projectId,
-      targetId: args.targetId,
+      organization: organizationId,
+      project: projectId,
+      target: args.targetId,
     });
   }
 
@@ -348,9 +344,9 @@ export class TargetManager {
     nativeComposition: boolean;
   }) {
     await this.authManager.ensureTargetAccess({
-      organizationId: args.organizationId,
-      projectId: args.projectId,
-      targetId: args.targetId,
+      organization: args.organizationId,
+      project: args.projectId,
+      target: args.targetId,
       scope: TargetAccessScope.SETTINGS,
     });
 

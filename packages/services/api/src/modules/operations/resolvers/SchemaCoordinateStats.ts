@@ -5,9 +5,9 @@ import type { SchemaCoordinateStatsResolvers } from './../../../__generated__/ty
 export const SchemaCoordinateStats: SchemaCoordinateStatsResolvers = {
   totalRequests: ({ organization, project, target, period, schemaCoordinate }, _, { injector }) => {
     return injector.get(OperationsManager).countRequestsWithSchemaCoordinate({
-      organizationId: organization,
-      projectId: project,
-      targetId: target,
+      organization,
+      project,
+      target,
       period,
       schemaCoordinate,
     });
@@ -18,9 +18,9 @@ export const SchemaCoordinateStats: SchemaCoordinateStatsResolvers = {
     { injector },
   ) => {
     return injector.get(OperationsManager).readRequestsOverTime({
-      targetId: target,
-      projectId: project,
-      organizationId: organization,
+      target,
+      project,
+      organization,
       period,
       resolution,
       schemaCoordinate,
@@ -34,16 +34,16 @@ export const SchemaCoordinateStats: SchemaCoordinateStatsResolvers = {
     const operationsManager = injector.get(OperationsManager);
     const [operations, durations] = await Promise.all([
       operationsManager.readOperationsStats({
-        organizationId: organization,
-        projectId: project,
-        targetId: target,
+        organization,
+        project,
+        target,
         period,
         schemaCoordinate,
       }),
       operationsManager.readDetailedDurationPercentiles({
-        organizationId: organization,
-        projectId: project,
-        targetId: target,
+        organization,
+        project,
+        target,
         period,
         schemaCoordinate,
       }),
@@ -66,9 +66,9 @@ export const SchemaCoordinateStats: SchemaCoordinateStatsResolvers = {
   },
   clients: ({ organization, project, target, period, schemaCoordinate }, _, { injector }) => {
     return injector.get(OperationsManager).readUniqueClients({
-      targetId: target,
-      projectId: project,
-      organizationId: organization,
+      target,
+      project,
+      organization,
       period,
       schemaCoordinate,
     });

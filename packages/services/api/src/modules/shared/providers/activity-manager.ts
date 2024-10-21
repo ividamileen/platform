@@ -27,10 +27,10 @@ export class ActivityManager {
       const user = activity.user ? activity.user.id : (await this.authManager.getCurrentUser()).id;
 
       await this.storage.createActivity({
-        organizationId: activity.selector.organizationId,
-        projectId: 'projectId' in activity.selector ? activity.selector.projectId : undefined,
-        targetId: 'targetId' in activity.selector ? activity.selector.targetId : undefined,
-        userId: user,
+        organization: activity.selector.organization,
+        project: 'project' in activity.selector ? activity.selector.project : undefined,
+        target: 'target' in activity.selector ? activity.selector.target : undefined,
+        user,
         type: activity.type,
         meta: 'meta' in activity ? activity.meta : {},
       });
@@ -54,25 +54,25 @@ interface BaseActivity {
 }
 
 interface UserSelector {
-  userId: string;
+  user: string;
 }
 
 interface OrganizationSelector {
-  organizationId: string;
+  organization: string;
 }
 
 interface ProjectSelector extends OrganizationSelector {
-  projectId: string;
+  project: string;
 }
 
 interface PersistedOperationSelector extends ProjectSelector {
-  organizationId: string;
-  projectId: string;
+  organization: string;
+  project: string;
   operation: string;
 }
 
 interface TargetSelector extends ProjectSelector {
-  targetId: string;
+  target: string;
 }
 
 interface OrganizationCreatedActivity extends BaseActivity {

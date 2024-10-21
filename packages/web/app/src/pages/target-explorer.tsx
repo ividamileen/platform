@@ -39,9 +39,9 @@ const ExplorerPage_SchemaExplorerFragment = graphql(`
 function SchemaView(props: {
   explorer: FragmentType<typeof ExplorerPage_SchemaExplorerFragment>;
   totalRequests: number;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationCleanId: string;
+  projectCleanId: string;
+  targetCleanId: string;
 }) {
   const { query, mutation, subscription } = useFragment(
     ExplorerPage_SchemaExplorerFragment,
@@ -56,9 +56,9 @@ function SchemaView(props: {
           type={query}
           totalRequests={totalRequests}
           collapsed
-          targetSlug={props.targetSlug}
-          projectSlug={props.projectSlug}
-          organizationSlug={props.organizationSlug}
+          targetCleanId={props.targetCleanId}
+          projectCleanId={props.projectCleanId}
+          organizationCleanId={props.organizationCleanId}
           warnAboutDeprecatedArguments={false}
           warnAboutUnusedArguments={false}
           styleDeprecated
@@ -69,9 +69,9 @@ function SchemaView(props: {
           type={mutation}
           totalRequests={totalRequests}
           collapsed
-          targetSlug={props.targetSlug}
-          projectSlug={props.projectSlug}
-          organizationSlug={props.organizationSlug}
+          targetCleanId={props.targetCleanId}
+          projectCleanId={props.projectCleanId}
+          organizationCleanId={props.organizationCleanId}
           warnAboutDeprecatedArguments={false}
           warnAboutUnusedArguments={false}
           styleDeprecated
@@ -82,9 +82,9 @@ function SchemaView(props: {
           type={subscription}
           totalRequests={totalRequests}
           collapsed
-          targetSlug={props.targetSlug}
-          projectSlug={props.projectSlug}
-          organizationSlug={props.organizationSlug}
+          targetCleanId={props.targetCleanId}
+          projectCleanId={props.projectCleanId}
+          organizationCleanId={props.organizationCleanId}
           warnAboutDeprecatedArguments={false}
           warnAboutUnusedArguments={false}
           styleDeprecated
@@ -96,12 +96,12 @@ function SchemaView(props: {
 
 const TargetExplorerPageQuery = graphql(`
   query TargetExplorerPageQuery(
-    $organizationSlug: String!
-    $projectSlug: String!
-    $targetSlug: String!
+    $organizationId: ID!
+    $projectId: ID!
+    $targetId: ID!
     $period: DateRangeInput!
   ) {
-    organization(selector: { organizationSlug: $organizationSlug }) {
+    organization(selector: { organization: $organizationId }) {
       organization {
         id
         rateLimit {
@@ -110,13 +110,7 @@ const TargetExplorerPageQuery = graphql(`
         slug
       }
     }
-    target(
-      selector: {
-        organizationSlug: $organizationSlug
-        projectSlug: $projectSlug
-        targetSlug: $targetSlug
-      }
-    ) {
+    target(selector: { organization: $organizationId, project: $projectId, target: $targetId }) {
       id
       slug
       latestSchemaVersion {
@@ -133,9 +127,9 @@ const TargetExplorerPageQuery = graphql(`
     }
     operationsStats(
       selector: {
-        organizationSlug: $organizationSlug
-        projectSlug: $projectSlug
-        targetSlug: $targetSlug
+        organization: $organizationId
+        project: $projectId
+        target: $targetId
         period: $period
       }
     ) {
@@ -145,18 +139,18 @@ const TargetExplorerPageQuery = graphql(`
 `);
 
 function ExplorerPageContent(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   const { resolvedPeriod, dataRetentionInDays, setDataRetentionInDays } =
     useSchemaExplorerContext();
   const [query] = useQuery({
     query: TargetExplorerPageQuery,
     variables: {
-      organizationSlug: props.organizationSlug,
-      projectSlug: props.projectSlug,
-      targetSlug: props.targetSlug,
+      organizationId: props.organizationId,
+      projectId: props.projectId,
+      targetId: props.targetId,
       period: resolvedPeriod,
     },
   });
@@ -174,7 +168,7 @@ function ExplorerPageContent(props: {
   const isFilterVisible = useRef(false);
 
   if (query.error) {
-    return <QueryError organizationSlug={props.organizationSlug} error={query.error} />;
+    return <QueryError organizationId={props.organizationId} error={query.error} />;
   }
 
   const currentTarget = query.data?.target;
@@ -187,9 +181,9 @@ function ExplorerPageContent(props: {
 
   return (
     <TargetLayout
-      organizationSlug={props.organizationSlug}
-      projectSlug={props.projectSlug}
-      targetSlug={props.targetSlug}
+      organizationId={props.organizationId}
+      projectId={props.projectId}
+      targetId={props.targetId}
       page={Page.Explorer}
     >
       <div className="flex flex-row items-center justify-between py-6">
@@ -201,18 +195,18 @@ function ExplorerPageContent(props: {
           {isFilterVisible.current && (
             <>
               <TypeFilter
-                organizationSlug={props.organizationSlug}
-                projectSlug={props.projectSlug}
-                targetSlug={props.targetSlug}
+                organizationId={props.organizationId}
+                projectId={props.projectId}
+                targetId={props.targetId}
                 period={resolvedPeriod}
               />
               <FieldByNameFilter />
               <DateRangeFilter />
               <ArgumentVisibilityFilter />
               <SchemaVariantFilter
-                organizationSlug={props.organizationSlug}
-                projectSlug={props.projectSlug}
-                targetSlug={props.targetSlug}
+                organizationId={props.organizationId}
+                projectId={props.projectId}
+                targetId={props.targetId}
                 variant="all"
               />
             </>
@@ -236,11 +230,11 @@ function ExplorerPageContent(props: {
                     <br />
                     <br />
                     <Link
-                      to="/$organizationSlug/$projectSlug/$targetSlug/history/$versionId"
+                      to="/$organizationId/$projectId/$targetId/history/$versionId"
                       params={{
-                        organizationSlug: props.organizationSlug,
-                        projectSlug: props.projectSlug,
-                        targetSlug: props.targetSlug,
+                        organizationId: props.organizationId,
+                        projectId: props.projectId,
+                        targetId: props.targetId,
                         versionId: latestSchemaVersion.id,
                       }}
                     >
@@ -252,9 +246,9 @@ function ExplorerPageContent(props: {
               <SchemaView
                 totalRequests={query.data?.operationsStats.totalRequests ?? 0}
                 explorer={latestValidSchemaVersion.explorer}
-                organizationSlug={props.organizationSlug}
-                projectSlug={props.projectSlug}
-                targetSlug={props.targetSlug}
+                organizationCleanId={props.organizationId}
+                projectCleanId={props.projectId}
+                targetCleanId={props.targetId}
               />
             </>
           ) : latestSchemaVersion ? (
@@ -269,9 +263,9 @@ function ExplorerPageContent(props: {
 }
 
 export function TargetExplorerPage(props: {
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   return (
     <>

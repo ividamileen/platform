@@ -41,9 +41,9 @@ export function DeleteCollectionModal(props: {
   isOpen: boolean;
   toggleModalOpen: () => void;
   collectionId: string;
-  organizationSlug: string;
-  projectSlug: string;
-  targetSlug: string;
+  organizationId: string;
+  projectId: string;
+  targetId: string;
 }) {
   const { toast } = useToast();
   const { isOpen, toggleModalOpen, collectionId } = props;
@@ -53,9 +53,9 @@ export function DeleteCollectionModal(props: {
     const { error } = await mutate({
       id: collectionId,
       selector: {
-        targetSlug: props.targetSlug,
-        organizationSlug: props.organizationSlug,
-        projectSlug: props.projectSlug,
+        target: props.targetId,
+        organization: props.organizationId,
+        project: props.projectId,
       },
     });
     toggleModalOpen();
