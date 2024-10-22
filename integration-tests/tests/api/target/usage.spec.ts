@@ -159,58 +159,58 @@ test.concurrent(
       organizationScopes: [OrganizationAccessScope.Read],
     });
 
-    const raw_document = `
-    query outfit {
-      recommendations(
-        input: {
-          strategies: [{ name: "asd" }]
-          articleId: "asd"
-          customerId: "asd"
-          phoenixEnabled: true
-          sessionId: "asd"
-        }
-      ) {
-        ... on RecommendationResponse {
-          frequentlyBoughtTogether {
-            recommendedProducts {
-              id
+    const raw_document = /*GraphQL*/ `
+      query outfit {
+        recommendations(
+          input: {
+            strategies: [{ name: "asd" }]
+            articleId: "asd"
+            customerId: "asd"
+            phoenixEnabled: true
+            sessionId: "asd"
+          }
+        ) {
+          ... on RecommendationResponse {
+            frequentlyBoughtTogether {
+              recommendedProducts {
+                id
+              }
+              strategyMessage
             }
-            strategyMessage
-          }
-          outfit {
-            strategyMessage
-          }
-          outfit {
-            recommendedProducts {
-              articleId
-              id
-              imageUrl
-              name
-              productUrl
-              rating
-              tCode
+            outfit {
+              strategyMessage
             }
-            strategyMessage
-          }
-          similar {
-            recommendedProducts {
-              articleId
-              id
-              imageUrl
-              name
-              productUrl
-              rating
-              tCode
+            outfit {
+              recommendedProducts {
+                articleId
+                id
+                imageUrl
+                name
+                productUrl
+                rating
+                tCode
+              }
+              strategyMessage
             }
-            strategyMessage
-          }
-          visualSearch {
-            strategyMessage
+            similar {
+              recommendedProducts {
+                articleId
+                id
+                imageUrl
+                name
+                productUrl
+                rating
+                tCode
+              }
+              strategyMessage
+            }
+            visualSearch {
+              strategyMessage
+            }
           }
         }
       }
-    }
-  `;
+    `;
 
     const normalized_document = normalizeOperation({
       document: parse(raw_document),

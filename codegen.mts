@@ -242,8 +242,11 @@ const config: CodegenConfig = {
       plugins: ['typescript', 'typescript-operations'],
     },
     // Integration tests
-    './integration-tests/testkit/gql/': {
-      documents: ['./integration-tests/(testkit|tests)/**/*.ts'],
+    'integration-tests/testkit/gql/': {
+      documents: [
+        'integration-tests/(testkit|tests)/**/*.ts',
+        '!integration-tests/tests/api/target/usage.spec.ts',
+      ],
       preset: 'client',
       plugins: [],
       config: {
