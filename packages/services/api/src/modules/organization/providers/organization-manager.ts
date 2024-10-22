@@ -21,6 +21,7 @@ import {
   organizationViewerScopes,
   reservedOrganizationSlugs,
 } from './organization-config';
+import { AuditLogManager } from '../../audit-logs/providers/audit-logs-manager';
 
 function ensureReadAccess(
   scopes: readonly (OrganizationAccessScope | ProjectAccessScope | TargetAccessScope)[],
@@ -60,6 +61,7 @@ export class OrganizationManager {
     logger: Logger,
     private storage: Storage,
     private authManager: AuthManager,
+    private auditLogManager: AuditLogManager,
     private tokenStorage: TokenStorage,
     private activityManager: ActivityManager,
     private billingProvider: BillingProvider,
@@ -167,12 +169,12 @@ export class OrganizationManager {
 
   async leaveOrganization(organizationId: string): Promise<
     | {
-        ok: true;
-      }
+      ok: true;
+    }
     | {
-        ok: false;
-        message: string;
-      }
+      ok: false;
+      message: string;
+    }
   > {
     this.logger.debug('Leaving organization (organization=%s)', organizationId);
     const user = await this.authManager.getCurrentUser();
@@ -310,7 +312,25 @@ export class OrganizationManager {
         },
         user,
       });
+
+      const currentUser = await this.authManager.getCurrentUser();
+      this.auditLogManager.createLogAuditEvent(
+        {
+          eventType: 'ORGANIZATION_CREATED',
+          organizationCreatedAuditLogSchema: {
+            organizationId: result.organization.id,
+            organizationName: result.organization.name,
+          }
+        },
+        {
+          organizationId: result.organization.id,
+          userEmail: currentUser.email,
+          userId: currentUser.id,
+          user: currentUser,
+        },
+      );
     }
+
 
     return result;
   }
@@ -334,6 +354,23 @@ export class OrganizationManager {
 
     // Because we checked the access before, it's stale by now
     this.authManager.resetAccessCache();
+
+
+    const currentUser = await this.authManager.getCurrentUser();
+    this.auditLogManager.createLogAuditEvent(
+      {
+        eventType: 'ORGANIZATION_DELETED',
+        organizationDeletedAuditLogSchema: {
+          organizationId: organization.id,
+        },
+      },
+      {
+        organizationId: organization.id,
+        userEmail: currentUser.email,
+        userId: currentUser.id,
+        user: currentUser,
+      },
+    );
 
     return deletedOrganization;
   }
@@ -398,6 +435,27 @@ export class OrganizationManager {
         },
       });
     }
+
+    const currentUser = await this.authManager.getCurrentUser();
+    this.auditLogManager.createLogAuditEvent(
+      {
+        eventType: 'SUBSCRIPTION_UPDATED',
+        subscriptionUpdatedAuditLogSchema: {
+          updatedFields: JSON.stringify({
+            monthlyRateLimit: {
+              retentionInDays: monthlyRateLimit.retentionInDays,
+              operations: monthlyRateLimit.operations,
+            },
+          }),
+        },
+      },
+      {
+        organizationId: organization.id,
+        userEmail: currentUser.email,
+        userId: currentUser.id,
+        user: currentUser,
+      },
+    );
 
     return result;
   }
@@ -491,12 +549,12 @@ export class OrganizationManager {
 
     const role = input.role
       ? await this.storage.getOrganizationMemberRole({
-          organizationId: organization.id,
-          roleId: input.role,
-        })
+        organizationId: organization.id,
+        roleId: input.role,
+      })
       : await this.storage.getViewerOrganizationMemberRole({
-          organizationId: organization.id,
-        });
+        organizationId: organization.id,
+      });
     if (!role) {
       throw new HiveError(`Role not found`);
     }
@@ -947,6 +1005,22 @@ export class OrganizationManager {
       scopes,
     });
 
+    this.auditLogManager.createLogAuditEvent(
+      {
+        eventType: 'ROLE_CREATED',
+        roleCreatedAuditLogSchema: {
+          roleId: role.id,
+          roleName: role.name,
+        },
+      },
+      {
+        organizationId: input.organizationId,
+        userEmail: currentUser.email,
+        userId: currentUser.id,
+        user: currentUser,
+      },
+    );
+
     return {
       ok: {
         updatedOrganization: await this.storage.getOrganization({
@@ -1288,12 +1362,12 @@ export class OrganizationManager {
     )[],
   ): Promise<
     | {
-        ok: false;
-        message: string;
-      }
+      ok: false;
+      message: string;
+    }
     | {
-        ok: true;
-      }
+      ok: true;
+    }
   > {
     // Ensure role is not locked (can't be deleted)
     if (role.locked) {
@@ -1354,12 +1428,12 @@ export class OrganizationManager {
     )[],
   ):
     | {
-        ok: false;
-        message: string;
-      }
+      ok: false;
+      message: string;
+    }
     | {
-        ok: true;
-      } {
+      ok: true;
+    } {
     // Ensure role is not locked (can't be updated)
     if (role.locked) {
       return {
@@ -1397,12 +1471,12 @@ export class OrganizationManager {
     )[],
   ):
     | {
-        ok: false;
-        message: string;
-      }
+      ok: false;
+      message: string;
+    }
     | {
-        ok: true;
-      } {
+      ok: true;
+    } {
     // Ensure user has access to all scopes in the role
     const currentUserMissingScopes = role.scopes.filter(
       scope => !currentUserScopes.includes(scope),

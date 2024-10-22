@@ -1,4 +1,3 @@
-import { AuditLogManager } from '../../../audit-logs/providers/audit-logs-manager';
 import { AuthManager } from '../../../auth/providers/auth-manager';
 import { OrganizationManager } from '../../providers/organization-manager';
 import { OrganizationSlugModel } from '../../validation';
@@ -28,22 +27,6 @@ export const createOrganization: NonNullable<MutationResolvers['createOrganizati
   });
 
   if (result.ok) {
-    injector.get(AuditLogManager).createLogAuditEvent(
-      {
-        eventType: 'ORGANIZATION_CREATED',
-        organizationCreatedAuditLogSchema: {
-          organizationId: result.organization.id,
-          organizationName: result.organization.name,
-        },
-      },
-      {
-        organizationId: result.organization.id,
-        userEmail: user.email,
-        userId: user.id,
-        user: user,
-      },
-    );
-
     return {
       ok: {
         createdOrganizationPayload: {

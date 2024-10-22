@@ -7,27 +7,32 @@ import { Logger } from '../../shared/providers/logger';
 import { Storage } from '../../shared/providers/storage';
 import type { BillingConfig } from './tokens';
 import { BILLING_CONFIG } from './tokens';
+import { AuthManager } from '../../auth/providers/auth-manager';
+import { AuditLogManager } from '../../audit-logs/providers/audit-logs-manager';
 
 @Injectable({
   global: true,
-  scope: Scope.Singleton,
+  scope: Scope.Operation,
 })
 export class BillingProvider {
   private logger: Logger;
   private billingService;
 
+
   enabled = false;
 
   constructor(
     logger: Logger,
+    private authManager: AuthManager,
+    private auditLogManager: AuditLogManager,
     private storage: Storage,
     @Inject(BILLING_CONFIG) billingConfig: BillingConfig,
   ) {
     this.logger = logger.child({ source: 'BillingProvider' });
     this.billingService = billingConfig.endpoint
       ? createTRPCProxyClient<StripeBillingApi>({
-          links: [httpLink({ url: `${billingConfig.endpoint}/trpc`, fetch })],
-        })
+        links: [httpLink({ url: `${billingConfig.endpoint}/trpc`, fetch })],
+      })
       : null;
 
     if (billingConfig.endpoint) {
@@ -103,6 +108,23 @@ export class BillingProvider {
     if (!this.billingService) {
       throw new Error(`Billing service is not configured!`);
     }
+
+    const currentUser = await this.authManager.getCurrentUser();
+    this.auditLogManager.createLogAuditEvent(
+      {
+        eventType: 'SUBSCRIPTION_CANCELED',
+        subscriptionCanceledAuditLogSchema: {
+          newPlan: 'HOBBY',
+          previousPlan: 'PRO',
+        }
+      },
+      {
+        organizationId: input.organizationId,
+        userEmail: currentUser.email,
+        userId: currentUser.id,
+        user: currentUser,
+      },
+    );
 
     return await this.billingService.cancelSubscriptionForOrganization.mutate(input);
   }

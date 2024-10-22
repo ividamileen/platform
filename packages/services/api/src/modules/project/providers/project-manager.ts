@@ -8,6 +8,7 @@ import { ActivityManager } from '../../shared/providers/activity-manager';
 import { Logger } from '../../shared/providers/logger';
 import { OrganizationSelector, ProjectSelector, Storage } from '../../shared/providers/storage';
 import { TokenStorage } from '../../token/providers/token-storage';
+import { AuditLogManager } from '../../audit-logs/providers/audit-logs-manager';
 
 const reservedSlugs = ['view', 'new'];
 
@@ -28,6 +29,7 @@ export class ProjectManager {
     private authManager: AuthManager,
     private tokenStorage: TokenStorage,
     private activityManager: ActivityManager,
+    private auditLogManager: AuditLogManager,
   ) {
     this.logger = logger.child({ source: 'ProjectManager' });
   }
@@ -60,7 +62,9 @@ export class ProjectManager {
       organization,
     });
 
+
     if (result.ok) {
+      const currentUser = await this.authManager.getCurrentUser();
       await Promise.all([
         this.storage.completeGetStartedStep({
           organization,
@@ -76,6 +80,22 @@ export class ProjectManager {
             projectType: type,
           },
         }),
+        this.auditLogManager.createLogAuditEvent(
+          {
+            eventType: 'PROJECT_CREATED',
+            projectCreatedAuditLogSchema: {
+              projectId: result.project.id,
+              projectType: type,
+              projectName: result.project.name,
+            }
+          },
+          {
+            user: currentUser,
+            organizationId: organization,
+            userId: currentUser.id,
+            userEmail: currentUser.email,
+          }
+        )
       ]);
     }
 
@@ -94,6 +114,23 @@ export class ProjectManager {
       project,
       organization,
     });
+    const currentUser = await this.authManager.getCurrentUser();
+    this.auditLogManager.createLogAuditEvent(
+      {
+        eventType: 'PROJECT_DELETED',
+        projectDeletedAuditLogSchema: {
+          projectId: deletedProject.id,
+          projectName: deletedProject.name
+        }
+      },
+      {
+        user: currentUser,
+        organizationId: organization,
+        userId: currentUser.id,
+        userEmail: currentUser.email,
+      }
+    )
+
 
     await this.tokenStorage.invalidateTokens(deletedProject.tokens);
 
@@ -142,13 +179,13 @@ export class ProjectManager {
     } & ProjectSelector,
   ): Promise<
     | {
-        ok: true;
-        project: Project;
-      }
+      ok: true;
+      project: Project;
+    }
     | {
-        ok: false;
-        message: string;
-      }
+      ok: false;
+      message: string;
+    }
   > {
     const { slug, organization, project } = input;
     this.logger.info('Updating a project slug (input=%o)', input);

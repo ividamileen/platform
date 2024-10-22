@@ -24,22 +24,6 @@ export const deleteProject: NonNullable<MutationResolvers['deleteProject']> = as
     project: projectId,
   });
 
-  const currentUser = await injector.get(AuthManager).getCurrentUser();
-  injector.get(AuditLogManager).createLogAuditEvent(
-    {
-      eventType: 'PROJECT_DELETED',
-      projectDeletedAuditLogSchema: {
-        projectId: projectId,
-        projectName: deletedProject.name,
-      },
-    },
-    {
-      organizationId: organizationId,
-      userEmail: currentUser.email,
-      userId: currentUser.id,
-      user: currentUser,
-    },
-  );
 
   return {
     selector: {

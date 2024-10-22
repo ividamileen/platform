@@ -78,24 +78,6 @@ export const createProject: NonNullable<MutationResolvers['createProject']> = as
     }),
   ]);
 
-  const currentUser = await injector.get(AuthManager).getCurrentUser();
-  injector.get(AuditLogManager).createLogAuditEvent(
-    {
-      eventType: 'PROJECT_CREATED',
-      projectCreatedAuditLogSchema: {
-        projectId: result.project.id,
-        projectType: result.project.type,
-        projectName: result.project.name,
-      },
-    },
-    {
-      organizationId: organization.id,
-      userEmail: currentUser.email,
-      userId: currentUser.id,
-      user: currentUser,
-    },
-  );
-
   const logger = injector.get(Logger);
   const targets: Target[] = [];
   for (const result of targetResults) {
