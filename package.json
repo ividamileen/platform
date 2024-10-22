@@ -98,6 +98,9 @@
     "vitest": "2.0.5"
   },
   "pnpm": {
+    "overrides": {
+      "csstype": "3.1.1"
+    },
     "patchedDependencies": {
       "@theguild/buddy@0.1.0": "patches/@theguild__buddy@0.1.0.patch",
       "mjml-core@4.14.0": "patches/mjml-core@4.14.0.patch",
