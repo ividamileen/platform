@@ -17,7 +17,9 @@ export const AUDIT_LOG_CLICKHOUSE_OBJECT = z.object({
   user_email: z.string(),
   organization_id: z.string(),
   event_action: z.enum(auditLogEventTypes as [string, ...string[]]),
-  metadata: z.string().transform(x => JSON.parse(x)),
+  metadata:
+    z.string().transform(x => auditLogSchema.parse(JSON.parse(x))) &&
+    z.string().transform(x => JSON.parse(x)),
 });
 
 export type AuditLogType = z.infer<typeof AUDIT_LOG_CLICKHOUSE_OBJECT>;
@@ -116,8 +118,7 @@ export class AuditLogManager {
     if (!props.selector.organization) {
       throw new Error('Organization ID is required');
     }
-    console.log('props.pagination.limit', props.pagination.limit);
-    console.log('props.pagination.offset', props.pagination.offset);
+
     const sqlLimit = sql.raw(props.pagination.limit.toString());
     const sqlOffset = sql.raw(props.pagination.offset.toString());
 
@@ -169,6 +170,7 @@ export class AuditLogManager {
     const currentOrganization = await injector.get(OrganizationManager).getOrganization({
       organization: event.organization_id,
     });
+    console.log('event', event);
     return {
       userEmail: event.user_email,
       userId: event.user_id,
