@@ -159,7 +159,7 @@ test.concurrent(
       organizationScopes: [OrganizationAccessScope.Read],
     });
 
-    const raw_document = /*GraphQL*/ `
+    const raw_document = `
       query outfit {
         recommendations(
           input: {
@@ -2567,11 +2567,7 @@ test.concurrent(
 
     client.collectSubscriptionUsage({
       args: {
-        document: parse(/* GraphQL */ `
-          subscription {
-            a
-          }
-        `),
+        document: parse('subscription { a }'),
         schema,
         contextValue: {
           request,
@@ -2653,11 +2649,7 @@ test.concurrent(
 
     client.collectUsage()(
       {
-        document: parse(/* GraphQL */ `
-          query {
-            a
-          }
-        `),
+        document: parse('{ a }'),
         schema,
         contextValue: {
           request,
@@ -2667,11 +2659,7 @@ test.concurrent(
     );
     client.collectUsage()(
       {
-        document: parse(/* GraphQL */ `
-          query {
-            a
-          }
-        `),
+        document: parse('{ a }'),
         schema,
         contextValue: {
           request,
@@ -2681,11 +2669,7 @@ test.concurrent(
     );
     client.collectUsage()(
       {
-        document: parse(/* GraphQL */ `
-          query {
-            a
-          }
-        `),
+        document: parse('{ a }'),
         schema,
         contextValue: {
           request,
@@ -2734,11 +2718,7 @@ test.concurrent(
 
     client.collectSubscriptionUsage({
       args: {
-        document: parse(/* GraphQL */ `
-          subscription {
-            a
-          }
-        `),
+        document: parse('subscription { a }'),
         schema,
         contextValue: {
           request,
@@ -2747,11 +2727,7 @@ test.concurrent(
     });
     client.collectSubscriptionUsage({
       args: {
-        document: parse(/* GraphQL */ `
-          subscription {
-            a
-          }
-        `),
+        document: parse('subscription { a }'),
         schema,
         contextValue: {
           request,
@@ -2760,11 +2736,7 @@ test.concurrent(
     });
     client.collectSubscriptionUsage({
       args: {
-        document: parse(/* GraphQL */ `
-          subscription {
-            a
-          }
-        `),
+        document: parse('subscription { a }'),
         schema,
         contextValue: {
           request,
